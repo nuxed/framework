@@ -1,0 +1,34 @@
+{
+    "name": "nuxed/framework",
+    "type": "framework",
+    "description": "Hack framework for building web applications with expressive, elegant syntax.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "azjezz",
+            "email": "azjezz@protonmail.com"
+        }
+    ],
+    "require": {
+        "hhvm": "^3.29",
+        "hhvm/hsl": "^1.0.0|^3.26.0|^3.29.0",
+        "facebook/hack-router": "^0.17.0"
+    },
+    "require-dev": {
+        "hhvm/hhast": "^3.29",
+        "facebook/xhp-lib": "^2.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nuxed\\": "src/Nuxed/"
+        }
+    },
+    "scripts": {
+        "lint": "hhast-lint -v src/",
+        "type-check": "hh_client src/",
+        "check": [
+            "@type-check",
+            "@lint"
+        ]
+    }
+}

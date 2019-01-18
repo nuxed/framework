@@ -1,0 +1,19 @@
+language: php
+sudo: false
+matrix:
+    fast_finish: true
+    include:
+        - php: hhvm
+        - php: hhvm-nightly
+    allow_failures:
+        - php: hhvm-nightly
+
+install:
+    - composer self-update
+    - composer install
+
+before_script:
+    - hh_server --daemon $TRAVIS_BUILD_DIR
+
+script:
+    - composer check
