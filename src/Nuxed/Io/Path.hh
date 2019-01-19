@@ -16,9 +16,9 @@ use const PATH_SEPARATOR;
 use const DIRECTORY_SEPARATOR;
 
 /**
- * Provides convenience functions for inflecting notation paths, namespace paths and file system paths.
+ * Provides convenience functions for inflecting notation paths and file system paths.
  */
-class Path {
+final abstract class Path {
 
   /**
    * Directory separator.
