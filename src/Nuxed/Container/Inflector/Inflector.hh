@@ -2,6 +2,7 @@
 
 namespace Nuxed\Container\Inflector;
 
+use namespace HH\Lib\C;
 use type Nuxed\Container\ContainerAwareTrait;
 use type Nuxed\Container\Argument\ArgumentResolverInterface;
 use type Nuxed\Container\Argument\ArgumentResolverTrait;
@@ -68,7 +69,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface {
     string $property,
     mixed $value,
   ): InflectorInterface {
-    $this->properties[$property] = $this->resolveArguments(vec[$value])[0];
+    $this->properties[$property] = C\first($this->resolveArguments(vec[$value]));
 
     return $this;
   }
@@ -94,7 +95,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface {
     foreach ($this->properties as $key => $value) {
       $arguments = vec[$value];
       $resolved = $this->resolveArguments($arguments);
-      $properties[$key] = $resolved[0];
+      $properties[$key] = C\first($resolved);
     }
 
     foreach ($properties as $property => $value) {

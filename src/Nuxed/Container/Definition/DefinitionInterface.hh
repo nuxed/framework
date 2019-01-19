@@ -53,21 +53,21 @@ interface DefinitionInterface extends ContainerAwareInterface {
   /**
    * Add multiple arguments to be injected.
    */
-  public function addArguments(vec<mixed> $args): DefinitionInterface;
+  public function addArguments(Container<mixed> $args): DefinitionInterface;
 
   /**
    * Add a method to be invoked
    */
   public function addMethodCall(
     string $method,
-    vec<mixed> $args,
+    Container<mixed> $args,
   ): DefinitionInterface;
 
   /**
    * Add multiple methods to be invoked
    */
   public function addMethodCalls(
-    dict<string, vec<mixed>> $methods = dict[],
+    KeyedContainer<string, Container<mixed>> $methods = dict[],
   ): DefinitionInterface;
 
   /**

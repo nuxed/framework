@@ -29,7 +29,7 @@ class Definition
 
   protected vec<mixed> $arguments = vec[];
 
-  protected dict<string, vec<mixed>> $methods = dict[];
+  protected vec<(string, Container<mixed>)> $methods = vec[];
 
   protected mixed $resolved;
 
@@ -88,7 +88,7 @@ class Definition
     return $this;
   }
 
-  public function addArguments(vec<mixed> $args): DefinitionInterface {
+  public function addArguments(Container<mixed> $args): DefinitionInterface {
     $this->arguments = Vec\concat($this->arguments, $args);
 
     return $this;
@@ -99,9 +99,9 @@ class Definition
    */
   public function addMethodCall(
     string $method,
-    vec<mixed> $args,
+    Container<mixed> $args,
   ): DefinitionInterface {
-    $this->methods[$method] = $args;
+    $this->methods[] = tuple($method, $args);
 
     return $this;
   }
@@ -110,7 +110,7 @@ class Definition
    * {@inheritdoc}
    */
   public function addMethodCalls(
-    dict<string, vec<mixed>> $methods = dict[],
+    KeyedContainer<string, Container<mixed>> $methods = dict[],
   ): DefinitionInterface {
     foreach ($methods as $method => $args) {
       $this->addMethodCall($method, $args);
@@ -163,7 +163,7 @@ class Definition
   }
 
   protected function resolveClass(string $concrete): mixed {
-    $resolved = $this->resolveArguments($this->arguments);
+    $resolved = vec($this->resolveArguments($this->arguments));
     $reflection = new ReflectionClass($concrete);
     $constructor = $reflection->getConstructor();
 
@@ -179,12 +179,12 @@ class Definition
   }
 
   protected function invokeMethods(mixed $instance): mixed {
-    foreach ($this->methods as $method => $args) {
-      $args = $this->resolveArguments($args);
+    foreach ($this->methods as $method) {
+      $args = $this->resolveArguments($method[1]);
 
       /* HH_IGNORE_ERROR[2025]
        * there's no way to tell the type-checker that $instance is an object */
-      $callable = inst_meth($instance, $method);
+      $callable = inst_meth($instance, $method[0]);
 
       $callable(...$args);
     }

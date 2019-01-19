@@ -13,7 +13,7 @@ use type ReflectionFunctionAbstract;
 use type ReflectionParameter;
 
 trait ArgumentResolverTrait {
-  public function resolveArguments(vec<mixed> $arguments): vec<mixed> {
+  public function resolveArguments(Container<mixed> $arguments): Container<mixed> {
     $resolved = vec[];
 
     foreach ($arguments as $arg) {
@@ -61,8 +61,8 @@ trait ArgumentResolverTrait {
 
   public function reflectArguments(
     ReflectionFunctionAbstract $method,
-    dict<string, mixed> $args = dict[],
-  ): vec<mixed> {
+    KeyedContainer<string, mixed> $args = dict[],
+  ): Container<mixed> {
     $parameters = $method->getParameters();
     $arguments = Vec\map($parameters, (ReflectionParameter $param) ==> {
 

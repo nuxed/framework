@@ -9,13 +9,13 @@ interface ArgumentResolverInterface extends ContainerAwareInterface {
   /**
    * Resolve a vector of arguments to their concrete implementations.
    */
-  public function resolveArguments(vec<mixed> $arguments): vec<mixed>;
+  public function resolveArguments(Container<mixed> $arguments): Container<mixed>;
 
   /**
    * Resolves the correct arguments to be passed to a method.
    */
   public function reflectArguments(
     ReflectionFunctionAbstract $method,
-    dict<string, mixed> $args,
-  ): vec<mixed>;
+    KeyedContainer<string, mixed> $args,
+  ): Container<mixed>;
 }
