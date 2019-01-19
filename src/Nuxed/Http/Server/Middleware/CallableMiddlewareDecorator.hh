@@ -32,10 +32,10 @@ final class CallableMiddlewareDecorator implements MiddlewareInterface {
     ): ResponseInterface) $middleware,
   ) {}
 
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $fun = $this->middleware;
 
     return $fun($request, $handler);

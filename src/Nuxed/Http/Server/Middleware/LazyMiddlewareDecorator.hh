@@ -16,16 +16,16 @@ class LazyMiddlewareDecorator implements MiddlewareInterface {
     private mixed $middleware,
   ) {}
 
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     if (
       $this->middleware is string && $this->container->has($this->middleware)
     ) {
       $this->middleware = $this->container->get($this->middleware as string);
     }
-    return $this->factory
+    return await $this->factory
       ->prepare($this->middleware)
       ->process($request, $handler);
   }

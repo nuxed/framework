@@ -50,7 +50,7 @@ async function main(): Awaitable<void> {
   /**
    * Handle the request and return a response instance
    */
-  $response = $kernel->handle($request);
+  $response = await $kernel->handle($request);
 
   /**
    * Send the response to the client.

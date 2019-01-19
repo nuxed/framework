@@ -51,29 +51,29 @@ class ImplicitHeadMiddleware implements MiddlewareInterface {
    * resets the response body to be empty; otherwise, creates a new empty
    * response.
    */
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     if ($request->getMethod() !== RequestMethod::METHOD_HEAD) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     $result = $request->getAttribute(RouteResultInterface::class);
 
     if (!$result is RouteResultInterface) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     if (null !== $result->getMatchedRoute()) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     $routeResult = $this->router
       ->match($request->withMethod(RequestMethod::METHOD_GET));
 
     if ($routeResult->isFailure()) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     // Copy matched parameters like RouteMiddleware does
@@ -81,7 +81,7 @@ class ImplicitHeadMiddleware implements MiddlewareInterface {
       $request = $request->withAttribute($param, $value);
     }
 
-    $response = $handler->handle(
+    $response = await $handler->handle(
       $request
         ->withAttribute(RouteResultInterface::class, $routeResult)
         ->withMethod(RequestMethod::METHOD_GET)

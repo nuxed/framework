@@ -18,10 +18,10 @@ class DoublePassMiddlewareDecorator implements MiddlewareInterface {
     private ResponseInterface $response = new Response(),
   ) {}
 
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $fun = $this->call;
     return $fun($request, $this->response, $handler);
   }

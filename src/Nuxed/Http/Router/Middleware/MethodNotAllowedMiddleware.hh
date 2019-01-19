@@ -26,16 +26,16 @@ class MethodNotAllowedMiddleware implements MiddlewareInterface {
     private ResponseFactoryInterface $responseFactory,
   ) {}
 
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $routeResult = $request->getAttribute(RouteResultInterface::class);
 
     if (
       !$routeResult is RouteResultInterface || !$routeResult->isMethodFailure()
     ) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     return $this->responseFactory

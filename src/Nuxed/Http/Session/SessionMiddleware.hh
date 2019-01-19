@@ -12,13 +12,14 @@ class SessionMiddleware implements MiddlewareInterface {
     private Persistence\SessionPersistenceInterface $persistence,
   ) {}
 
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $session = $this->persistence->initialize($request);
+    $response =
+      await $handler->handle($request->withAttribute('session', $session));
 
-    return $handler->handle($request->withAttribute('session', $session))
-      |> $this->persistence->persist($session, $$);
+    return $this->persistence->persist($session, $response);
   }
 }

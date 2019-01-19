@@ -11,7 +11,6 @@ use type Nuxed\Contract\Http\Message\ServerRequestInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Kernel\KernelInterface;
 use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
 use type Nuxed\Contract\Http\Router\RouteInterface;
 use type Nuxed\Contract\Service\ResetInterface;
 use type Nuxed\Container\ServiceProvider\ServiceProviderInterface;
@@ -22,7 +21,6 @@ use type Container as C;
 
 class Application implements KernelInterface, ResetInterface {
   protected KernelInterface $kernel;
-  protected RouteCollectorInterface $collector;
   protected EventDispatcherInterface $events;
   protected MiddlewareFactory $middlewares;
   protected Configuration $configuration;
@@ -53,7 +51,6 @@ class Application implements KernelInterface, ResetInterface {
     $this->middlewares = new MiddlewareFactory($container);
 
     $this->kernel = $this->getService(KernelInterface::class);
-    $this->collector = $this->getService(RouteCollectorInterface::class);
     $this->events = $this->getService(EventDispatcherInterface::class);
 
     $this->use(new Extension\FrameworkExtension());
@@ -65,7 +62,7 @@ class Application implements KernelInterface, ResetInterface {
     foreach ($extension->services($this->configuration) as $service) {
       $this->container->addServiceProvider($service);
     }
-    $extension->route($this->collector, $this->middlewares);
+    $extension->route($this->kernel, $this->middlewares);
     $extension->pipe($this, $this->middlewares);
     $extension->subscribe($this->events);
   }
@@ -117,7 +114,7 @@ class Application implements KernelInterface, ResetInterface {
     ?C<string> $methods = null,
     ?string $name = null,
   ): RouteInterface {
-    return $this->collector
+    return $this->kernel
       ->route($path, $this->middlewares->prepare($middleware), $methods, $name);
   }
 
@@ -177,25 +174,27 @@ class Application implements KernelInterface, ResetInterface {
    * Process an incoming server request and return a response, optionally delegating
    * response creation to a handler.
    */
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $event = $this->events
       ->dispatch(new Event\ProcessEvent($request, $handler)) as
       Event\ProcessEvent;
 
-    return $this->kernel->process($event->request, $event->handler);
+    return await $this->kernel->process($event->request, $event->handler);
   }
 
   /**
    * Handle the request and return a response.
    */
-  public function handle(ServerRequestInterface $request): ResponseInterface {
+  public async function handle(
+    ServerRequestInterface $request,
+  ): Awaitable<ResponseInterface> {
     $event = $this->events->dispatch(new Event\HandleEvent($request)) as
       Event\HandleEvent;
 
-    return $this->kernel->handle($event->request);
+    return await $this->kernel->handle($event->request);
   }
 
   /**
@@ -227,9 +226,9 @@ class Application implements KernelInterface, ResetInterface {
     $this->reset();
   }
 
-  public function run(): void {
+  public async function run(): Awaitable<void> {
     $request = ServerRequest::capture();
-    $response = $this->handle($request);
+    $response = await $this->handle($request);
     $this->emit($response);
     $this->terminate($request, $response);
   }
@@ -239,7 +238,7 @@ class Application implements KernelInterface, ResetInterface {
    * Retrieve all directly registered routes with the application.
    */
   public function getRoutes(): C<RouteInterface> {
-    return $this->collector->getRoutes();
+    return $this->kernel->getRoutes();
   }
 
   /**
@@ -250,12 +249,11 @@ class Application implements KernelInterface, ResetInterface {
     $this->middlewares = new MiddlewareFactory($this->container);
 
     $this->kernel = $this->getService(KernelInterface::class);
-    $this->collector = $this->getService(RouteCollectorInterface::class);
     $this->events = $this->getService(EventDispatcherInterface::class);
 
     foreach ($this->extensions as $extension) {
       $extension->pipe($this, $this->middlewares);
-      $extension->route($this->collector, $this->middlewares);
+      $extension->route($this->kernel, $this->middlewares);
       $extension->subscribe($this->events);
     }
   }

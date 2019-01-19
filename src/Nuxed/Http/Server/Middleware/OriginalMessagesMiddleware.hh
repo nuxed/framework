@@ -8,11 +8,11 @@ use type Nuxed\Contract\Http\Server\MiddlewareInterface;
 use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
 
 class OriginalMessagesMiddleware implements MiddlewareInterface {
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
-    return $handler->handle(
+  ): Awaitable<ResponseInterface> {
+    return await $handler->handle(
       $request
         ->withAttribute('OriginalUri', $request->getUri())
         ->withAttribute('OriginalRequest', $request),

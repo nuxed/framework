@@ -61,7 +61,9 @@ class MiddlewarePipe implements MiddlewarePipeInterface {
    * @throws Exception\EmptyPipelineException if no middleware is present in
    *     the instance in order to process the request.
    */
-  public function handle(ServerRequestInterface $request): ResponseInterface {
+  public async function handle(
+    ServerRequestInterface $request,
+  ): Awaitable<ResponseInterface> {
     if (0 === $this->pipeline->count()) {
       throw Exception\EmptyPipelineException::forClass(static::class);
     }
@@ -77,12 +79,12 @@ class MiddlewarePipe implements MiddlewarePipeInterface {
    * Executes the internal pipeline, passing $handler as the "final
    * handler" in cases when the pipeline exhausts itself.
    */
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $next = new __Private\NextMiddlewareProcessor($this->pipeline, $handler);
-    return $next->handle($request);
+    return await $next->handle($request);
   }
 
   public function reset(): void {

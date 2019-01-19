@@ -75,18 +75,20 @@ class Kernel implements KernelInterface {
    * Process an incoming server request and return a response, optionally delegating
    * response creation to a handler.
    */
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
-    return $this->pipe->process($request, $handler);
+  ): Awaitable<ResponseInterface> {
+    return await $this->pipe->process($request, $handler);
   }
 
   /**
    * Handle the request and return a response.
    */
-  public function handle(ServerRequestInterface $request): ResponseInterface {
-    return $this->pipe->handle($request);
+  public async function handle(
+    ServerRequestInterface $request,
+  ): Awaitable<ResponseInterface> {
+    return await $this->pipe->handle($request);
   }
 
   /**

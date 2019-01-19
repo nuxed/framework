@@ -12,12 +12,12 @@ use type Throwable;
 class ErrorMiddleware implements MiddlewareInterface {
   public function __construct(private ErrorHandlerInterface $handler) {}
 
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     try {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     } catch (Throwable $e) {
       return $this->handler->handle($e, $request);
     }

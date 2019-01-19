@@ -14,16 +14,16 @@ class HostMiddlewareDecorator implements MiddlewareInterface {
     private MiddlewareInterface $middleware,
   ) {}
 
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $host = $request->getUri()->getHost();
 
     if ($host !== Str\lowercase($this->host)) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
-    return $this->middleware->process($request, $handler);
+    return await $this->middleware->process($request, $handler);
   }
 }

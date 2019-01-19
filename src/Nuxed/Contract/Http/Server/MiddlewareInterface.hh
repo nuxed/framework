@@ -18,5 +18,5 @@ interface MiddlewareInterface {
   public function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface;
+  ): Awaitable<ResponseInterface>;
 }

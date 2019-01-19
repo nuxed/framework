@@ -9,12 +9,12 @@ use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Session\SessionInterface;
 
 class FlashMessagesMiddleware implements MiddlewareInterface {
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $session = $request->getAttribute('session') as SessionInterface;
     $flash = FlashMessages::create($session);
-    return $handler->handle($request->withAttribute('flash', $flash));
+    return await $handler->handle($request->withAttribute('flash', $flash));
   }
 }

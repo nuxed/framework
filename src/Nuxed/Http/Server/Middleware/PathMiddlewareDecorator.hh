@@ -19,43 +19,44 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
     $this->prefix = $this->normalizePrefix($prefix);
   }
 
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $path = $request->getUri()->getPath();
     $path = $path === '' ? '/' : $path;
 
     // Current path is shorter than decorator path
     if (Str\length($path) < Str\length($this->prefix)) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     // Current path does not match decorator path
     if (0 !== Str\search_ci($path, $this->prefix)) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     // Skip if match is not at a border ('/' or end)
     $border = $this->getBorder($path);
     if ($border && '/' !== $border) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     // Trim off the part of the url that matches the prefix if it is not / only
-    $requestToProcess = $this->prefix !== '/'
-      ? $this->prepareRequestWithTruncatedPrefix($request)
-      : $request;
+    if ($this->prefix !== '/') {
+      $requestToProcess =
+        await $this->prepareRequestWithTruncatedPrefix($request);
+    } else {
+      $requestToProcess = $request;
+    }
 
     // Process our middleware.
     // If the middleware calls on the handler, the handler should be provided
     // the original request, as this indicates we've left the path-segregated
     // layer.
-    return $this->middleware
-      ->process(
-        $requestToProcess,
-        $this->prepareHandlerForOriginalRequest($handler),
-      );
+    $handler = await $this->prepareHandlerForOriginalRequest($handler);
+    return await $this->middleware
+      ->process($requestToProcess, $handler);
   }
 
   private function getBorder(string $path): string {
@@ -68,17 +69,20 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
     return Str\length($path) > $length ? $path[$length] : '';
   }
 
-  private function prepareRequestWithTruncatedPrefix(
+  private async function prepareRequestWithTruncatedPrefix(
     ServerRequestInterface $request,
-  ): ServerRequestInterface {
+  ): Awaitable<ServerRequestInterface> {
     $uri = $request->getUri();
-    $path = $this->getTruncatedPath($this->prefix, $uri->getPath());
+    $path = await $this->getTruncatedPath($this->prefix, $uri->getPath());
     $new = $uri->withPath($path);
 
     return $request->withUri($new);
   }
 
-  private function getTruncatedPath(string $segment, string $path): string {
+  private async function getTruncatedPath(
+    string $segment,
+    string $path,
+  ): Awaitable<string> {
     if ($segment === $path) {
       // Decorated path and current path are the same; return empty string
       return '';
@@ -88,13 +92,13 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
     return Str\slice($path, Str\length($segment));
   }
 
-  private function prepareHandlerForOriginalRequest(
+  private async function prepareHandlerForOriginalRequest(
     RequestHandlerInterface $handler,
-  ): RequestHandlerInterface {
+  ): Awaitable<RequestHandlerInterface> {
     $callable = (ServerRequestInterface $request): ResponseInterface ==> {
       $uri = $request->getUri();
       $uri = $uri->withPath($this->prefix.$uri->getPath());
-      return $handler->handle($request->withUri($uri));
+      return \HH\Asio\join($handler->handle($request->withUri($uri)));
     };
 
     return new CallableRequestHandlerDecorator($callable);

@@ -25,7 +25,7 @@ class RouteMiddleware implements MiddlewareInterface {
   public function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $result = $this->router->match($request);
 
     // Inject the actual route result, as well as individual matched parameters.

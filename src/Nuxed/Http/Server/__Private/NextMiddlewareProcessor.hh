@@ -18,13 +18,15 @@ class NextMiddlewareProcessor implements RequestHandlerInterface {
     $this->queue = clone $queue;
   }
 
-  public function handle(ServerRequestInterface $request): ResponseInterface {
+  public async function handle(
+    ServerRequestInterface $request,
+  ): Awaitable<ResponseInterface> {
     if (0 === $this->queue->count()) {
-      return $this->handler->handle($request);
+      return await $this->handler->handle($request);
     }
 
     $middleware = $this->queue->extract();
 
-    return $middleware->process($request, $this);
+    return await $middleware->process($request, $this);
   }
 }

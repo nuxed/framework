@@ -8,7 +8,9 @@ use type Nuxed\Contract\Http\Message\ServerRequestInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 
 class NotFoundHandler implements RequestHandlerInterface {
-  public function handle(ServerRequestInterface $_request): ResponseInterface {
+  public async function handle(
+    ServerRequestInterface $_request,
+  ): Awaitable<ResponseInterface> {
     return new Message\Response\JsonResponse(
       dict[
         'status' => 'error',

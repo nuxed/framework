@@ -11,7 +11,9 @@ final class CallableRequestHandlerDecorator implements RequestHandlerInterface {
     private (function(ServerRequestInterface): ResponseInterface) $callback,
   ) {}
 
-  public function handle(ServerRequestInterface $request): ResponseInterface {
+  public async function handle(
+    ServerRequestInterface $request,
+  ): Awaitable<ResponseInterface> {
     $fun = $this->callback;
 
     return $fun($request);

@@ -13,5 +13,7 @@ interface RequestHandlerInterface {
   /**
    * Handle the request and return a response.
    */
-  public function handle(ServerRequestInterface $request): ResponseInterface;
+  public function handle(
+    ServerRequestInterface $request,
+  ): Awaitable<ResponseInterface>;
 }

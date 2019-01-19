@@ -41,26 +41,26 @@ class ImplicitOptionsMiddleware implements MiddlewareInterface {
   /**
    * Handle an implicit OPTIONS request.
    */
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     if ($request->getMethod() !== RequestMethod::METHOD_OPTIONS) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     $result = $request->getAttribute(RouteResultInterface::class);
 
     if (!$result is RouteResultInterface) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     if ($result->isFailure() && !$result->isMethodFailure()) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     if ($result->getMatchedRoute()) {
-      return $handler->handle($request);
+      return await $handler->handle($request);
     }
 
     $allowedMethods = $result->getAllowedMethods();

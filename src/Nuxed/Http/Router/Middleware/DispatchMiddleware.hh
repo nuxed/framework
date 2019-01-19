@@ -17,21 +17,21 @@ use type Nuxed\Contract\Http\Router\RouteResultInterface;
  * Otherwise, it delegates processing to the route result.
  */
 class DispatchMiddleware implements MiddlewareInterface {
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $routeResult = $request->getAttribute(RouteResultInterface::class);
 
     if ($routeResult is RouteResultInterface) {
       $route = $routeResult->getMatchedRoute();
       if ($route is nonnull) {
-        return $route->getMiddleware()->process($request, $handler);
+        return await $route->getMiddleware()->process($request, $handler);
       } else {
-        return $handler->handle($request);
+        return await $handler->handle($request);
       }
     }
 
-    return $handler->handle($request);
+    return await $handler->handle($request);
   }
 }

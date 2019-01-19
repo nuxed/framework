@@ -25,17 +25,19 @@ final class RequestHandlerMiddleware
   /**
    * Proxies to decorated handler to handle the request.
    */
-  public function handle(ServerRequestInterface $request): ResponseInterface {
-    return $this->handler->handle($request);
+  public async function handle(
+    ServerRequestInterface $request,
+  ): Awaitable<ResponseInterface> {
+    return await $this->handler->handle($request);
   }
 
   /**
    * Proxies to decorated handler to handle the request.
    */
-  public function process(
+  public async function process(
     ServerRequestInterface $request,
     RequestHandlerInterface $_,
-  ): ResponseInterface {
-    return $this->handler->handle($request);
+  ): Awaitable<ResponseInterface> {
+    return await $this->handler->handle($request);
   }
 }
