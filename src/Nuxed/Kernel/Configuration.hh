@@ -48,9 +48,9 @@ type Configuration = shape(
     #───────────────────────────────────────────────────────────────────────#
     # The extensions listed here will be automatically loaded on the        #
     # request to your application. Feel free to add your own extensions to  #
-    # this vector to grant expanded functionality to your application       #
+    # this container to grant expanded functionality to your application    #
     #───────────────────────────────────────────────────────────────────────#
-    'extensions' => vec<string>,
+    'extensions' => Container<classname<Extension\ExtensionInterface>>,
 
     ...
   ),
@@ -199,7 +199,7 @@ type Configuration = shape(
     #───────────────────────────────────────────────────────────────────────#
     # You may define as much log handlers as you want here.                 #
     #───────────────────────────────────────────────────────────────────────#
-    'handlers' => vec<classname<Log\Handler\HandlerInterface>>,
+    'handlers' => Container<classname<Log\Handler\HandlerInterface>>,
 
     #───────────────────────────────────────────────────────────────────────#
     # Log Processors                                                        #
@@ -207,7 +207,7 @@ type Configuration = shape(
     # Log processors process the log record before passing it to the        #
     # handlers, allowing you to add extra information to the record.        #
     #───────────────────────────────────────────────────────────────────────#
-    'processors' => vec<classname<Log\Processor\ProcessorInterface>>,
+    'processors' => Container<classname<Log\Processor\ProcessorInterface>>,
 
     #───────────────────────────────────────────────────────────────────────#
     # Handlers Options                                                      #
