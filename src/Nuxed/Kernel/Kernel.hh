@@ -75,6 +75,14 @@ class Kernel implements KernelInterface {
     }
   }
 
+  public function on(
+    classname<EventInterface> $event,
+    EventListener $listener,
+    int $priority = 0,
+  ): void {
+    $this->events->on($event, $listener, $priority);
+  }
+
   /*
    * Pipe middleware like unix pipes.
    */
