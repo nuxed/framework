@@ -4,7 +4,7 @@ namespace Nuxed\Kernel;
 
 use type Nuxed\Contract\Event\EventDispatcherInterface;
 use type Nuxed\Contract\Kernel\KernelInterface;
-use type Nuxed\Container\Container;
+use type Nuxed\Container\Container as ServiceContainer;
 use type Nuxed\Container\ReflectionContainer;
 use type Nuxed\Container\ServiceProvider\ServiceProviderInterface;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
@@ -21,7 +21,6 @@ use type Nuxed\Contract\Log\LoggerAwareTrait;
 use type Nuxed\Contract\Event\EventSubscriberInterface;
 use type Nuxed\Contract\Event\EventListener;
 use type Nuxed\Contract\Event\EventInterface;
-use type Container as C;
 
 class Kernel implements KernelInterface {
   use LoggerAwareTrait;
@@ -35,7 +34,7 @@ class Kernel implements KernelInterface {
   protected Configuration $configuration;
   public function __construct(
     KeyedContainer<string, mixed> $configuration = dict[],
-    protected Container $container = new Container(),
+    protected ServiceContainer $container = new ServiceContainer(),
   ) {
     $container->delegate(new ReflectionContainer());
     $this->configuration = Config::load($configuration);
@@ -166,7 +165,7 @@ class Kernel implements KernelInterface {
   public function route(
     string $path,
     mixed $middleware,
-    ?C<string> $methods = null,
+    ?Container<string> $methods = null,
     ?string $name = null,
   ): RouteInterface {
     $middleware = $this->middleware->prepare($middleware);
@@ -246,7 +245,7 @@ class Kernel implements KernelInterface {
     return $this->route($path, $middleware, null, $name);
   }
 
-  public function getRoutes(): C<RouteInterface> {
+  public function getRoutes(): Container<RouteInterface> {
     return $this->collector->getRoutes();
   }
 
