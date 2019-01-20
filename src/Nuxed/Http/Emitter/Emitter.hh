@@ -24,7 +24,7 @@ use function urlencode;
 class Emitter implements EmitterInterface {
   const SET_COOKIE_HEADER = 'Set-Cookie';
 
-  public function emit(ResponseInterface $response): bool {
+  public async function emit(ResponseInterface $response): Awaitable<bool> {
     $this->assertNoPreviousOutput();
 
     $response = $this->renderCookiesIntoHeader($response);
@@ -159,8 +159,8 @@ class Emitter implements EmitterInterface {
       $cookieStringParts[] = 'HttpOnly';
     }
     $sameSite = $cookie->getSameSite();
-    if (null !== $sameSite) {
-      $cookieStringParts[] = CookieSameSite::assert($sameSite);
+    if ($sameSite is nonnull) {
+      $cookieStringParts[] = $sameSite;
     }
 
     return Str\join($cookieStringParts, '; ');

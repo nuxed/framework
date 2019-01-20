@@ -22,5 +22,5 @@ interface EmitterInterface {
    * the emitter was able to emit the response, while `false` indicates
    * it was not.
    */
-  public function emit(ResponseInterface $response): bool;
+  public function emit(ResponseInterface $response): Awaitable<bool>;
 }
