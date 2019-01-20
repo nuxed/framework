@@ -6,6 +6,7 @@ use type Nuxed\Contract\Event\EventDispatcherInterface;
 use type Nuxed\Contract\Kernel\KernelInterface;
 use type Nuxed\Container\Container;
 use type Nuxed\Container\ReflectionContainer;
+use type Nuxed\Container\ServiceProvider\ServiceProviderInterface;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Emitter\EmitterInterface;
@@ -72,7 +73,7 @@ class Kernel implements KernelInterface {
   /**
    * Register a service provider with the container.
    */
-  public function register(mixed $service): void {
+  public function register(ServiceProviderInterface $service): void {
     $this->container->addServiceProvider($service);
   }
 
