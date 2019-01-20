@@ -32,9 +32,6 @@ class Kernel implements KernelInterface {
   protected MiddlewareFactory $middleware;
   protected RouteCollectorInterface $collector;
   protected Configuration $configuration;
-
-  protected C<classname<ServiceProviderInterface>> $services = vec[];
-  protected C<classname<Extension\ExtensionInterface>> $extensions = vec[];
   public function __construct(
     KeyedContainer<string, mixed> $configuration = dict[],
     protected Container $container = new Container(),
@@ -56,9 +53,6 @@ class Kernel implements KernelInterface {
     foreach ($providers as $provider) {
       $container->addServiceProvider($provider);
     }
-    foreach ($this->services as $provider) {
-      $container->addServiceProvider($provider);
-    }
 
     $this->pipe = $this->getService(MiddlewarePipeInterface::class);
     $this->emitter = $this->getService(EmitterInterface::class);
@@ -68,7 +62,7 @@ class Kernel implements KernelInterface {
     $this->collector = $this->getService(RouteCollectorInterface::class);
 
     $this->use(new Extension\HttpExtension());
-    foreach ($this->extensions as $extension) {
+    foreach ($this->configuration['app']['extensions'] as $extension) {
       $this->use(
         $this->container->get($extension) as Extension\ExtensionInterface,
       );
@@ -125,24 +119,6 @@ class Kernel implements KernelInterface {
       ->dispatch(new Event\ProcessEvent($request, $handler));
 
     return await $this->pipe->process($event->request, $event->handler);
-  }
-
-  public function use(Extension\ExtensionInterface $extension): void {
-    $extension->setContainer($this->container);
-    foreach ($extension->services($this->configuration) as $service) {
-      $this->container->addServiceProvider($service);
-    }
-    $extension->route($this, $this->middleware);
-    $extension->pipe($this, $this->middleware);
-    $extension->subscribe($this->events);
-  }
-
-  public function on(
-    classname<EventInterface> $event,
-    EventListener $listener,
-    int $priority = 0,
-  ): void {
-    $this->events->on($event, $listener, $priority);
   }
 
   /**
