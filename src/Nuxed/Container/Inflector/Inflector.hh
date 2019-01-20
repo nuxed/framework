@@ -6,10 +6,7 @@ use namespace HH\Lib\C;
 use type Nuxed\Container\ContainerAwareTrait;
 use type Nuxed\Container\Argument\ArgumentResolverInterface;
 use type Nuxed\Container\Argument\ArgumentResolverTrait;
-use type ReflectionProperty;
 use type ReflectionObject;
-use function get_class;
-use function inst_meth;
 
 class Inflector implements ArgumentResolverInterface, InflectorInterface {
   use ArgumentResolverTrait;

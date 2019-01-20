@@ -24,9 +24,7 @@ class MiddlewareFactory {
 
   public function prepare(mixed $middleware): MiddlewareInterface {
     if ($middleware is MiddlewareInterface) {
-      if (
-        $this->hasContainer() && $middleware is ContainerAwareInterface
-      ) {
+      if ($this->hasContainer() && $middleware is ContainerAwareInterface) {
         $middleware->setContainer($this->getContainer());
       }
       /* HH_IGNORE_ERROR[4110] */
@@ -34,9 +32,7 @@ class MiddlewareFactory {
     }
 
     if ($middleware is RequestHandlerInterface) {
-      if (
-        $this->hasContainer() && $middleware is ContainerAwareInterface
-      ) {
+      if ($this->hasContainer() && $middleware is ContainerAwareInterface) {
         $middleware->setContainer($this->getContainer());
       }
       /* HH_IGNORE_ERROR[4110] */

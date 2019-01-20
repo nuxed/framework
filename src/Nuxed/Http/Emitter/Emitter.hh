@@ -7,7 +7,6 @@ use namespace HH\Lib\Str;
 use namespace Nuxed\Http\Emitter\Exception;
 use type Nuxed\Contract\Http\Emitter\EmitterInterface;
 use type Nuxed\Contract\Http\Message\CookieInterface;
-use type Nuxed\Contract\Http\Message\CookieSameSite;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use function ob_get_level;
 use function ob_get_length;
