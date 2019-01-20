@@ -2,14 +2,20 @@
 
 namespace Nuxed\Container\Inflector;
 
+use type Nuxed\Contract\Container\ContainerAwareInterface;
 use type Nuxed\Container\ContainerAwareTrait;
 use type Iterator;
 use function is_a;
 
 class InflectorAggregate implements InflectorAggregateInterface {
   use ContainerAwareTrait;
+  protected vec<InflectorInterface> $inflectors;
 
-  public function __construct(protected vec<Inflector> $inflectors = vec[]) {}
+  public function __construct(
+    Container<InflectorInterface> $inflectors = vec[],
+  ) {
+    $this->inflectors = vec($inflectors);
+  }
 
   /**
    * {@inheritdoc}
@@ -28,7 +34,7 @@ class InflectorAggregate implements InflectorAggregateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getIterator(): Iterator<Inflector> {
+  public function getIterator(): Iterator<InflectorInterface> {
     return (new Vector($this->inflectors))->getIterator();
   }
 
@@ -43,7 +49,11 @@ class InflectorAggregate implements InflectorAggregateInterface {
         continue;
       }
 
-      $inflector->setContainer($this->getContainer());
+      if ($inflector is ContainerAwareInterface) {
+        $inflector->setContainer($this->getContainer());
+      }
+
+      // UNSAFE
       $inflector->inflect($object);
     }
 

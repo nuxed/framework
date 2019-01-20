@@ -9,7 +9,9 @@ interface ArgumentResolverInterface extends ContainerAwareInterface {
   /**
    * Resolve a vector of arguments to their concrete implementations.
    */
-  public function resolveArguments(Container<mixed> $arguments): Container<mixed>;
+  public function resolveArguments(
+    Container<mixed> $arguments,
+  ): Container<mixed>;
 
   /**
    * Resolves the correct arguments to be passed to a method.

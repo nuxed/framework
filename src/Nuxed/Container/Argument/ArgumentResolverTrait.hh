@@ -13,7 +13,9 @@ use type ReflectionFunctionAbstract;
 use type ReflectionParameter;
 
 trait ArgumentResolverTrait {
-  public function resolveArguments(Container<mixed> $arguments): Container<mixed> {
+  public function resolveArguments(
+    Container<mixed> $arguments,
+  ): Container<mixed> {
     $resolved = vec[];
 
     foreach ($arguments as $arg) {

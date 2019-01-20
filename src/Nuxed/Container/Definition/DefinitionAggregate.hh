@@ -12,9 +12,13 @@ class DefinitionAggregate
   implements DefinitionAggregateInterface, ResetInterface {
   use ContainerAwareTrait;
 
+  protected vec<DefinitionInterface> $definitions;
+
   public function __construct(
-    protected vec<DefinitionInterface> $definitions = vec[],
-  ) {}
+    Container<DefinitionInterface> $definitions = vec[],
+  ) {
+    $this->definitions = vec($definitions);
+  }
 
   /**
     * {@inheritdoc}
