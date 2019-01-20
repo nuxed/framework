@@ -11,9 +11,9 @@ interface ClientInterface {
    *
    * @param RequestInterface $request
    *
-   * @return ResponseInterface
+   * @return Awaitable<ResponseInterface>
    *
    * @throws \Nuxed\Contract\Http\Client\ClientExceptionInterface If an error happens while processing the request.
    */
-  public function send(RequestInterface $request): ResponseInterface;
+  public function send(RequestInterface $request): Awaitable<ResponseInterface>;
 }
