@@ -18,6 +18,7 @@ use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
 use type Nuxed\Http\Server\MiddlewareFactory;
 use type Nuxed\Http\Message\ServerRequest;
 use type Nuxed\Contract\Log\LoggerAwareTrait;
+use type Nuxed\Contract\Event\EventSubscriberInterface;
 use type Nuxed\Contract\Event\EventListener;
 use type Nuxed\Contract\Event\EventInterface;
 use type Container as C;
@@ -85,6 +86,10 @@ class Kernel implements KernelInterface {
     $extension->route($this, $this->middleware);
     $extension->pipe($this, $this->middleware);
     $extension->subscribe($this->events);
+  }
+
+  public function subscribe(EventSubscriberInterface $subscriber): void {
+    $this->events->subscribe($subscriber);
   }
 
   public function on(
