@@ -9,12 +9,15 @@ use type Nuxed\Contract\Http\Server\MiddlewareInterface;
 use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
 use type Nuxed\Contract\Container\ContainerAwareInterface;
 use type Nuxed\Contract\Container\ContainerInterface;
+use type Nuxed\Container\ContainerAwareTrait;
 use type ReflectionFunctionAbstract;
 use type ReflectionMethod;
 use type ReflectionFunction;
 use function is_callable;
 
 class MiddlewareFactory {
+  use ContainerAwareTrait;
+
   public function __construct(
     protected ?ContainerInterface $container = null,
   ) {}
@@ -22,9 +25,9 @@ class MiddlewareFactory {
   public function prepare(mixed $middleware): MiddlewareInterface {
     if ($middleware is MiddlewareInterface) {
       if (
-        $this->container is nonnull && $middleware is ContainerAwareInterface
+        $this->hasContainer() && $middleware is ContainerAwareInterface
       ) {
-        $middleware->setContainer($this->container);
+        $middleware->setContainer($this->getContainer());
       }
       /* HH_IGNORE_ERROR[4110] */
       return $middleware;
@@ -32,9 +35,9 @@ class MiddlewareFactory {
 
     if ($middleware is RequestHandlerInterface) {
       if (
-        $this->container is nonnull && $middleware is ContainerAwareInterface
+        $this->hasContainer() && $middleware is ContainerAwareInterface
       ) {
-        $middleware->setContainer($this->container);
+        $middleware->setContainer($this->getContainer());
       }
       /* HH_IGNORE_ERROR[4110] */
       return new Middleware\RequestHandlerMiddleware($middleware);
@@ -49,13 +52,12 @@ class MiddlewareFactory {
     }
 
     if (
-      $this->container is nonnull &&
+      $this->hasContainer() &&
       $middleware is string &&
-      $this->container->has($middleware)
+      $this->getContainer()->has($middleware)
     ) {
       return new Middleware\LazyMiddlewareDecorator(
-        /* HH_IGNORE_ERROR[4110] Container is nonnull */
-        $this->container,
+        $this->getContainer(),
         $this,
         $middleware,
       );
