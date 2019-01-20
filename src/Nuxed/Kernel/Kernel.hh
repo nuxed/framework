@@ -75,6 +75,16 @@ class Kernel implements KernelInterface {
     }
   }
 
+  public function use(Extension\ExtensionInterface $extension): void {
+    $extension->setContainer($this->container);
+    foreach ($extension->services($this->configuration) as $service) {
+      $this->container->addServiceProvider($service);
+    }
+    $extension->route($this, $this->middleware);
+    $extension->pipe($this, $this->middleware);
+    $extension->subscribe($this->events);
+  }
+
   public function on(
     classname<EventInterface> $event,
     EventListener $listener,
