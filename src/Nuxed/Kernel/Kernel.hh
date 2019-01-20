@@ -16,7 +16,6 @@ use type Nuxed\Contract\Http\Router\RouterInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
 use type Nuxed\Http\Server\MiddlewareFactory;
 use type Nuxed\Http\Message\ServerRequest;
-use type Nuxed\Container\ServiceProvider\ServiceProviderInterface;
 use type Nuxed\Contract\Log\LoggerAwareTrait;
 use type Nuxed\Contract\Event\EventListener;
 use type Nuxed\Contract\Event\EventInterface;
@@ -50,6 +49,7 @@ class Kernel implements KernelInterface {
       ServiceProvider\RedisServiceProvider::class,
       ServiceProvider\MysqlServiceProvider::class,
     ];
+
     foreach ($providers as $provider) {
       $container->addServiceProvider($provider);
     }
