@@ -6,9 +6,7 @@ use type Nuxed\Container\Exception\ContainerException;
 use type Nuxed\Contract\Container\ContainerInterface;
 use type Nuxed\Contract\Container\ContainerAwareInterface;
 
-trait ContainerAwareTrait {
-  require implements ContainerAwareInterface;
-
+trait ContainerAwareTrait implements ContainerAwareInterface {
   protected ?ContainerInterface $container;
 
   /**
@@ -28,5 +26,9 @@ trait ContainerAwareTrait {
     }
 
     throw new ContainerException('No container implementation has been set.');
+  }
+
+  protected function hasContainer(): bool {
+    return $this->container is nonnull;
   }
 }
