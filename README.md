@@ -22,11 +22,19 @@ use type Nuxed\Contract\Http\Message\ResponseInterface as Response;
 require __DIR__ . '/path/to/vendor/hh_autoload.hh';
 
 <<__EntryPoint>>
-async function main(): Awaitable<void> {
+async function main(): Awaitable<noreturn> {
+
+  /**
+   * Configure the application
+   */
+  $config = dict[
+
+  ];
+
   /**
    * Create an Http kernel instance.
    */
-  $kernel = new Http\Kernel\Kernel();
+  $kernel = new Http\Kernel\Kernel($config);
 
   /**
    * Add a simple route
@@ -41,26 +49,7 @@ async function main(): Awaitable<void> {
     },
   );
 
-  /**
-   * Create a server request instance from the global
-   * variables ( $_SERVER, $_POST, $_GET ... etc)
-   */
-  $request = Http\Message\ServerRequest::capture();
-
-  /**
-   * Handle the request and return a response instance
-   */
-  $response = await $kernel->handle($request);
-
-  /**
-   * Send the response to the client.
-   */
-  $kernel->emit($response);
-
-  /**
-   * Perform any final actions for the request lifecycle.
-   */
-  $kernel->terminate($request, $response);
+  return await $kernel->run();
 }
 ```
 
