@@ -75,6 +75,13 @@ class Kernel implements KernelInterface {
     }
   }
 
+  /**
+   * Register a service provider with the container.
+   */
+  public function register(mixed $service): void {
+    $this->container->addServiceProvider($service);
+  }
+
   public function use(Extension\ExtensionInterface $extension): void {
     $extension->setContainer($this->container);
     foreach ($extension->services($this->configuration) as $service) {
