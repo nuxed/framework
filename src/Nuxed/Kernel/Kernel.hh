@@ -75,9 +75,7 @@ class Kernel implements KernelInterface {
    * Register a service provider with the container.
    */
   public function register(ServiceProviderInterface $service): void {
-    $event = $this->events->dispatch(
-      new Event\RegisterEvent($service)
-    );
+    $event = $this->events->dispatch(new Event\RegisterEvent($service));
 
     $this->container->addServiceProvider($event->service);
   }
@@ -93,9 +91,7 @@ class Kernel implements KernelInterface {
   }
 
   public function subscribe(EventSubscriberInterface $subscriber): void {
-    $event = $this->events->dispatch(
-      new Event\SubscribeEvent($subscriber)
-    );
+    $event = $this->events->dispatch(new Event\SubscribeEvent($subscriber));
 
     $this->events->subscribe($event->subscriber);
   }
