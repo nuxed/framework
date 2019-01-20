@@ -70,7 +70,7 @@ class MiddlewarePipe implements MiddlewarePipeInterface {
 
     $next = clone $this;
     $middleware = $next->pipeline->extract();
-    return $middleware->process($request, $next);
+    return await $middleware->process($request, $next);
   }
 
   /**
