@@ -6,16 +6,17 @@ use namespace Nuxed\Http;
 use namespace Nuxed\Kernel\Handler;
 use namespace Nuxed\Kernel\Middleware;
 use namespace Nuxed\Http\Router\Middleware as Router;
-use type Nuxed\Contract\Log\LoggerInterface;
-use type Nuxed\Contract\Event\EventDispatcherInterface;
 use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
+use type Nuxed\Contract\Event\EventDispatcherInterface;
+use type Nuxed\Kernel\Event\TerminateEvent;
+use type Nuxed\Contract\Log\LoggerInterface;
 use type Nuxed\Http\Server\MiddlewareFactory;
 use type Nuxed\Log\Logger;
 
 class HttpExtension extends AbstractExtension {
   <<__Override>>
   public function subscribe(EventDispatcherInterface $events): void {
-    $events->on(Http\Kernel\Event\TerminateEvent::class, ($event): void ==> {
+    $events->on(TerminateEvent::class, ($event): void ==> {
       /**
        * Close Logger after sending the response.
        */
