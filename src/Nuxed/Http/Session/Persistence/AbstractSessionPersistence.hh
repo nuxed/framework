@@ -56,8 +56,8 @@ abstract class AbstractSessionPersistence
   ): ResponseInterface {
     return $response->withCookie(
       $this->cookieOptions['name'],
-      new Cookie('')
-        |> $$->withExpires(DateTime::createFromFormat(
+      (new Cookie(''))
+        ->withExpires(DateTime::createFromFormat(
           'D, d M Y H:i:s T',
           static::CACHE_PAST_DATE,
         )),
@@ -67,16 +67,15 @@ abstract class AbstractSessionPersistence
   protected function createCookie(string $id, ?int $expires = null): Cookie {
     $expires = $expires ?? $this->cookieOptions['lifetime'];
 
-    return new Cookie($id)
-      |> $$->withExpires(
-        new DateTime()
-          |> $$->add(new DateInterval(Str\format('PT%dS', $expires))),
+    return (new Cookie($id))
+      ->withExpires(
+        (new DateTime())->add(new DateInterval(Str\format('PT%dS', $expires))),
       )
-        ->withDomain($this->cookieOptions['domain'])
-        ->withPath($this->cookieOptions['path'])
-        ->withHttpOnly($this->cookieOptions['http_only'])
-        ->withSecure($this->cookieOptions['secure'])
-        ->withSameSite($this->cookieOptions['same_site']);
+      ->withDomain($this->cookieOptions['domain'])
+      ->withPath($this->cookieOptions['path'])
+      ->withHttpOnly($this->cookieOptions['http_only'])
+      ->withSecure($this->cookieOptions['secure'])
+      ->withSameSite($this->cookieOptions['same_site']);
   }
 
   /**
