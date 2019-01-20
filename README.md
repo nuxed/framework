@@ -7,15 +7,15 @@
 [![Build Status](https://travis-ci.org/nuxed/framework.svg?branch=master)](https://travis-ci.org/nuxed/framework)
 
 ---
-#### Sample
+#### Usage Example
 
-A simple example using `Nuxed\Http\Kernel\Kernel`, the heart of the `Nuxed\Http` package.
+A simple example using `Nuxed\Kernel\Kernel`, the heart of the `Nuxed` framework.
 
 `main.hack` :
 ```hack
 <?hh // strict
 
-use namespace Nuxed\Http;
+use namespace Nuxed\Kernel;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface as Request;
 use type Nuxed\Contract\Http\Message\ResponseInterface as Response;
 
@@ -32,9 +32,9 @@ async function main(): Awaitable<noreturn> {
   ];
 
   /**
-   * Create an Http kernel instance.
+   * Create an Kernel instance.
    */
-  $kernel = new Http\Kernel\Kernel($config);
+  $kernel = new Kernel\Kernel($config);
 
   /**
    * Add a simple route
@@ -49,6 +49,9 @@ async function main(): Awaitable<noreturn> {
     },
   );
 
+  /**
+   * run the kernel application.
+   */
   return await $kernel->run();
 }
 ```
