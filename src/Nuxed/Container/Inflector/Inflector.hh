@@ -7,6 +7,7 @@ use type Nuxed\Container\ContainerAwareTrait;
 use type Nuxed\Container\Argument\ArgumentResolverInterface;
 use type Nuxed\Container\Argument\ArgumentResolverTrait;
 use type ReflectionProperty;
+use type ReflectionObject;
 use function get_class;
 use function inst_meth;
 
@@ -18,7 +19,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface {
 
   protected ?(function(mixed): void) $callback;
 
-  protected dict<string, vec<mixed>> $methods = dict[];
+  protected vec<(string, Container<mixed>)> $methods = vec[];
 
   protected dict<string, mixed> $properties = dict[];
 
@@ -42,9 +43,9 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface {
    */
   public function invokeMethod(
     string $name,
-    vec<mixed> $args,
+    Container<mixed> $args,
   ): InflectorInterface {
-    $this->methods[$name] = $args;
+    $this->methods[] = tuple($name, $args);
 
     return $this;
   }
@@ -53,7 +54,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface {
    * {@inheritdoc}
    */
   public function invokeMethods(
-    dict<string, vec<mixed>> $methods,
+    KeyedContainer<string, Container<mixed>> $methods,
   ): InflectorInterface {
     foreach ($methods as $name => $args) {
       $this->invokeMethod($name, $args);
@@ -69,7 +70,8 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface {
     string $property,
     mixed $value,
   ): InflectorInterface {
-    $this->properties[$property] = C\first($this->resolveArguments(vec[$value]));
+    $this->properties[$property] =
+      C\first($this->resolveArguments(vec[$value]));
 
     return $this;
   }
@@ -92,22 +94,24 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface {
    */
   public function inflect(mixed $object): void {
     $properties = dict[];
+    $reflection = new ReflectionObject($object);
+
     foreach ($this->properties as $key => $value) {
-      $arguments = vec[$value];
-      $resolved = $this->resolveArguments($arguments);
+      $resolved = $this->resolveArguments(vec[$value]);
       $properties[$key] = C\first($resolved);
     }
 
     foreach ($properties as $property => $value) {
-      $reflection = new ReflectionProperty(get_class($object), $property);
-      $reflection->setValue($object, $value);
+      $reflectionProperty = $reflection->getProperty($property);
+      $reflectionProperty->setValue($object, $value);
     }
 
-    foreach ($this->methods as $method => $args) {
-      $args = $this->resolveArguments($args);
-      /* HH_IGNORE_ERROR[2025] */
-      $callback = inst_meth($object, $method);
-      $callback(...$args);
+    foreach ($this->methods as $method) {
+      $args = $this->resolveArguments($method[1]);
+      $reflectionMethod = $reflection->getMethod($method[0]);
+      /* HH_IGNORE_ERROR[2049] */
+      /* HH_IGNORE_ERROR[4107] */
+      $reflectionMethod->invokeArgs($object, varray($args));
     }
 
     if (null !== $this->callback) {
