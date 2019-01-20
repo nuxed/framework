@@ -5,9 +5,7 @@ namespace Nuxed\Contract\Log;
 /**
  * Basic Implementation of LoggerAwareInterface.
  */
-trait LoggerAwareTrait {
-  require implements LoggerAwareInterface;
-
+trait LoggerAwareTrait implements LoggerAwareInterface {
   /**
    * The logger instance.
    */
