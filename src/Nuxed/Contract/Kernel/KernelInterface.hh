@@ -9,6 +9,7 @@ use type Nuxed\Contract\Http\Message\ServerRequestInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
 use type Nuxed\Contract\Log\LoggerAwareInterface;
+use type Nuxed\Contract\Event\EventSubscriberInterface;
 use type Nuxed\Contract\Event\EventInterface;
 use type Nuxed\Contract\Event\EventListener;
 
@@ -27,6 +28,11 @@ interface KernelInterface
     EventListener $listener,
     int $priority = 0,
   ): void;
+
+  /**
+   * Register an event subscriber with the kernel.
+   */
+  public function subscribe(EventSubscriberInterface $subscriber): void;
 
   /**
    * Register fallback middleware.
