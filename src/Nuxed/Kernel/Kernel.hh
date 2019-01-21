@@ -32,6 +32,7 @@ class Kernel implements KernelInterface {
   protected MiddlewareFactory $middleware;
   protected RouteCollectorInterface $collector;
   protected Configuration $configuration;
+
   public function __construct(
     KeyedContainer<string, mixed> $configuration = dict[],
     protected ServiceContainer $container = new ServiceContainer(),
@@ -75,7 +76,6 @@ class Kernel implements KernelInterface {
    */
   public function register(ServiceProviderInterface $service): void {
     $event = $this->events->dispatch(new Event\RegisterEvent($service));
-
     $this->container->addServiceProvider($event->service);
   }
 
@@ -84,6 +84,7 @@ class Kernel implements KernelInterface {
     foreach ($extension->services($this->configuration) as $service) {
       $this->container->addServiceProvider($service);
     }
+
     $extension->route($this, $this->middleware);
     $extension->pipe($this, $this->middleware);
     $extension->subscribe($this->events);
@@ -91,7 +92,6 @@ class Kernel implements KernelInterface {
 
   public function subscribe(EventSubscriberInterface $subscriber): void {
     $event = $this->events->dispatch(new Event\SubscribeEvent($subscriber));
-
     $this->events->subscribe($event->subscriber);
   }
 
@@ -107,12 +107,9 @@ class Kernel implements KernelInterface {
    * Pipe middleware like unix pipes.
    */
   public function pipe(mixed $middleware, int $priority = 0): void {
-
     $middleware = $this->middleware->prepare($middleware);
-
     $event = $this->events
       ->dispatch(new Event\PipeEvent($middleware, $priority));
-
     $this->pipe->pipe($event->middleware, $event->priority);
   }
 
@@ -169,6 +166,7 @@ class Kernel implements KernelInterface {
     ?string $name = null,
   ): RouteInterface {
     $middleware = $this->middleware->prepare($middleware);
+
     return $this->collector->route($path, $middleware, $methods, $name);
   }
 
@@ -272,6 +270,7 @@ class Kernel implements KernelInterface {
     if ($emitted) {
       await $this->terminate($request, $response);
     }
+
     exit($emitted ? $this->getTerminationStatusCode($response) : 1);
   }
 
