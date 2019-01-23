@@ -46,8 +46,6 @@ class Kernel implements KernelInterface {
       ServiceProvider\ErrorServiceProvider::class,
       ServiceProvider\LoggerServiceProvider::class,
       ServiceProvider\CacheServiceProvider::class,
-      ServiceProvider\RedisServiceProvider::class,
-      ServiceProvider\MysqlServiceProvider::class,
     ];
 
     foreach ($providers as $provider) {
