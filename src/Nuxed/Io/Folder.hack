@@ -198,7 +198,6 @@ class Folder extends Node {
       return $contents;
     }
 
-    /** @var \SPLFileInfo $file */
     foreach ($iterator as $file) {
       if (
         $file->isDir() && ($filter === self::ALL || $filter === self::FOLDERS)
