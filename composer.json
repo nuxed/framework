@@ -14,7 +14,8 @@
         "hhvm": "^3.29",
         "hhvm/hsl": "^3.29.0",
         "facebook/hack-router": "^0.17",
-        "hhvm/hsl-experimental": "^3.29"
+        "hhvm/hsl-experimental": "^3.29",
+        "facebook/fbmarkdown": "^1.4"
     },
     "require-dev": {
         "hhvm/hhast": "^3.29",
