@@ -34,7 +34,7 @@ final abstract class Json {
     return $json;
   }
 
-  public static function decode(string $json, bool $assoc = false): mixed {
+  public static function decode(string $json, bool $assoc = true): mixed {
     $value = json_decode(
       $json,
       $assoc,
