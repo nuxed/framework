@@ -1,12 +1,12 @@
 namespace Nuxed\Kernel\Handler;
 
-use type Nuxed\Contract\Container\ContainerAwareInterface;
-use type Nuxed\Container\ContainerAwareTrait;
+use namespace Nuxed\Markdown;
 use namespace Nuxed\Contract\Log;
 use namespace Nuxed\Contract\Http;
 use namespace Nuxed\Contract\Cache;
-use namespace Nuxed\Contract\Crypto;
 use namespace Nuxed\Contract\Http\Router;
+use type Nuxed\Contract\Container\ContainerAwareInterface;
+use type Nuxed\Container\ContainerAwareTrait;
 use type AsyncMysqlConnection;
 use type SQLite3;
 
@@ -18,7 +18,6 @@ trait ServicesTrait implements ContainerAwareInterface {
     // UNSAFE
     return $this->getContainer()->get($service);
   }
-
 
   protected function logger(): Log\LoggerInterface {
     return $this->getService(Log\LoggerInterface::class);
@@ -35,8 +34,9 @@ trait ServicesTrait implements ContainerAwareInterface {
   protected function sqlite(): SQLite3 {
     return $this->getService(SQLite3::class);
   }
-  protected function crypto(): Crypto\CryptoInterface {
-    return $this->getService(Crypto\CryptoInterface::class);
+
+  protected function crypto(): Markdown\Environment<string> {
+    return $this->getService(Markdown\Environment::class);
   }
 
   protected function router(): Router\RouterInterface {

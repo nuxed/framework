@@ -19,95 +19,10 @@ A simple example using `Nuxed\Kernel\Kernel`, the heart of the `Nuxed` framework
 ```hack
 <?hh // strict
 
-use namespace Nuxed\Kernel;
-use namespace Nuxed\Http\Message;
-use type Nuxed\Contract\Http\Session\SessionInterface;
-use type Nuxed\Contract\Http\Flash\FlashMessagesInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface as Request;
-use type Nuxed\Contract\Http\Message\ResponseInterface as Response;
-
-require __DIR__.'/../../vendor/hh_autoload.hh';
-
-<<__EntryPoint>>
-async function main(): Awaitable<noreturn> {
-
-  /**
-   * Configure the application
-   */
-  $config = dict[
-    'app' => dict[
-      'name' => 'example application',
-      'env' => Kernel\Environment::DEVELOPMENT,
-      'debug' => true
-    ]
-  ];
-
-  /**
-   * Create an Kernel instance.
-   */
-  $kernel = new Kernel\Kernel($config);
-
-  /**
-   * Add a simple route
-   */
-  $kernel->get(
-    '/',
-    (Request $request): Response ==> {
-
-      /**
-       * Even that we retrieved the session instance here.
-       * the cookie won't be sent as we didn't change the session data.
-       * same goes for the flash as it uses the session to store messages.
-       */
-      $session = $request->getAttribute('session') as SessionInterface;
-      $flash = $request->getAttribute('flash') as FlashMessagesInterface;
-
-
-      $data = dict[
-        'message' => 'Hello, World!'
-      ];
-
-      $response = new Message\Response\JsonResponse($data);
-
-      return $response->withHeader('X-Powered-By', vec[
-        'Nuxed'
-      ]);
-    },
-  );
-
-  /**
-   * run the kernel application.
-   */
-  return await $kernel->run();
-}
-```
-
-`server.ini`
-
-```ini
-hhvm.force_hh=true
-hhvm.server.port = 8080
-hhvm.server.type = "proxygen"
-hhvm.server.default_document = "main.hack"
-hhvm.server.error_document404 = "main.hack"
-hhvm.server.utf8ize_replace = true
-```
-
-Run the application :
-
-```console
-➜ hhvm -m daemon -c /etc/hhvm/server.ini -d hhvm.log.file=log.txt
-```
-
----
-
-### Configuration Shape
-
-```hack
-<?hh // strict
-
 namespace Nuxed\Kernel;
 
+use namespace Facebook;
+use namespace Nuxed\Markdown;
 use namespace Nuxed\Cache;
 use namespace Nuxed\Log;
 use namespace Nuxed\Http\Session;
@@ -351,6 +266,14 @@ type Configuration = shape(
       ),
       ...
     ),
+    ...
+  ),
+
+  ?'markdown' => shape(
+    ?'parser' => classname<Facebook\Markdown\ParserContext>,
+    ?'context' => classname<Facebook\Markdown\RenderContext>,
+    ?'renderer' => classname<Facebook\Markdown\Renderer<string>>,
+    ?'extensions' => Container<Markdown\Extension\ExtensionInterface>,
     ...
   ),
 

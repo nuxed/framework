@@ -2,6 +2,8 @@
 
 namespace Nuxed\Kernel;
 
+use namespace Facebook;
+use namespace Nuxed\Markdown;
 use namespace Nuxed\Cache;
 use namespace Nuxed\Log;
 use namespace Nuxed\Http\Session;
@@ -245,6 +247,14 @@ type Configuration = shape(
       ),
       ...
     ),
+    ...
+  ),
+
+  ?'markdown' => shape(
+    ?'parser' => classname<Facebook\Markdown\ParserContext>,
+    ?'context' => classname<Facebook\Markdown\RenderContext>,
+    ?'renderer' => classname<Facebook\Markdown\Renderer<string>>,
+    ?'extensions' => Container<Markdown\Extension\ExtensionInterface>,
     ...
   ),
 
