@@ -1,5 +1,7 @@
 namespace Nuxed\Io;
 
+use namespace HH\Lib\C;
+use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use type Nuxed\Io\Exception\ExistingFileException;
 use type Nuxed\Io\Exception\InvalidPathException;
@@ -276,6 +278,15 @@ class File extends Node {
     }
 
     return '';
+  }
+
+  public function lines(): Lines {
+    return $this->read()
+      |> Str\replace($$, "\r\n", "\n")
+      |> Str\replace($$, "\r", "\n")
+      |> Str\split($$, "\n")
+      |> (C\last($$) === '' ? Vec\slice($$, 0, C\count($$) - 1) : $$)
+      |> new Lines($$);
   }
 
   /**
