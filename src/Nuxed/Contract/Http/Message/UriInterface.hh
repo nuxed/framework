@@ -2,6 +2,8 @@
 
 namespace Nuxed\Contract\Http\Message;
 
+use type Nuxed\Contract\Lib\Stringable;
+
 /**
  * Value object representing a URI.
  *
@@ -22,7 +24,7 @@ namespace Nuxed\Contract\Http\Message;
  *
  * @link http://tools.ietf.org/html/rfc3986 (the URI specification)
  */
-interface UriInterface {
+interface UriInterface extends Stringable {
   /**
    * Retrieve the scheme component of the URI.
    *
@@ -310,17 +312,11 @@ interface UriInterface {
    *
    * - If a scheme is present, it MUST be suffixed by ":".
    * - If an authority is present, it MUST be prefixed by "//".
-   * - The path can be concatenated without delimiters. But there are two
-   *   cases where the path has to be adjusted to make the URI reference
-   *   valid as Hack does not allow to throw an exception in __toString():
-   *     - If the path is rootless and an authority is present, the path MUST
-   *       be prefixed by "/".
-   *     - If the path is starting with more than one "/" and no authority is
-   *       present, the starting slashes MUST be reduced to one.
+   * - The path can be concatenated without delimiters.
    * - If a query is present, it MUST be prefixed by "?".
    * - If a fragment is present, it MUST be prefixed by "#".
    *
    * @see http://tools.ietf.org/html/rfc3986#section-4.1
    */
-  public function __toString(): string;
+  public function toString(): string;
 }

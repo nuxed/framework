@@ -5,6 +5,7 @@ namespace Nuxed\Period;
 use namespace HH\Lib\Str;
 use type Nuxed\Lib\Json;
 use type Nuxed\Contract\Lib\Jsonable;
+use type Nuxed\Lib\StringableTrait;
 use type DateInterval;
 use type DatePeriod;
 use type DateTimeImmutable;
@@ -13,6 +14,8 @@ use type DateTimeZone;
 use type JsonSerializable;
 
 final class Period implements JsonSerializable, Jsonable {
+  use StringableTrait;
+
   const string ISO8601_FORMAT = 'Y-m-d\TH:i:s.i\Z';
 
   private DatePoint $startDate;
@@ -235,7 +238,7 @@ final class Period implements JsonSerializable, Jsonable {
    *
    * @link https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
    */
-  public function __toString(): string {
+  public function toString(): string {
     $interval = $this->jsonSerialize() as
       shape('startDate' => string, 'endDate' => string, ...);
 

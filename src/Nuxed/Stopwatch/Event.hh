@@ -6,9 +6,12 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Math;
+use type Nuxed\Lib\StringableTrait;
 use function microtime;
 
 class Event {
+  use StringableTrait;
+
   private vec<Period> $periods = vec[];
   private float $origin;
   private string $category;
@@ -201,7 +204,7 @@ class Event {
   /**
    * @return string
    */
-  public function __toString(): string {
+  public function toString(): string {
     return Str\format(
       '%s: %.2F MiB - %d ms',
       $this->getCategory(),

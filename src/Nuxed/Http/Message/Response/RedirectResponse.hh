@@ -28,7 +28,7 @@ class RedirectResponse extends Response {
   ) {
     $headers = dict($headers);
     $headers['location'] = vec[
-      $uri->__toString(),
+      $uri->toString(),
     ];
 
     parent::__construct(

@@ -3,6 +3,7 @@
 namespace Nuxed\Period;
 
 use namespace HH\Lib\Str;
+use type Nuxed\Lib\StringableTrait;
 use type DateInterval;
 use function gettype;
 use function is_object;
@@ -10,6 +11,7 @@ use function get_class;
 use const FILTER_VALIDATE_INT;
 
 final class Duration extends DateInterval {
+  use StringableTrait;
 
   /**
    * Returns a continuous portion of time between two datepoints
@@ -67,7 +69,7 @@ final class Duration extends DateInterval {
    *
    * Microseconds fractions are included
    */
-  public function __toString(): string {
+  public function toString(): string {
     $date = 'P';
     foreach (
       ['Y' => $this->y, 'M' => $this->m, 'D' => $this->d] as $key => $value

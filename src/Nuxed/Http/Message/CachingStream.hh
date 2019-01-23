@@ -10,7 +10,7 @@ class CachingStream extends Stream {
   private bool $reachedEof = false;
 
   <<__Override>>
-  public function __toString(): string {
+  public function toString(): string {
     if ($this->reachedEof) {
       return $this->cache;
     }

@@ -2,6 +2,7 @@ namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
 use type Nuxed\Contract\Http\Message\StreamInterface;
+use type Nuxed\Lib\StringableTrait;
 use function fclose;
 use function fwrite;
 use function fstat;
@@ -17,6 +18,8 @@ use const SEEK_SET;
 
 <<__ConsistentConstruct>>
 class Stream implements StreamInterface {
+  use StringableTrait;
+
   protected ?resource $stream;
 
   protected mixed $uri;
@@ -30,7 +33,7 @@ class Stream implements StreamInterface {
     $this->uri = $this->getMetadata('uri');
   }
 
-  public function __toString(): string {
+  public function toString(): string {
     try {
       if ($this->isSeekable()) {
         $this->seek(0);

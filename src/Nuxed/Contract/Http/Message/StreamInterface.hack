@@ -1,5 +1,6 @@
 namespace Nuxed\Contract\Http\Message;
 
+use type Nuxed\Contract\Lib\Stringable;
 use const SEEK_SET;
 
 /**
@@ -9,7 +10,7 @@ use const SEEK_SET;
  * a wrapper around the most common operations, including serialization of
  * the entire stream to a string.
  */
-interface StreamInterface {
+interface StreamInterface extends Stringable {
   /**
    * Reads all data from the stream into a string, from the beginning to end.
    *
@@ -21,10 +22,9 @@ interface StreamInterface {
    * This method MUST NOT raise an exception in order to conform with Hack's
    * string casting operations.
    *
-   * @see http://php.net/manual/en/language.oop5.magic.php#object.tostring
    * @return string
    */
-  public function __toString(): string;
+  public function toString(): string;
 
   /**
    * Closes the stream and any underlying resources.

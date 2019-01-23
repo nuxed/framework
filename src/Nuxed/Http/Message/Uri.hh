@@ -5,11 +5,14 @@ namespace Nuxed\Http\Message;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use type Nuxed\Contract\Http\Message\UriInterface;
+use type Nuxed\Lib\StringableTrait;
 use function parse_url;
 use function preg_replace_callback;
 use function rawurlencode;
 
 final class Uri implements UriInterface {
+  use StringableTrait;
+
   private static dict<string, int> $schemes = dict[
     'http' => 80,
     'https' => 443,
@@ -46,7 +49,7 @@ final class Uri implements UriInterface {
     }
   }
 
-  public function __toString(): string {
+  public function toString(): string {
     return self::createUriString(
       $this->scheme,
       $this->getAuthority(),
