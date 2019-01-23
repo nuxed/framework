@@ -6,13 +6,15 @@
     "authors": [
         {
             "name": "azjezz",
-            "email": "azjezz@protonmail.com"
+            "email": "azjezz@protonmail.com",
+            "homepage": "https://azjezz.github.io"
         }
     ],
     "require": {
         "hhvm": "^3.29",
-        "hhvm/hsl": "^1.0.0|^3.26.0|^3.29.0",
-        "facebook/hack-router": "^0.17.0"
+        "hhvm/hsl": "^3.29.0",
+        "facebook/hack-router": "^0.17",
+        "hhvm/hsl-experimental": "^3.29"
     },
     "require-dev": {
         "hhvm/hhast": "^3.29",

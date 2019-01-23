@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "141fdfb0c500ed879c7dd447a437b7ff",
+    "content-hash": "737e8fd6c60ba43d8663426cfabce41a",
     "packages": [
         {
             "name": "facebook/hack-http-request-response-interfaces",
