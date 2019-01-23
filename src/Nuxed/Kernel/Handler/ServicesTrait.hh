@@ -2,18 +2,17 @@
 
 namespace Nuxed\Kernel\Handler;
 
+use type Nuxed\Contract\Container\ContainerAwareInterface;
 use type Nuxed\Container\ContainerAwareTrait;
-use namespace Nuxed\Io;
 use namespace Nuxed\Contract\Log;
 use namespace Nuxed\Contract\Http;
-use namespace Nuxed\Contract\Event;
 use namespace Nuxed\Contract\Cache;
 use namespace Nuxed\Contract\Crypto;
 use namespace Nuxed\Contract\Http\Router;
 use type AsyncMysqlConnection;
 use type SQLite3;
 
-trait ServicesTrait {
+trait ServicesTrait implements ContainerAwareInterface {
   require implements Http\Server\RequestHandlerInterface;
   use ContainerAwareTrait;
 
