@@ -413,6 +413,23 @@ type Configuration = shape(
       'extra-key' => string,
       ...
     ),
+
+    #───────────────────────────────────────────────────────────────────────#
+    # Sqlite3 Connection                                                    #
+    #───────────────────────────────────────────────────────────────────────#
+    # SQLite is a relational database management system contained in a C    #
+    # programming library. In contrast to many other database management    #
+    # systems, SQLite is not a client–server database engine.               #
+    # Rather, it is embedded into the end program.                          #
+    # More information about sqlite connection can be found here :          #
+    # https://secure.php.net/manual/en/class.sqlite3.php                    #
+    #───────────────────────────────────────────────────────────────────────#
+    'sqlite' => shape(
+      'filename' => string,
+      'flags' => int,
+      'encryption_key' => ?string,
+      ...
+    ),
     ...
   ),
 

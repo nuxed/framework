@@ -10,6 +10,8 @@ use type DateTimeZone;
 use function md5;
 use function sys_get_temp_dir;
 use const LOG_PID;
+use const SQLITE3_OPEN_CREATE;
+use const SQLITE3_OPEN_READWRITE;
 
 final abstract class Config {
 
@@ -330,6 +332,22 @@ final abstract class Config {
           'password' => '',
           'timeout-micros' => -1,
           'extra-key' => '',
+        ),
+
+        #───────────────────────────────────────────────────────────────────────#
+        # Sqlite3 Connection                                                    #
+        #───────────────────────────────────────────────────────────────────────#
+        # SQLite is a relational database management system contained in a C    #
+        # programming library. In contrast to many other database management    #
+        # systems, SQLite is not a client–server database engine.               #
+        # Rather, it is embedded into the end program.                          #
+        # More information about sqlite connection can be found here :          #
+        # https://secure.php.net/manual/en/class.sqlite3.php                    #
+        #───────────────────────────────────────────────────────────────────────#
+        'sqlite' => shape(
+          'filename' => ':memory:',
+          'flags' => SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE,
+          'encryption_key' => null,
         ),
       ),
     );
