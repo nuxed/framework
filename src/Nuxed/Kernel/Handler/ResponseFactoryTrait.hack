@@ -1,21 +1,22 @@
 namespace Nuxed\Kernel\Handler;
 
 use namespace Nuxed\Http\Message;
-use namespace Nuxed\Contract\Http;
 use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
+use type Nuxed\Contract\Http\Message\UriInterface;
+use type Stringish;
 
 trait ResponseFactoryTrait {
   require implements RequestHandlerInterface;
 
-  protected function uri(string $uri): Http\Message\UriInterface {
+  protected function uri(string $uri): Message\Uri {
     return new Message\Uri($uri);
   }
 
   protected function redirect(
-    Http\Message\UriInterface $uri,
+    UriInterface $uri,
     int $status = 302,
     KeyedContainer<string, Container<string>> $headers = dict[],
-  ): Http\Message\ResponseInterface {
+  ): Message\Response\RedirectResponse {
     return new Message\Response\RedirectResponse($uri, $status, $headers);
   }
 
@@ -23,38 +24,38 @@ trait ResponseFactoryTrait {
     mixed $data,
     int $status = 200,
     KeyedContainer<string, Container<string>> $headers = dict[],
-  ): Http\Message\ResponseInterface {
+  ): Message\Response\JsonResponse {
     return new Message\Response\JsonResponse($data, $status, $headers);
   }
 
   protected function html(
-    string $html,
+    Stringish $html,
     int $status = 200,
     KeyedContainer<string, Container<string>> $headers = dict[],
-  ): Http\Message\ResponseInterface {
-    return new Message\Response\HtmlResponse($html, $status, $headers);
+  ): Message\Response\HtmlResponse {
+    return new Message\Response\HtmlResponse((string)$html, $status, $headers);
   }
 
   protected function xml(
-    string $xml,
+    Stringish $xml,
     int $status = 200,
     KeyedContainer<string, Container<string>> $headers = dict[],
-  ): Http\Message\ResponseInterface {
-    return new Message\Response\XmlResponse($xml, $status, $headers);
+  ): Message\Response\XmlResponse {
+    return new Message\Response\XmlResponse((string)$xml, $status, $headers);
   }
 
   protected function text(
-    string $text,
+    Stringish $text,
     int $status = 200,
     KeyedContainer<string, Container<string>> $headers = dict[],
-  ): Http\Message\ResponseInterface {
-    return new Message\Response\TextResponse($text, $status, $headers);
+  ): Message\Response\TextResponse {
+    return new Message\Response\TextResponse((string)$text, $status, $headers);
   }
 
   protected function response(
     int $status = 200,
     KeyedContainer<string, Container<string>> $headers = dict[],
-  ): Http\Message\ResponseInterface {
+  ): Message\Response {
     return new Message\Response($status, $headers);
   }
 }
