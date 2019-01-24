@@ -5,7 +5,6 @@ namespace Nuxed\Markdown\Extension;
 use type Facebook\Markdown\RenderFilter;
 use type Facebook\Markdown\Inlines\Inline;
 use type Facebook\Markdown\UnparsedBlocks\BlockProducer;
-use type Facebook\Markdown\UnparsedBlocks\LinkReferenceDefinition;
 
 interface ExtensionInterface {
   /**
@@ -17,11 +16,6 @@ interface ExtensionInterface {
    * @see Facebook\Markdown\Inlines\Context::prependInlineTypes()
    */
   public function getInlineTypes(): Container<classname<Inline>>;
-
-  /**
-   * @see Facebook\Markdown\UnparsedBlocks\Context::addLinkReferenceDefinition()
-   */
-  public function getLinkReferenceDefinition(): ?LinkReferenceDefinition;
 
   /**
    * @see Facebook\Markdown\UnparsedBlocks\Context::prependBlockTypes()

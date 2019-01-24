@@ -76,11 +76,6 @@ class Environment<T> {
   }
 
   public function use(Extension\ExtensionInterface $extension): void {
-    $linkReferenceDefinition = $extension->getLinkReferenceDefinition();
-    if ($linkReferenceDefinition is nonnull) {
-      $this->getBlockContext()
-        ->addLinkReferenceDefinition($linkReferenceDefinition);
-    }
     $this->getBlockContext()
       ->prependBlockTypes(...$extension->getBlockProducers());
     $this->getInlineContext()

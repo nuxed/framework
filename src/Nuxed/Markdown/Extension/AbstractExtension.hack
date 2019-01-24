@@ -3,7 +3,6 @@ namespace Nuxed\Markdown\Extension;
 use type Facebook\Markdown\RenderFilter;
 use type Facebook\Markdown\Inlines\Inline;
 use type Facebook\Markdown\UnparsedBlocks\BlockProducer;
-use type Facebook\Markdown\UnparsedBlocks\LinkReferenceDefinition;
 
 class AbstractExtension implements ExtensionInterface {
   /**
@@ -18,13 +17,6 @@ class AbstractExtension implements ExtensionInterface {
    */
   public function getInlineTypes(): Container<classname<Inline>> {
     return vec[];
-  }
-
-  /**
-   * @see Facebook\Markdown\UnparsedBlocks\Context::addLinkReferenceDefinition()
-   */
-  public function getLinkReferenceDefinition(): ?LinkReferenceDefinition {
-    return null;
   }
 
   /**
