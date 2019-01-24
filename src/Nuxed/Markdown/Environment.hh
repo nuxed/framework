@@ -99,4 +99,9 @@ class Environment<T> {
   public function convert(string $markdown): T {
     return $this->render($this->parse($markdown));
   }
+
+  public function xhp(string $markdown): XHPElement where T as string {
+    // UNSAFE
+    return new XHPElement($markdown, $this);
+  }
 }
