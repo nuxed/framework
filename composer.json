@@ -15,11 +15,11 @@
         "hhvm/hsl": "^3.29.0",
         "facebook/hack-router": "^0.17",
         "hhvm/hsl-experimental": "^3.29",
-        "facebook/fbmarkdown": "^1.4"
+        "facebook/fbmarkdown": "^1.4",
+        "facebook/xhp-lib": "^2.8"
     },
     "require-dev": {
-        "hhvm/hhast": "^3.29",
-        "facebook/xhp-lib": "^2.8"
+        "hhvm/hhast": "^3.29"
     },
     "autoload": {
         "psr-4": {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "48fb1c44865981e5d2a4e3e44e26e484",
+    "content-hash": "d3abca47817f4ed62530c30f030cd64c",
     "packages": [
         {
             "name": "facebook/fbmarkdown",
@@ -121,6 +121,49 @@
                 "routing"
             ],
             "time": "2018-12-10T20:46:28+00:00"
+        },
+        {
+            "name": "facebook/xhp-lib",
+            "version": "v2.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hhvm/xhp-lib.git",
+                "reference": "c1206482e07acdf9956a2d455613a840ed8fa610"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hhvm/xhp-lib/zipball/c1206482e07acdf9956a2d455613a840ed8fa610",
+                "reference": "c1206482e07acdf9956a2d455613a840ed8fa610",
+                "shasum": ""
+            },
+            "require": {
+                "hhvm": "~3.23",
+                "hhvm/hhvm-autoload": "^1.5",
+                "hhvm/type-assert": "^3.0"
+            },
+            "require-dev": {
+                "facebook/fbexpect": "^2.0.0",
+                "hhvm/hacktest": "^1.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Class library for XHP",
+            "homepage": "https://github.com/facebook/xhp-lib",
+            "keywords": [
+                "facebook",
+                "hack",
+                "hhvm",
+                "xhp"
+            ],
+            "time": "2018-10-19T20:45:31+00:00"
         },
         {
             "name": "hhvm/hhvm-autoload",
@@ -351,49 +394,6 @@
                 "MIT"
             ],
             "time": "2018-12-05T19:10:19+00:00"
-        },
-        {
-            "name": "facebook/xhp-lib",
-            "version": "v2.8.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hhvm/xhp-lib.git",
-                "reference": "c1206482e07acdf9956a2d455613a840ed8fa610"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/xhp-lib/zipball/c1206482e07acdf9956a2d455613a840ed8fa610",
-                "reference": "c1206482e07acdf9956a2d455613a840ed8fa610",
-                "shasum": ""
-            },
-            "require": {
-                "hhvm": "~3.23",
-                "hhvm/hhvm-autoload": "^1.5",
-                "hhvm/type-assert": "^3.0"
-            },
-            "require-dev": {
-                "facebook/fbexpect": "^2.0.0",
-                "hhvm/hacktest": "^1.0.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.x-dev"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Class library for XHP",
-            "homepage": "https://github.com/facebook/xhp-lib",
-            "keywords": [
-                "facebook",
-                "hack",
-                "hhvm",
-                "xhp"
-            ],
-            "time": "2018-10-19T20:45:31+00:00"
         },
         {
             "name": "hhvm/hhast",
