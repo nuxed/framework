@@ -35,7 +35,7 @@ trait ServicesTrait implements ContainerAwareInterface {
     return $this->getService(SQLite3::class);
   }
 
-  protected function crypto(): Markdown\Environment<string> {
+  protected function markdown(): Markdown\Environment<string> {
     return $this->getService(Markdown\Environment::class);
   }
 
