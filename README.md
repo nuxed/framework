@@ -18,15 +18,19 @@ A simple example using `Nuxed\Kernel\Kernel`, the heart of the `Nuxed` framework
 
 ```hack
 <?hh // strict
+
 use namespace Nuxed\Kernel;
 use namespace Nuxed\Http\Message;
 use type Nuxed\Contract\Http\Session\SessionInterface;
 use type Nuxed\Contract\Http\Flash\FlashMessagesInterface;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface as Request;
 use type Nuxed\Contract\Http\Message\ResponseInterface as Response;
+
 require __DIR__.'/../../vendor/hh_autoload.hh';
+
 <<__EntryPoint>>
 async function main(): Awaitable<noreturn> {
+
   /**
    * Configure the application
    */
@@ -37,10 +41,12 @@ async function main(): Awaitable<noreturn> {
       'debug' => true
     ]
   ];
+  
   /**
    * Create an Kernel instance.
    */
   $kernel = new Kernel\Kernel($config);
+  
   /**
    * Add a simple route
    */
@@ -54,15 +60,19 @@ async function main(): Awaitable<noreturn> {
        */
       $session = $request->getAttribute('session') as SessionInterface;
       $flash = $request->getAttribute('flash') as FlashMessagesInterface;
+      
       $data = dict[
         'message' => 'Hello, World!'
       ];
+      
       $response = new Message\Response\JsonResponse($data);
+      
       return $response->withHeader('X-Powered-By', vec[
         'Nuxed'
       ]);
     },
   );
+  
   /**
    * run the kernel application.
    */
