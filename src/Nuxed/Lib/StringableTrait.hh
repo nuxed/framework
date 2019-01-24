@@ -4,8 +4,9 @@ namespace Nuxed\Lib;
 
 use type Nuxed\Contract\Lib\Stringable;
 use type Throwable;
+use type Stringish;
 
-trait StringableTrait implements Stringable {
+trait StringableTrait implements Stringable, Stringish {
   abstract public function toString(): string;
 
   public function __toString(): string {
