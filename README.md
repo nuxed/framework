@@ -53,26 +53,12 @@ async function main(): Awaitable<noreturn> {
   $kernel->get(
     '/',
     (Request $request): Response ==> {
-      /**
-       * Even that we retrieved the session instance here.
-       * the cookie won't be sent as we didn't change the session data.
-       * same goes for the flash as it uses the session to store messages.
-       */
-      $session = $request->getAttribute('session') as SessionInterface;
-      $flash = $request->getAttribute('flash') as FlashMessagesInterface;
-      
-      $data = dict[
-        'message' => 'Hello, World!'
-      ];
-      
-      $response = new Message\Response\JsonResponse($data);
-      
-      return $response->withHeader('X-Powered-By', vec[
-        'Nuxed'
+      return new Message\Response\JsonResponse(dict[
+        'message' => 'Hello, World'
       ]);
     },
   );
-  
+
   /**
    * run the kernel application.
    */
