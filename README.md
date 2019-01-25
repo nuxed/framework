@@ -55,7 +55,7 @@ async function main(): Awaitable<noreturn> {
     (Request $request): Response ==>
       new Message\Response\JsonResponse(dict[
         'message' => 'Hello, World'
-      ]);
+      ])
   );
 
   /**
