@@ -6,7 +6,7 @@
 *DO NOT USE; Nuxed is under heavy active development*
 
 ---
-[![Build Status](https://travis-ci.org/nuxed/framework.svg?branch=master)](https://travis-ci.org/nuxed/framework)
+[![Build Status](https://travis-ci.org/nuxed/framework.svg?branch=master)](https://travis-ci.org/nuxed/framework) [![Join the chat at https://gitter.im/Nuxed/framework](https://badges.gitter.im/Nuxed/framework.svg)](https://gitter.im/Nuxed/framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ---
 
