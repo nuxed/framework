@@ -52,11 +52,10 @@ async function main(): Awaitable<noreturn> {
    */
   $kernel->get(
     '/',
-    (Request $request): Response ==> {
-      return new Message\Response\JsonResponse(dict[
+    (Request $request): Response ==>
+      new Message\Response\JsonResponse(dict[
         'message' => 'Hello, World'
       ]);
-    },
   );
 
   /**
