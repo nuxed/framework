@@ -2,33 +2,13 @@
 
 namespace Nuxed\Kernel\Extension;
 
-use namespace Nuxed\Http;
 use namespace Nuxed\Kernel\Handler;
 use namespace Nuxed\Kernel\Middleware;
 use namespace Nuxed\Http\Router\Middleware as Router;
 use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
-use type Nuxed\Contract\Event\EventDispatcherInterface;
-use type Nuxed\Kernel\Event\TerminateEvent;
-use type Nuxed\Contract\Log\LoggerInterface;
 use type Nuxed\Http\Server\MiddlewareFactory;
-use type Nuxed\Log\Logger;
 
 class HttpExtension extends AbstractExtension {
-  <<__Override>>
-  public function subscribe(EventDispatcherInterface $events): void {
-    $events->on(TerminateEvent::class, ($event): void ==> {
-      /**
-       * Close Logger after sending the response.
-       */
-      if ($this->getContainer()->has(LoggerInterface::class)) {
-        $logger = $this->getContainer()->get(LoggerInterface::class);
-        if ($logger is Logger) {
-          $logger->close();
-        }
-      }
-    });
-  }
-
   <<__Override>>
   public function pipe(
     MiddlewarePipeInterface $pipe,
@@ -41,26 +21,6 @@ class HttpExtension extends AbstractExtension {
     $pipe->pipe(
       $middlewares->prepare(Middleware\ErrorMiddleware::class),
       0x10000,
-    );
-
-    /*
-     * Register the session middleware in the middleware pipeline.
-     * This middleware register the 'session' attribute containing the
-     * session implementation.
-     */
-    $pipe->pipe(
-      $middlewares->prepare(Http\Session\SessionMiddleware::class),
-      0x9100,
-    );
-
-    /*
-     * Register the flash middleware in the middleware pipeline.
-     * This middleware register the 'flash' attribute containing the
-     * flash implementation.
-     */
-    $pipe->pipe(
-      $middlewares->prepare(Http\Flash\FlashMessagesMiddleware::class),
-      0x9090,
     );
 
     /*

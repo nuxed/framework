@@ -12,7 +12,6 @@ use type Nuxed\Contract\Http\Message\UriFactoryInterface;
 use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
 use type Nuxed\Contract\Http\Router\RouterInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
-use type Nuxed\Container\Argument\RawArgument;
 
 class HttpServiceProvider extends AbstractServiceProvider {
   protected vec<string> $provides = vec[
@@ -26,11 +25,6 @@ class HttpServiceProvider extends AbstractServiceProvider {
     UriFactoryInterface::class,
     MiddlewarePipeInterface::class,
     Http\Server\MiddlewareFactory::class,
-    Http\Session\SessionMiddleware::class,
-    Http\Session\Persistence\SessionPersistenceInterface::class,
-    Http\Session\Persistence\NativeSessionPersistence::class,
-    Http\Session\Persistence\CacheSessionPersistence::class,
-    Http\Flash\FlashMessagesMiddleware::class,
     RouterInterface::class,
     RouteCollectorInterface::class,
     Http\Router\Middleware\DispatchMiddleware::class,
@@ -48,10 +42,6 @@ class HttpServiceProvider extends AbstractServiceProvider {
     $this->registerMessagesFactories();
     // Server
     $this->registerServer();
-    // Session
-    $this->registerSession();
-    // Flash
-    $this->registerFlash();
     // Router
     $this->registerRouter();
   }
@@ -81,39 +71,6 @@ class HttpServiceProvider extends AbstractServiceProvider {
       MiddlewarePipeInterface::class,
       Http\Server\MiddlewarePipe::class,
     );
-  }
-
-  private function registerSession(): void {
-    $config = $this->config();
-
-    $this->share(Http\Server\MiddlewareFactory::class)
-      ->addArgument(new RawArgument($this->getContainer()));
-    $this->share(Http\Session\SessionMiddleware::class)
-      ->addArgument(
-        Http\Session\Persistence\SessionPersistenceInterface::class,
-      );
-
-    $this->share(
-      Http\Session\Persistence\SessionPersistenceInterface::class,
-      () ==> $this->getContainer()
-        ->get($config['session']['persistence']),
-    );
-
-    $session = $config['session'];
-
-    $this->share(Http\Session\Persistence\NativeSessionPersistence::class)
-      ->addArgument(new RawArgument($session['cookie']))
-      ->addArgument(new RawArgument($session['cache-limiter']))
-      ->addArgument(new RawArgument($session['cache-expire']));
-
-    $this->share(Http\Session\Persistence\CacheSessionPersistence::class)
-      ->addArgument(new RawArgument($session['cookie']))
-      ->addArgument(new RawArgument($session['cache-limiter']))
-      ->addArgument(new RawArgument($session['cache-expire']));
-  }
-
-  private function registerFlash(): void {
-    $this->share(Http\Flash\FlashMessagesMiddleware::class);
   }
 
   private function registerRouter(): void {
