@@ -299,7 +299,7 @@ class DocumentHandler extends Handler\AbstractHandler {
 In addition to HTTP this component supports other protocols (such as file:// and ftp://). This allows for example to serve local files in order to improve performance:
 
 ```hack
-use Symfony\Component\Asset\UrlPackage;
+use type Nuxed\Asset\UrlPackage;
 // ...
 
 $localPackage = new UrlPackage(
