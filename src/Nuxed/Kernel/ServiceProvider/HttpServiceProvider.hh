@@ -73,6 +73,11 @@ class HttpServiceProvider extends AbstractServiceProvider {
       MiddlewarePipeInterface::class,
       Http\Server\MiddlewarePipe::class,
     );
+
+    $this->share(
+      Http\Server\MiddlewareFactory::class, () ==>
+        new Http\Server\MiddlewareFactory($this->container)
+    );
   }
 
   private function registerRouter(): void {
