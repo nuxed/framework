@@ -75,8 +75,8 @@ class HttpServiceProvider extends AbstractServiceProvider {
     );
 
     $this->share(
-      Http\Server\MiddlewareFactory::class, () ==>
-        new Http\Server\MiddlewareFactory($this->container)
+      Http\Server\MiddlewareFactory::class,
+      () ==> new Http\Server\MiddlewareFactory($this->container),
     );
   }
 
