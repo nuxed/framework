@@ -35,7 +35,8 @@ class Kernel implements KernelInterface {
     KeyedContainer<string, mixed> $configuration = dict[],
     protected ServiceContainer $container = new ServiceContainer(),
   ) {
-    $container->delegate(new ReflectionContainer());
+    $container->defaultToShared();
+    $container->delegate(new ReflectionContainer(true));
     $this->configuration = Config::load($configuration);
 
     $container->share('config', () ==> $this->configuration);
