@@ -6,8 +6,7 @@
         "hack",
         "hhvm",
         "nuxed",
-        "container",
-        "nuxed/container"
+        "container"
     ],
     "license": "MIT",
     "authors": [

@@ -6,8 +6,7 @@
         "hack",
         "hhvm",
         "nuxed",
-        "asset",
-        "nuxed/asset"
+        "asset"
     ],
     "license": "MIT",
     "authors": [

@@ -6,8 +6,7 @@
         "hack",
         "hhvm",
         "nuxed",
-        "io",
-        "nuxed/io"
+        "io"
     ],
     "license": "MIT",
     "authors": [

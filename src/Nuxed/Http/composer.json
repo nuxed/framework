@@ -6,8 +6,7 @@
         "hack",
         "hhvm",
         "nuxed",
-        "http",
-        "nuxed/http"
+        "http"
     ],
     "license": "MIT",
     "authors": [

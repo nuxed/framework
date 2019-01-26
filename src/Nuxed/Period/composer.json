@@ -6,8 +6,7 @@
         "hack",
         "hhvm",
         "nuxed",
-        "period",
-        "nuxed/period"
+        "period"
     ],
     "license": "MIT",
     "authors": [

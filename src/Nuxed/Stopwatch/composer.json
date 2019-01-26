@@ -6,8 +6,7 @@
         "hack",
         "hhvm",
         "nuxed",
-        "stopwatch",
-        "nuxed/stopwatch"
+        "stopwatch"
     ],
     "license": "MIT",
     "authors": [

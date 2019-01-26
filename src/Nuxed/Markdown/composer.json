@@ -6,8 +6,7 @@
         "hack",
         "hhvm",
         "nuxed",
-        "markdown",
-        "nuxed/markdown"
+        "markdown"
     ],
     "license": "MIT",
     "authors": [

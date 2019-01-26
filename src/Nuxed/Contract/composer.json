@@ -6,8 +6,7 @@
         "hack",
         "hhvm",
         "nuxed",
-        "contract",
-        "nuxed/contract"
+        "contract"
     ],
     "license": "MIT",
     "authors": [

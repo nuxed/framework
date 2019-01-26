@@ -6,8 +6,7 @@
         "hack",
         "hhvm",
         "nuxed",
-        "kernel",
-        "nuxed/kernel"
+        "kernel"
     ],
     "license": "MIT",
     "authors": [
