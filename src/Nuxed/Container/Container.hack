@@ -38,6 +38,8 @@ class Container implements ContainerInterface {
     if ($this->inflectors instanceof ContainerAwareInterface) {
       $this->inflectors->setContainer($this);
     }
+
+    $this->share(ContainerInterface::class, new Argument\RawArgument($this));
   }
 
   /**
