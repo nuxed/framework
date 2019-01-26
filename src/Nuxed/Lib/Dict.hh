@@ -45,4 +45,17 @@ final abstract class Dict {
     }
     return $result;
   }
+
+  public static function only<Tk as arraykey, Tv>(
+    KeyedContainer<Tk, Tv> $container,
+    keyset<Tk> $keys,
+  ): dict<Tk, Tv> {
+    $result = dict[];
+    foreach ($container as $key => $value) {
+      if (C\contains($keys, $key)) {
+        $result[$key] = $value;
+      }
+    }
+    return $result;
+  }
 }
