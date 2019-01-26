@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d3abca47817f4ed62530c30f030cd64c",
+    "content-hash": "207d7a6139cf8ffd242739bac27e6796",
     "packages": [
         {
             "name": "facebook/fbmarkdown",
@@ -167,16 +167,16 @@
         },
         {
             "name": "hhvm/hhvm-autoload",
-            "version": "v1.7",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hhvm-autoload.git",
-                "reference": "2e8b1ec08f00101d63f5ec797d9db47faa99a6dc"
+                "reference": "5d3fdbf7c203b05e13edab7b4f9981b19877f368"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hhvm-autoload/zipball/2e8b1ec08f00101d63f5ec797d9db47faa99a6dc",
-                "reference": "2e8b1ec08f00101d63f5ec797d9db47faa99a6dc",
+                "url": "https://api.github.com/repos/hhvm/hhvm-autoload/zipball/5d3fdbf7c203b05e13edab7b4f9981b19877f368",
+                "reference": "5d3fdbf7c203b05e13edab7b4f9981b19877f368",
                 "shasum": ""
             },
             "require": {
@@ -214,7 +214,7 @@
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
-            "time": "2018-12-14T20:41:25+00:00"
+            "time": "2019-01-22T22:32:09+00:00"
         },
         {
             "name": "hhvm/hsl",
@@ -442,11 +442,13 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "hhvm/hhvm-autoload": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "hhvm": "^3.29"
+        "hhvm": "^3.30.0"
     },
     "platform-dev": []
 }

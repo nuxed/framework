@@ -11,15 +11,16 @@
         }
     ],
     "require": {
-        "hhvm": "^3.29",
-        "hhvm/hsl": "^3.29.0",
+        "hhvm": "^3.30.0",
+        "hhvm/hsl": "^3.30.0",
+        "hhvm/hsl-experimental": "^3.30.0",
+        "hhvm/hhvm-autoload": "dev-master",
         "facebook/hack-router": "^0.17",
-        "hhvm/hsl-experimental": "^3.29",
         "facebook/fbmarkdown": "^1.4",
         "facebook/xhp-lib": "^2.8"
     },
     "require-dev": {
-        "hhvm/hhast": "^3.29"
+        "hhvm/hhast": "^3.30"
     },
     "autoload": {
         "psr-4": {
