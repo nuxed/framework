@@ -24,11 +24,13 @@
     "require": {
         "hhvm": "^3.30.0",
         "hhvm/hsl": "^3.30.0",
-        "hhvm/hhvm-autoload": "dev-master"
+        "hhvm/hhvm-autoload": "dev-master",
+        "nuxed/contract": "dev-master",
+        "nuxed/lib": "dev-master"
     },
     "autoload": {
         "psr-4": {
-            "Nuxed\\Http": "./"
+            "Nuxed\\Http\\": "./"
         }
     }
 }
