@@ -3,7 +3,7 @@ namespace Nuxed\Lib;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 
-class Recursive {
+final abstract class Recursive {
   public static function union<Tk as arraykey, Tv>(
     KeyedContainer<Tk, Tv> ...$containers
   ): dict<Tk, Tv> {

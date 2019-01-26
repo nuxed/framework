@@ -4,7 +4,7 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use function invariant;
 
-class Dict {
+final abstract class Dict {
   public static function union<Tk as arraykey, Tv>(
     KeyedContainer<Tk, Tv> ...$containers
   ): dict<Tk, Tv> {
@@ -40,6 +40,19 @@ class Dict {
     $result = dict[];
     foreach ($keys as $i => $key) {
       $result[$key] = $values[$i];
+    }
+    return $result;
+  }
+
+  public static function only<Tk as arraykey, Tv>(
+    KeyedContainer<Tk, Tv> $container,
+    Container<Tk> $keys,
+  ): dict<Tk, Tv> {
+    $result = dict[];
+    foreach ($container as $key => $value) {
+      if (C\contains($keys, $key)) {
+        $result[$key] = $value;
+      }
     }
     return $result;
   }
