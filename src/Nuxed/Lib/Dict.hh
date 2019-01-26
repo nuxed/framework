@@ -6,7 +6,7 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use function invariant;
 
-class Dict {
+final abstract class Dict {
   public static function union<Tk as arraykey, Tv>(
     KeyedContainer<Tk, Tv> ...$containers
   ): dict<Tk, Tv> {
