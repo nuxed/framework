@@ -11,8 +11,10 @@ class Packages {
   private dict<string, PackageInterface> $packages;
 
   /**
-   * @param PackageInterface   $defaultPackage The default package
-   * @param PackageInterface[] $packages       Additional packages indexed by name
+   * @param PackageInterface                          $defaultPackage
+   *                                                    The default package
+   * @param KeyedContainer<string, PackageInterface>  $packages
+   *                                                    Additional packages indexed by name
    */
   public function __construct(
     private ?PackageInterface $defaultPackage = null,
