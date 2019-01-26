@@ -22,6 +22,7 @@ git subsplit publish --heads="master" src/Nuxed/Http:git@github.com:nuxed/http.g
 git subsplit publish --heads="master" src/Nuxed/Io:git@github.com:nuxed/io.git
 git subsplit publish --heads="master" src/Nuxed/Kernel:git@github.com:nuxed/kernel.git
 git subsplit publish --heads="master" src/Nuxed/Lib:git@github.com:nuxed/lib.git
+git subsplit publish --heads="master" src/Nuxed/Log:git@github.com:nuxed/log.git
 git subsplit publish --heads="master" src/Nuxed/Markdown:git@github.com:nuxed/markdown.git
 git subsplit publish --heads="master" src/Nuxed/Period:git@github.com:nuxed/period.git
 git subsplit publish --heads="master" src/Nuxed/Stopwatch:git@github.com:nuxed/stopwatch.git
