@@ -47,9 +47,12 @@ class ReflectionContainer
     $reflector = new ReflectionClass($id);
     $construct = $reflector->getConstructor();
 
-    $resolution = null === $construct
-      ? $reflector->newInstance()
-      : $reflector->newInstanceArgs($this->reflectArguments($construct, $args));
+    if ($construct is nonnull) {
+      $args = $this->reflectArguments($construct, $args);
+      $resolution = $reflector->newInstanceArgs($args);
+    } else {
+      $resolution = $reflector->newInstance();
+    }
 
     if ($this->cacheResolutions) {
       $this->cache[$id] = $resolution;
