@@ -2,12 +2,22 @@
     "name": "nuxed/framework",
     "type": "framework",
     "description": "Hack framework for building web applications with expressive, elegant syntax.",
+    "keywords": [
+        "hack",
+        "hhvm",
+        "framework",
+        "nuxed"
+    ],
     "license": "MIT",
     "authors": [
         {
             "name": "azjezz",
             "email": "azjezz@protonmail.com",
             "homepage": "https://azjezz.github.io"
+        },
+        {
+            "name": "Nuxed Community",
+            "homepage": "https://github.com/nuxed/framework/graphs/contributors"
         }
     ],
     "require": {
@@ -18,6 +28,22 @@
         "facebook/hack-router": "^0.17",
         "facebook/fbmarkdown": "^1.4",
         "facebook/xhp-lib": "^2.8"
+    },
+    "replace": {
+        "nuxed/io": "self.version",
+        "nuxed/contract": "self.version",
+        "nuxed/event": "self.version",
+        "nuxed/crypto": "self.version",
+        "nuxed/cache": "self.version",
+        "nuxed/markdown": "self.version",
+        "nuxed/asset": "self.version",
+        "nuxed/period": "self.version",
+        "nuxed/kernel": "self.version",
+        "nuxed/container": "self.version",
+        "nuxed/lib": "self.version",
+        "nuxed/log": "self.version",
+        "nuxed/stopwatch": "self.version",
+        "nuxed/http": "self.version"
     },
     "require-dev": {
         "hhvm/hhast": "^3.30"
