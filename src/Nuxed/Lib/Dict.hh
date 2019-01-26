@@ -48,7 +48,7 @@ final abstract class Dict {
 
   public static function only<Tk as arraykey, Tv>(
     KeyedContainer<Tk, Tv> $container,
-    keyset<Tk> $keys,
+    Container<Tk> $keys,
   ): dict<Tk, Tv> {
     $result = dict[];
     foreach ($container as $key => $value) {
