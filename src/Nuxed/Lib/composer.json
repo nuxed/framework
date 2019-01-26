@@ -1,0 +1,34 @@
+{
+    "name": "nuxed/lib",
+    "type": "library",
+    "description": "The Nuxed Lib Component.",
+    "keywords": [
+        "hack",
+        "hhvm",
+        "nuxed",
+        "lib",
+        "nuxed/lib"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "azjezz",
+            "email": "azjezz@protonmail.com",
+            "homepage": "https://azjezz.github.io"
+        },
+        {
+            "name": "Nuxed Community",
+            "homepage": "https://github.com/nuxed/framework/graphs/contributors"
+        }
+    ],
+    "require": {
+        "hhvm": "^3.30.0",
+        "hhvm/hsl": "^3.30.0",
+        "hhvm/hhvm-autoload": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nuxed\\Lib": "./"
+        }
+    }
+}

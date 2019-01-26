@@ -1,0 +1,1 @@
+### The Nuxed Stopwatch Component.
