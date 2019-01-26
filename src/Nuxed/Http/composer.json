@@ -25,6 +25,7 @@
         "hhvm": "^3.30.0",
         "hhvm/hsl": "^3.30.0",
         "hhvm/hhvm-autoload": "dev-master",
+        "facebook/hack-router": "^0.17",
         "nuxed/contract": "dev-master",
         "nuxed/lib": "dev-master"
     },
