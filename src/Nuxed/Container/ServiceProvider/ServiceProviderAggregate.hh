@@ -17,11 +17,6 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface {
 
   protected vec<string> $registered = vec[];
 
-  public function __construct() {
-    $this->providers = vec[];
-    $this->registered = vec[];
-  }
-
   /**
    * {@inheritdoc}
    */
@@ -56,14 +51,14 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface {
   /**
    * {@inheritdoc}
    */
-  public function provides(string $service): bool {
+  public function provides(string $service): (bool, ?string) {
     foreach ($this->providers as $provider) {
       if ($provider->provides($service)) {
-        return true;
+        return tuple(true, $provider->getIdentifier());
       }
     }
 
-    return false;
+    return tuple(false, null);
   }
 
   /**
@@ -77,13 +72,13 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface {
    * {@inheritdoc}
    */
   public function register(string $service): void {
-    if (!$this->provides($service)) {
+    if (!$this->provides($service)[0]) {
       throw new ContainerException(
         Str\format('(%s) is not provided by a service provider', $service),
       );
     }
 
-    foreach ($this->getIterator() as $provider) {
+    foreach ($this->providers as $provider) {
       if (C\contains($this->registered, $provider->getIdentifier())) {
         continue;
       }

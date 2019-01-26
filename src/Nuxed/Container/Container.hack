@@ -5,6 +5,7 @@ use namespace HH\Lib\Vec;
 use type Nuxed\Container\Definition\DefinitionAggregate;
 use type Nuxed\Container\Definition\DefinitionInterface;
 use type Nuxed\Container\Definition\DefinitionAggregateInterface;
+use type Nuxed\Container\Exception\ContainerException;
 use type Nuxed\Container\Exception\NotFoundException;
 use type Nuxed\Container\Inflector\InflectorAggregate;
 use type Nuxed\Container\Inflector\InflectorInterface;
@@ -78,7 +79,7 @@ class Container implements ContainerInterface {
    * Get a definition to extend.
    */
   public function extend(string $id): DefinitionInterface {
-    if ($this->providers->provides($id)) {
+    if ($this->providers->provides($id)[0]) {
       $this->providers->register($id);
     }
 
@@ -123,8 +124,16 @@ class Container implements ContainerInterface {
         Vec\map($tagged, ($resolved) ==> $this->inflectors->inflect($resolved));
     }
 
-    if ($this->providers->provides($id)) {
+    list($provided, $provider) = $this->providers->provides($id);
+    if ($provided) {
       $this->providers->register($id);
+      if (!$this->definitions->has($id) && !$this->definitions->hasTag($id)) {
+        throw new ContainerException(Str\format(
+          'Service Provider (%s) lied about providing (%s) service.',
+          (string)$provider,
+          $id,
+        ));
+      }
       return $this->get($id, $new);
     }
 
@@ -155,7 +164,7 @@ class Container implements ContainerInterface {
       return true;
     }
 
-    if ($this->providers->provides($id)) {
+    if ($this->providers->provides($id)[0]) {
       return true;
     }
 

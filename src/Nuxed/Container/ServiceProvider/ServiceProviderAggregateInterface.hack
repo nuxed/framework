@@ -14,8 +14,11 @@ interface ServiceProviderAggregateInterface
 
   /**
    * Determines whether a service is provided by the aggregate.
+   *
+   * in case a ServiceProvider provides the given service, this method
+   * MUST return true and the service identifier, otherwise, return false and null.
    */
-  public function provides(string $service): bool;
+  public function provides(string $service): (bool, ?string);
 
   /**
    * Invokes the register method of a provider that provides a specific service.
