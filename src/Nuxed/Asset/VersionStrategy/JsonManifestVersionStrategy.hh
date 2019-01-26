@@ -52,7 +52,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface {
       }
 
       // UNSAFE
-      $this->manifestData = Lib\Json::decode($this->manifest->read());
+      $this->manifestData = dict(Lib\Json::decode($this->manifest->read()));
     }
 
     return idx($this->manifestData, $path, null);
