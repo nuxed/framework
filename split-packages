@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+#WORK_DIR=~/titon-framework-subsplit
+
+# Either clone or update the subsplit repo
+#if [ ! -d "$WORK_DIR" ]; then
+#    git subsplit init git@github.com:nuxed/framework.git
+#else
+#    git subsplit update
+#fi
+
+git subsplit init git@github.com:nuxed/framework.git
+
+# Split packages to their own repo
+git subsplit publish --heads="master" src/Nuxed/Asset:git@github.com:nuxed/asset.git
+git subsplit publish --heads="master" src/Nuxed/Cache:git@github.com:nuxed/cache.git
+git subsplit publish --heads="master" src/Nuxed/Container:git@github.com:nuxed/container.git
+git subsplit publish --heads="master" src/Nuxed/Contract:git@github.com:nuxed/contract.git
+git subsplit publish --heads="master" src/Nuxed/Crypto:git@github.com:nuxed/crypto.git
+git subsplit publish --heads="master" src/Nuxed/Event:git@github.com:nuxed/event.git
+git subsplit publish --heads="master" src/Nuxed/Http:git@github.com:nuxed/http.git
+git subsplit publish --heads="master" src/Nuxed/Io:git@github.com:nuxed/io.git
+git subsplit publish --heads="master" src/Nuxed/Kernel:git@github.com:nuxed/kernel.git
+git subsplit publish --heads="master" src/Nuxed/Lib:git@github.com:nuxed/lib.git
+git subsplit publish --heads="master" src/Nuxed/Markdown:git@github.com:nuxed/markdown.git
+git subsplit publish --heads="master" src/Nuxed/Period:git@github.com:nuxed/period.git
+git subsplit publish --heads="master" src/Nuxed/Stopwatch:git@github.com:nuxed/stopwatch.git
