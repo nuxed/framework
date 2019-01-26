@@ -23,12 +23,11 @@
     ],
     "require": {
         "hhvm": "^3.30.0",
-        "hhvm/hsl": "^3.30.0",
         "hhvm/hhvm-autoload": "dev-master"
     },
     "autoload": {
         "psr-4": {
-            "Nuxed\\Contract": "./"
+            "Nuxed\\Contract\\": "./"
         }
     }
 }
