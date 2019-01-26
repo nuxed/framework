@@ -24,11 +24,13 @@
     "require": {
         "hhvm": "^3.30.0",
         "hhvm/hsl": "^3.30.0",
-        "hhvm/hhvm-autoload": "dev-master"
+        "hhvm/hhvm-autoload": "dev-master",
+        "facebook/fbmarkdown": "^1.4",
+        "facebook/xhp-lib": "^2.8"
     },
     "autoload": {
         "psr-4": {
-            "Nuxed\\Markdown": "./"
+            "Nuxed\\Markdown\\": "./"
         }
     }
 }
