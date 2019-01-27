@@ -3,9 +3,11 @@
 namespace Nuxed\Period;
 
 use namespace HH\Lib\Vec;
+use type IteratorAggregate;
+use type Countable;
 use const ARRAY_FILTER_USE_BOTH;
 
-final class Sequence {
+final class Sequence implements Countable, IteratorAggregate<Period> {
   public Vector<Period> $intervals;
 
   /**
@@ -44,7 +46,7 @@ final class Sequence {
   /**
    * Returns the gaps inside the instance.
    */
-  public function getGaps(): this {
+  public function gaps(): this {
     $sequence = new self();
     $interval = null;
     $sorted = Vec\sort(
@@ -129,5 +131,13 @@ final class Sequence {
     }
 
     return 0 !== $this->intervals->count();
+  }
+
+  public function count(): int {
+    return $this->intervals->count();
+  }
+
+  public function getIterator(): Iterator<Period> {
+    return $this->intervals->getIterator();
   }
 }
