@@ -296,7 +296,7 @@ class DocumentHandler extends Handler\AbstractHandler {
 
 ### Local Files and Other Protocols
 
-In addition to HTTP this component supports other protocols (such as file:// and ftp://). This allows for example to serve local files in order to improve performance:
+In addition to HTTP this component supports other protocols (such as `file://` and `ftp://`). This allows for example to serve local files in order to improve performance:
 
 ```hack
 use type Nuxed\Asset\UrlPackage;
