@@ -1,6 +1,7 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace Nuxed\Http;
+use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 use type Nuxed\Contract\Http\Emitter\EmitterInterface;
 use type Nuxed\Contract\Http\Message\ResponseFactoryInterface;
 use type Nuxed\Contract\Http\Message\RequestFactoryInterface;

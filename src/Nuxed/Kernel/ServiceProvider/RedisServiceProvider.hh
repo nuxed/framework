@@ -2,6 +2,7 @@
 
 namespace Nuxed\Kernel\ServiceProvider;
 
+use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 use type Redis;
 
 class RedisServiceProvider extends AbstractServiceProvider {
@@ -10,17 +11,38 @@ class RedisServiceProvider extends AbstractServiceProvider {
   ];
 
   <<__Override>>
+  public function __construct(
+    private shape(
+      ?'host' => string,
+      ?'port' => int,
+      ?'database' => int,
+      ?'password' => string,
+      ?'timeout' => int,
+      ...
+    ) $config = shape(),
+  ) {
+    parent::__construct();
+  }
+
+  <<__Override>>
   public function register(): void {
     $this->share(Redis::class, () ==> {
-      $config = $this->config()['services']['redis'];
       $client = new Redis();
-      $client->connect($config['host'], $config['port'], $config['timeout']);
-      if ($config['password'] is nonnull) {
-        $client->auth($config['password']);
+      $client->connect(
+        $this->config['host'] ?? '127.0.0.1',
+        $this->config['port'] ?? 6379,
+        $this->config['timeout'] ?? 0,
+      );
+
+      $pw = $this->config['password'] ?? null;
+      $db = $this->config['database'] ?? null;
+      if ($pw is nonnull) {
+        $client->auth($pw);
       }
-      if ($config['database'] is nonnull) {
-        $client->select($config['database']);
+      if ($db is nonnull) {
+        $client->select($db);
       }
+
       return $client;
     });
   }

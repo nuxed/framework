@@ -2,8 +2,11 @@
 
 namespace Nuxed\Kernel\ServiceProvider;
 
+use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 use type Nuxed\Container\Argument\RawArgument;
 use type SQLite3;
+use const SQLITE3_OPEN_CREATE;
+use const SQLITE3_OPEN_READWRITE;
 
 class SqliteServiceProvider extends AbstractServiceProvider {
 
@@ -12,14 +15,27 @@ class SqliteServiceProvider extends AbstractServiceProvider {
   ];
 
   <<__Override>>
-  public function register(): void {
-    $config = $this->config()['services']['sqlite'];
+  public function __construct(
+    private shape(
+      ?'filename' => string,
+      ?'flags' => int,
+      ?'encryption_key' => string,
+      ...
+    ) $config = shape(),
+  ) {
+    parent::__construct();
+  }
 
+  <<__Override>>
+  public function register(): void {
     $this->share(SQLite3::class)
       ->addArguments(vec[
-        new RawArgument($config['filename']),
-        new RawArgument($config['flags']),
-        new RawArgument($config['encryption_key']),
+        new RawArgument($this->config['filename'] ?? ':memory:'),
+        new RawArgument(
+          $this->config['flags'] ??
+            SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE,
+        ),
+        new RawArgument($this->config['encryption_key'] ?? null),
       ]);
   }
 }

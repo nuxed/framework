@@ -2,6 +2,7 @@ namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace HH\Asio;
 use type Nuxed\Container\Argument\RawArgument;
+use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 use type AsyncMysqlConnectionPool;
 use type AsyncMysqlConnection;
 
@@ -12,11 +13,35 @@ class MysqlServiceProvider extends AbstractServiceProvider {
   ];
 
   <<__Override>>
-  public function register(): void {
-    $config = $this->config()['services']['mysql'];
+  public function __construct(
+    private shape(
+      ?'pool' => shape(
+        ?'per_key_connection_limit' => int,
+        ?'pool_connection_limit' => int,
+        ?'idle_timeout_micros' => int,
+        ?'age_timeout_micros' => int,
+        ?'expiration_policy' => string,
+        ...
+      ),
+      ?'host' => string,
+      ?'port' => int,
+      ?'database' => string,
+      ?'username' => string,
+      ?'password' => string,
+      ?'timeout-micros' => int,
+      ?'extra-key' => string,
+      ...
+    ) $config = shape(),
+  ) {
+    parent::__construct();
+  }
 
+  <<__Override>>
+  public function register(): void {
     $this->share(AsyncMysqlConnectionPool::class)
-      ->addArgument(new RawArgument($config['pool']));
+      ->addArgument(
+        new RawArgument(Shapes::idx($this->config, 'pool', shape())),
+      );
 
     $this->add(
       AsyncMysqlConnection::class,
@@ -26,13 +51,13 @@ class MysqlServiceProvider extends AbstractServiceProvider {
 
         return Asio\join(
           $pool->connect(
-            $config['host'],
-            $config['port'],
-            $config['database'],
-            $config['username'],
-            $config['password'],
-            $config['timeout-micros'],
-            $config['extra-key'],
+            $this->config['host'] ?? '127.0.0.1',
+            $this->config['port'] ?? 3306,
+            $this->config['database'] ?? 'nuxed',
+            $this->config['username'] ?? 'nuxed',
+            $this->config['password'] ?? '',
+            $this->config['timeout-micros'] ?? -1,
+            $this->config['extra-key'] ?? '',
           ),
         );
       },

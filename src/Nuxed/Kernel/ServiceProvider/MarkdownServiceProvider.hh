@@ -4,6 +4,7 @@ namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace Facebook;
 use namespace Nuxed\Markdown;
+use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 
 class MarkdownServiceProvider extends AbstractServiceProvider {
   protected vec<string> $provides = vec[
@@ -14,14 +15,37 @@ class MarkdownServiceProvider extends AbstractServiceProvider {
   ];
 
   <<__Override>>
-  public function register(): void {
-    $config = $this->config()['markdown'] ?? shape();
+  public function __construct(
+    private shape(
+      ?'parser' => classname<Facebook\Markdown\ParserContext>,
+      ?'context' => classname<Facebook\Markdown\RenderContext>,
+      ?'renderer' => classname<Facebook\Markdown\Renderer<string>>,
+      ?'extensions' => Container<Markdown\Extension\ExtensionInterface>,
+      ...
+    ) $config = shape(),
+  ) {
+    parent::__construct();
+  }
 
+  <<__Override>>
+  public function register(): void {
     $environment = $this->share(Markdown\Environment::class)
       ->addArguments(vec[
-        Shapes::idx($config, 'parser', Facebook\Markdown\ParserContext::class),
-        Shapes::idx($config, 'context', Facebook\Markdown\RenderContext::class),
-        Shapes::idx($config, 'renderer', Facebook\Markdown\Renderer::class),
+        Shapes::idx(
+          $this->config,
+          'parser',
+          Facebook\Markdown\ParserContext::class,
+        ),
+        Shapes::idx(
+          $this->config,
+          'context',
+          Facebook\Markdown\RenderContext::class,
+        ),
+        Shapes::idx(
+          $this->config,
+          'renderer',
+          Facebook\Markdown\Renderer::class,
+        ),
       ]);
 
     $this->share(Facebook\Markdown\ParserContext::class);
@@ -32,7 +56,7 @@ class MarkdownServiceProvider extends AbstractServiceProvider {
     )
       ->addArgument(Facebook\Markdown\RenderContext::class);
 
-    $extensions = Shapes::idx($config, 'extensions', vec[]);
+    $extensions = Shapes::idx($this->config, 'extensions', vec[]);
 
     foreach ($extensions as $extension) {
       $environment->addMethodCall('use', vec[$extension]);

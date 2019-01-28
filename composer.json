@@ -60,5 +60,7 @@
             "@type-check",
             "@lint"
         ]
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

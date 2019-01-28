@@ -2,9 +2,11 @@
 
 namespace Nuxed\Kernel\ServiceProvider;
 
-use type Nuxed\Container\Argument\RawArgument;
-use type Nuxed\Contract\Event\EventDispatcherInterface;
 use namespace Nuxed\Kernel;
+use type Nuxed\Contract\Event\EventDispatcherInterface;
+use type Nuxed\Container\Argument\RawArgument;
+use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
+use function Facebook\AutoloadMap\Generated\is_dev;
 
 class ErrorServiceProvider extends AbstractServiceProvider {
   protected vec<string> $provides = vec[
@@ -22,7 +24,7 @@ class ErrorServiceProvider extends AbstractServiceProvider {
       Kernel\Error\ErrorHandlerInterface::class,
       Kernel\Error\ErrorHandler::class,
     )
-      ->addArgument(new RawArgument($this->config()['app']['debug']))
+      ->addArgument(new RawArgument(is_dev()))
       ->addArgument(EventDispatcherInterface::class);
 
     $this->share(Kernel\Handler\NotFoundHandler::class);

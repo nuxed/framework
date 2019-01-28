@@ -21,8 +21,6 @@ A simple example using `Nuxed\Kernel\Kernel`, the heart of the `Nuxed` framework
 
 use namespace Nuxed\Kernel;
 use namespace Nuxed\Http\Message;
-use type Nuxed\Contract\Http\Session\SessionInterface;
-use type Nuxed\Contract\Http\Flash\FlashMessagesInterface;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface as Request;
 use type Nuxed\Contract\Http\Message\ResponseInterface as Response;
 
@@ -30,22 +28,13 @@ require __DIR__.'/../../vendor/hh_autoload.hh';
 
 <<__EntryPoint>>
 async function main(): Awaitable<noreturn> {
-
   /**
-   * Configure the application
+   * Create the container and kernel instances.
+   *
+   * you can use the container instance to register
+   * services.
    */
-  $config = dict[
-    'app' => dict[
-      'name' => 'example application',
-      'env' => Kernel\Environment::DEVELOPMENT,
-      'debug' => true
-    ]
-  ];
-  
-  /**
-   * Create an Kernel instance.
-   */
-  $kernel = new Kernel\Kernel($config);
+  list($container, $kernel) = Kernel\Kernel::create();
   
   /**
    * Add a simple route

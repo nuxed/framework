@@ -2,86 +2,64 @@
 
 namespace Nuxed\Kernel;
 
+use type Nuxed\Contract\Container\ContainerInterface;
 use type Nuxed\Contract\Event\EventDispatcherInterface;
 use type Nuxed\Contract\Kernel\KernelInterface;
-use type Nuxed\Container\Container as ServiceContainer;
-use type Nuxed\Container\ReflectionContainer;
-use type Nuxed\Container\ServiceProvider\ServiceProviderInterface;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Emitter\EmitterInterface;
 use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
 use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
 use type Nuxed\Contract\Http\Router\RouteInterface;
-use type Nuxed\Contract\Http\Router\RouterInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
-use type Nuxed\Http\Server\MiddlewareFactory;
-use type Nuxed\Http\Message\ServerRequest;
 use type Nuxed\Contract\Log\LoggerAwareTrait;
 use type Nuxed\Contract\Event\EventSubscriberInterface;
 use type Nuxed\Contract\Event\EventListener;
 use type Nuxed\Contract\Event\EventInterface;
+use type Nuxed\Container\Container as C;
+use type Nuxed\Container\ReflectionContainer;
+use type Nuxed\Http\Server\MiddlewareFactory;
+use type Nuxed\Http\Message\ServerRequest;
 
-class Kernel implements KernelInterface {
+final class Kernel implements KernelInterface {
   use LoggerAwareTrait;
 
-  protected MiddlewarePipeInterface $pipe;
-  protected EmitterInterface $emitter;
-  protected RouterInterface $router;
-  protected EventDispatcherInterface $events;
-  protected MiddlewareFactory $middleware;
-  protected RouteCollectorInterface $collector;
-  protected Configuration $configuration;
-
   public function __construct(
-    KeyedContainer<string, mixed> $configuration = dict[],
-    protected ServiceContainer $container = new ServiceContainer(),
-  ) {
-    $container->defaultToShared();
+    private ContainerInterface $container,
+    private MiddlewarePipeInterface $pipe,
+    private EmitterInterface $emitter,
+    private EventDispatcherInterface $events,
+    private MiddlewareFactory $middleware,
+    private RouteCollectorInterface $collector,
+  ) {}
+
+  public static function create(): (C, Kernel) {
+    $container = new C();
     $container->delegate(new ReflectionContainer(true));
-    $this->configuration = Config::load($configuration);
+    $container->defaultToShared();
 
-    $container->share('config', () ==> $this->configuration);
+    $container->addServiceProvider(new ServiceProvider\HttpServiceProvider());
+    $container->addServiceProvider(new ServiceProvider\EventServiceProvider());
+    $container->addServiceProvider(new ServiceProvider\ErrorServiceProvider());
 
-    $providers = vec[
-      ServiceProvider\HttpServiceProvider::class,
-      ServiceProvider\EventServiceProvider::class,
-      ServiceProvider\ErrorServiceProvider::class,
-    ];
+    $kernel = new Kernel(
+      $container,
+      $container->get(MiddlewarePipeInterface::class) as
+        MiddlewarePipeInterface,
+      $container->get(EmitterInterface::class) as EmitterInterface,
+      $container->get(EventDispatcherInterface::class) as
+        EventDispatcherInterface,
+      $container->get(MiddlewareFactory::class) as MiddlewareFactory,
+      $container->get(RouteCollectorInterface::class) as
+        RouteCollectorInterface,
+    );
+    $kernel->use(new Extension\HttpExtension());
 
-    foreach ($providers as $provider) {
-      $container->addServiceProvider($provider);
-    }
-
-    $this->pipe = $this->getService(MiddlewarePipeInterface::class);
-    $this->emitter = $this->getService(EmitterInterface::class);
-    $this->router = $this->getService(RouterInterface::class);
-    $this->events = $this->getService(EventDispatcherInterface::class);
-    $this->middleware = $this->getService(MiddlewareFactory::class);
-    $this->collector = $this->getService(RouteCollectorInterface::class);
-
-    $this->use(new Extension\HttpExtension());
-    foreach ($this->configuration['app']['extensions'] as $extension) {
-      $this->use(
-        $this->container->get($extension) as Extension\ExtensionInterface,
-      );
-    }
-  }
-
-  /**
-   * Register a service provider with the container.
-   */
-  public function register(ServiceProviderInterface $service): void {
-    $event = $this->events->dispatch(new Event\RegisterEvent($service));
-    $this->container->addServiceProvider($event->service);
+    return tuple($container, $kernel);
   }
 
   public function use(Extension\ExtensionInterface $extension): void {
     $extension->setContainer($this->container);
-    foreach ($extension->services($this->configuration) as $service) {
-      $this->container->addServiceProvider($service);
-    }
-
     $extension->route($this, $this->middleware);
     $extension->pipe($this, $this->middleware);
     $extension->subscribe($this->events);
@@ -280,7 +258,7 @@ class Kernel implements KernelInterface {
    */
   private function getTerminationStatusCode(ResponseInterface $response): int {
     $code = $response->getStatusCode();
-    if ($code >= 200 && $code < 300) {
+    if ($code >= 200 && $code < 400) {
       return 0;
     } elseif ($code <= 255 && $code > 0) {
       // even that 0 is an error, we don't return it
@@ -290,10 +268,5 @@ class Kernel implements KernelInterface {
     } else {
       return 1;
     }
-  }
-
-  private function getService<T>(classname<T> $service): T {
-    // UNSAFE
-    return $this->container->get($service);
   }
 }

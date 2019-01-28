@@ -25,6 +25,7 @@
         "hhvm/hsl": "^3.30.0",
         "hhvm/hhvm-autoload": "dev-master",
         "nuxed/contract": "dev-master",
+        "nuxed/container": "dev-master",
         "nuxed/http": "dev-master",
         "nuxed/event": "dev-master"
     },
