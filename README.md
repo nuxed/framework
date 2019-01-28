@@ -73,6 +73,13 @@ Run the application :
 
 ---
 
+### Advanced Usage: Repo Authoritative
+
+Nuxed doesn't use eval, or create classes / functions at runtime. meaning you can use it in repo authoritative mode. however compiling [`Hsl`](https://github.com/hhvm/hsl) 3.30 fails and crashs the hip-hop compiler, so we need to wait until it get fixed.
+
+see : [@facebook/hhvm#8395](https://github.com/facebook/hhvm/issues/8395)
+see : [@hhvm/hsl#71](https://github.com/hhvm/hsl/issues/71)
+
 ### Security Vulnerabilities
 
 If you discover a security vulnerability within Nuxed, please send an e-mail to Saif Eddin Gmati via azjezz@protonmail.com.
