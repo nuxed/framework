@@ -7,6 +7,7 @@ use type Nuxed\Cache\Store\StoreInterface;
 use type Nuxed\Cache\Serializer\SerializerInterface;
 use type Nuxed\Contract\Log\LoggerInterface;
 use type Nuxed\Contract\Cache\CacheInterface;
+use type Nuxed\Container\Container;
 use type Nuxed\Container\Argument\RawArgument;
 use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 use type Redis;
@@ -65,35 +66,35 @@ class CacheServiceProvider extends AbstractServiceProvider {
   }
 
   <<__Override>>
-  public function register(): void {
-    $this->share(CacheInterface::class, Cache::class)
+  public function register(Container $container): void {
+    $container->share(CacheInterface::class, Cache::class)
       ->addArgument(StoreInterface::class)
       ->addArgument(LoggerInterface::class);
     $namespace = Shapes::idx($this->config, 'namespace', md5(__DIR__));
     $defaultTtl = Shapes::idx($this->config, 'default_ttl', 0);
 
-    $this->share(Store\ApcStore::class)
+    $container->share(Store\ApcStore::class)
       ->addArgument(new RawArgument($namespace))
       ->addArgument(new RawArgument($defaultTtl))
       ->addArgument(SerializerInterface::class);
-    $this->share(Store\ArrayStore::class)
+    $container->share(Store\ArrayStore::class)
       ->addArgument(new RawArgument($defaultTtl));
-    $this->share(Store\RedisStore::class)
+    $container->share(Store\RedisStore::class)
       ->addArgument(Redis::class)
       ->addArgument(new RawArgument($namespace))
       ->addArgument(new RawArgument($defaultTtl))
       ->addArgument(SerializerInterface::class);
-    $this->share(Store\NullStore::class);
+    $container->share(Store\NullStore::class);
 
-    $this->share(StoreInterface::class, () ==> {
-      return $this->getContainer()
+    $container->share(StoreInterface::class, () ==> {
+      return $container
         ->get(Shapes::idx($this->config, 'store', Store\ArrayStore::class));
     });
 
-    $this->share(Serializer\DefaultSerializer::class);
+    $container->share(Serializer\DefaultSerializer::class);
 
-    $this->share(SerializerInterface::class, () ==> {
-      return $this->getContainer()
+    $container->share(SerializerInterface::class, () ==> {
+      return $container
         ->get(
           Shapes::idx(
             $this->config,

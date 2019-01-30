@@ -2,14 +2,10 @@ namespace Nuxed\Container\ServiceProvider;
 
 use namespace HH\Lib\Str;
 use namespace HH\Lib\C;
-use type Nuxed\Contract\Container\ContainerAwareInterface;
-use type Nuxed\Container\ContainerAwareTrait;
 use type Nuxed\Container\Exception\ContainerException;
-use type ReflectionClass;
-use function class_exists;
+use type Nuxed\Container\Container;
 
 class ServiceProviderAggregate implements ServiceProviderAggregateInterface {
-  use ContainerAwareTrait;
 
   protected vec<ServiceProviderInterface> $providers = vec[];
 
@@ -18,32 +14,14 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface {
   /**
    * {@inheritdoc}
    */
-  public function add(mixed $provider): this {
-    if (($provider is string) && $this->getContainer()->has($provider)) {
-      $provider = $this->getContainer()->get($provider);
-    } elseif (($provider is string) && class_exists($provider)) {
-      $reflection = new ReflectionClass($provider);
-      $provider = $reflection->newInstance();
-    }
-
-    if ($provider instanceof ContainerAwareInterface) {
-      $provider->setContainer($this->getContainer());
-    }
-
+  public function add(ServiceProviderInterface $provider): this {
     if ($provider instanceof BootableServiceProviderInterface) {
       $provider->boot();
     }
 
-    if ($provider instanceof ServiceProviderInterface) {
-      $this->providers[] = $provider;
+    $this->providers[] = $provider;
 
-      return $this;
-    }
-
-    throw new ContainerException(
-      'A service provider must be a fully qualified class name or instance '.
-      'of (\Nuxed\Container\ServiceProvider\ServiceProviderInterface)',
-    );
+    return $this;
   }
 
   /**
@@ -69,7 +47,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface {
   /**
    * {@inheritdoc}
    */
-  public function register(string $service): void {
+  public function register(string $service, Container $container): void {
     if (!$this->provides($service)[0]) {
       throw new ContainerException(
         Str\format('(%s) is not provided by a service provider', $service),
@@ -82,7 +60,7 @@ class ServiceProviderAggregate implements ServiceProviderAggregateInterface {
       }
 
       if ($provider->provides($service)) {
-        $provider->register();
+        $provider->register($container);
         $this->registered[] = $provider->getIdentifier();
       }
     }

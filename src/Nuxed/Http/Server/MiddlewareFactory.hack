@@ -7,15 +7,12 @@ use type Nuxed\Contract\Http\Server\MiddlewareInterface;
 use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
 use type Nuxed\Contract\Container\ContainerAwareInterface;
 use type Nuxed\Contract\Container\ContainerInterface;
-use type Nuxed\Container\ContainerAwareTrait;
 use type ReflectionFunctionAbstract;
 use type ReflectionMethod;
 use type ReflectionFunction;
 use function is_callable;
 
-class MiddlewareFactory {
-  use ContainerAwareTrait;
-
+class MiddlewareFactory implements ContainerAwareInterface {
   public function __construct(
     protected ?ContainerInterface $container = null,
   ) {}
@@ -174,4 +171,28 @@ class MiddlewareFactory {
     return true;
   }
 
+  /**
+   * Set a container.
+   */
+  public function setContainer(ContainerInterface $container): this {
+    $this->container = $container;
+    return $this;
+  }
+
+  /**
+   * Get the container.
+   */
+  public function getContainer(): ContainerInterface {
+    if ($this->container instanceof ContainerInterface) {
+      return $this->container;
+    }
+
+    throw new Exception\RuntimeException(
+      'No container implementation has been set.',
+    );
+  }
+
+  protected function hasContainer(): bool {
+    return $this->container is nonnull;
+  }
 }

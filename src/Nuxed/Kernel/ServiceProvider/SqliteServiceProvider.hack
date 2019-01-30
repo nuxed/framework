@@ -1,7 +1,8 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
+use type Nuxed\Container\Container;
 use type Nuxed\Container\Argument\RawArgument;
+use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 use type SQLite3;
 use const SQLITE3_OPEN_CREATE;
 use const SQLITE3_OPEN_READWRITE;
@@ -25,8 +26,8 @@ class SqliteServiceProvider extends AbstractServiceProvider {
   }
 
   <<__Override>>
-  public function register(): void {
-    $this->share(SQLite3::class)
+  public function register(Container $container): void {
+    $container->share(SQLite3::class)
       ->addArguments(vec[
         new RawArgument($this->config['filename'] ?? ':memory:'),
         new RawArgument(

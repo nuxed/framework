@@ -13,6 +13,7 @@ use type Nuxed\Contract\Http\Message\UriFactoryInterface;
 use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
 use type Nuxed\Contract\Http\Router\RouterInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
+use type Nuxed\Container\Container;
 
 class HttpServiceProvider extends AbstractServiceProvider {
   protected vec<string> $provides = vec[
@@ -36,64 +37,58 @@ class HttpServiceProvider extends AbstractServiceProvider {
   ];
 
   <<__Override>>
-  public function register(): void {
+  public function register(Container $container): void {
     // Emitter
-    $this->registerEmitter();
+    $container->share(EmitterInterface::class, Http\Emitter\Emitter::class);
     // Messages
-    $this->registerMessagesFactories();
-    // Server
-    $this->registerServer();
-    // Router
-    $this->registerRouter();
-  }
-
-  private function registerEmitter(): void {
-    $this->share(EmitterInterface::class, Http\Emitter\Emitter::class);
-  }
-
-  private function registerMessagesFactories(): void {
-    $this->share(ResponseFactoryInterface::class, Http\Message\Factory::class);
-    $this->share(RequestFactoryInterface::class, Http\Message\Factory::class);
-    $this->share(
+    $container->share(
+      ResponseFactoryInterface::class,
+      Http\Message\Factory::class,
+    );
+    $container->share(
+      RequestFactoryInterface::class,
+      Http\Message\Factory::class,
+    );
+    $container->share(
       ServerRequestFactoryInterface::class,
       Http\Message\Factory::class,
     );
-    $this->share(StreamFactoryInterface::class, Http\Message\Factory::class);
-    $this->share(
+    $container->share(
+      StreamFactoryInterface::class,
+      Http\Message\Factory::class,
+    );
+    $container->share(
       UploadedFileFactoryInterface::class,
       Http\Message\Factory::class,
     );
-    $this->share(CookieFactoryInterface::class, Http\Message\Factory::class);
-    $this->share(UriFactoryInterface::class, Http\Message\Factory::class);
-  }
-
-  private function registerServer(): void {
-    $this->share(
+    $container->share(
+      CookieFactoryInterface::class,
+      Http\Message\Factory::class,
+    );
+    $container->share(UriFactoryInterface::class, Http\Message\Factory::class);
+    // Server
+    $container->share(
       MiddlewarePipeInterface::class,
       Http\Server\MiddlewarePipe::class,
     );
-
-    $this->share(
+    $container->share(
       Http\Server\MiddlewareFactory::class,
-      () ==> new Http\Server\MiddlewareFactory($this->container),
+      () ==> new Http\Server\MiddlewareFactory($container),
     );
-  }
-
-  private function registerRouter(): void {
-    $this->share(RouterInterface::class, Http\Router\Router::class);
-    $this
+    // Router
+    $container->share(RouterInterface::class, Http\Router\Router::class);
+    $container
       ->share(RouteCollectorInterface::class, Http\Router\RouteCollector::class)
       ->addArgument(RouterInterface::class);
-
-    $this->share(Http\Router\Middleware\DispatchMiddleware::class);
-    $this->share(Http\Router\Middleware\ImplicitHeadMiddleware::class)
+    $container->share(Http\Router\Middleware\DispatchMiddleware::class);
+    $container->share(Http\Router\Middleware\ImplicitHeadMiddleware::class)
       ->addArgument(RouterInterface::class)
       ->addArgument(StreamFactoryInterface::class);
-    $this->share(Http\Router\Middleware\ImplicitOptionsMiddleware::class)
+    $container->share(Http\Router\Middleware\ImplicitOptionsMiddleware::class)
       ->addArgument(ResponseFactoryInterface::class);
-    $this->share(Http\Router\Middleware\MethodNotAllowedMiddleware::class)
+    $container->share(Http\Router\Middleware\MethodNotAllowedMiddleware::class)
       ->addArgument(ResponseFactoryInterface::class);
-    $this->share(Http\Router\Middleware\RouteMiddleware::class)
+    $container->share(Http\Router\Middleware\RouteMiddleware::class)
       ->addArgument(RouterInterface::class);
   }
 }

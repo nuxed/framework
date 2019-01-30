@@ -1,5 +1,6 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
+use type Nuxed\Container\Container;
 use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 use type Redis;
 
@@ -23,8 +24,8 @@ class RedisServiceProvider extends AbstractServiceProvider {
   }
 
   <<__Override>>
-  public function register(): void {
-    $this->share(Redis::class, () ==> {
+  public function register(Container $container): void {
+    $container->share(Redis::class, () ==> {
       $client = new Redis();
       $client->connect(
         $this->config['host'] ?? '127.0.0.1',

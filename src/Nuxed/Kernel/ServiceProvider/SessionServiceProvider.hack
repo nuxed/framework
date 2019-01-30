@@ -2,8 +2,9 @@ namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace Nuxed\Contract\Http;
 use namespace Nuxed\Http\Session;
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
+use type Nuxed\Container\Container;
 use type Nuxed\Container\Argument\RawArgument;
+use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 
 class SessionServiceProvider extends AbstractServiceProvider {
   protected vec<string> $provides = vec[
@@ -122,13 +123,13 @@ class SessionServiceProvider extends AbstractServiceProvider {
   }
 
   <<__Override>>
-  public function register(): void {
-    $this->share(Session\SessionMiddleware::class)
+  public function register(Container $container): void {
+    $container->share(Session\SessionMiddleware::class)
       ->addArgument(Session\Persistence\SessionPersistenceInterface::class);
 
-    $this->share(
+    $container->share(
       Session\Persistence\SessionPersistenceInterface::class,
-      () ==> $this->getContainer()
+      () ==> $container
         ->get(
           $this->config['persistence'] ??
             Session\Persistence\NativeSessionPersistence::class,
@@ -147,12 +148,12 @@ class SessionServiceProvider extends AbstractServiceProvider {
     $cl = $this->config['cache-limiter'] ?? Session\CacheLimiter::PRIVATE;
     $ce = $this->config['cache-expire'] ?? 180;
 
-    $this->share(Session\Persistence\NativeSessionPersistence::class)
+    $container->share(Session\Persistence\NativeSessionPersistence::class)
       ->addArgument(new RawArgument($cookie))
       ->addArgument(new RawArgument($cl))
       ->addArgument(new RawArgument($ce));
 
-    $this->share(Session\Persistence\CacheSessionPersistence::class)
+    $container->share(Session\Persistence\CacheSessionPersistence::class)
       ->addArgument(new RawArgument($cookie))
       ->addArgument(new RawArgument($cl))
       ->addArgument(new RawArgument($ce));
