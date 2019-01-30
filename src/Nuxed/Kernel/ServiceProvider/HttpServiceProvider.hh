@@ -43,18 +43,30 @@ class HttpServiceProvider extends AbstractServiceProvider {
     // Emitter
     $container->share(EmitterInterface::class, Http\Emitter\Emitter::class);
     // Messages
-    $container->share(ResponseFactoryInterface::class, Http\Message\Factory::class);
-    $container->share(RequestFactoryInterface::class, Http\Message\Factory::class);
+    $container->share(
+      ResponseFactoryInterface::class,
+      Http\Message\Factory::class,
+    );
+    $container->share(
+      RequestFactoryInterface::class,
+      Http\Message\Factory::class,
+    );
     $container->share(
       ServerRequestFactoryInterface::class,
       Http\Message\Factory::class,
     );
-    $container->share(StreamFactoryInterface::class, Http\Message\Factory::class);
+    $container->share(
+      StreamFactoryInterface::class,
+      Http\Message\Factory::class,
+    );
     $container->share(
       UploadedFileFactoryInterface::class,
       Http\Message\Factory::class,
     );
-    $container->share(CookieFactoryInterface::class, Http\Message\Factory::class);
+    $container->share(
+      CookieFactoryInterface::class,
+      Http\Message\Factory::class,
+    );
     $container->share(UriFactoryInterface::class, Http\Message\Factory::class);
     // Server
     $container->share(

@@ -189,7 +189,9 @@ class MiddlewareFactory implements ContainerAwareInterface {
       return $this->container;
     }
 
-    throw new Exception\RuntimeException('No container implementation has been set.');
+    throw new Exception\RuntimeException(
+      'No container implementation has been set.',
+    );
   }
 
   protected function hasContainer(): bool {
