@@ -5,6 +5,7 @@ namespace Nuxed\Kernel\ServiceProvider;
 use namespace HH\Lib\Vec;
 use namespace Nuxed\Contract\Log as Contract;
 use namespace Nuxed\Log;
+use type Nuxed\Container\Container as ServiceContainer;
 use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 use function sys_get_temp_dir;
 use const LOG_PID;
@@ -80,8 +81,8 @@ class LoggerServiceProvider extends AbstractServiceProvider {
   }
 
   <<__Override>>
-  public function register(): void {
-    $this->share(Contract\LoggerInterface::class, () ==> {
+  public function register(ServiceContainer $container): void {
+    $container->share(Contract\LoggerInterface::class, () ==> {
       $handlers = Vec\map(
         Shapes::idx(
           $this->config,
@@ -91,7 +92,7 @@ class LoggerServiceProvider extends AbstractServiceProvider {
           ],
         ),
         (classname<Log\Handler\HandlerInterface> $class) ==>
-          $this->getContainer()->get($class) as Log\Handler\HandlerInterface,
+          $container->get($class) as Log\Handler\HandlerInterface,
       );
       $processors = Vec\map(
         Shapes::idx(
@@ -101,15 +102,14 @@ class LoggerServiceProvider extends AbstractServiceProvider {
             Log\Processor\ContextProcessor::class,
           ],
         ),
-        (classname<Log\Processor\ProcessorInterface> $class) ==> $this
-          ->getContainer()
+        (classname<Log\Processor\ProcessorInterface> $class) ==> $container
           ->get($class) as Log\Processor\ProcessorInterface,
       );
       return new Log\Logger($handlers, $processors);
     });
 
     $options = Shapes::idx($this->config, 'options', shape());
-    $this->share(Log\Handler\RotatingFileHandler::class, () ==> {
+    $container->share(Log\Handler\RotatingFileHandler::class, () ==> {
       $options = Shapes::idx($options, 'rotating-file', shape());
       return new Log\Handler\RotatingFileHandler(
         $options['filename'] ?? sys_get_temp_dir().'/nuxed.log',
@@ -120,7 +120,7 @@ class LoggerServiceProvider extends AbstractServiceProvider {
         $options['use-lock'] ?? false,
       );
     });
-    $this->share(Log\Handler\StreamHandler::class, () ==> {
+    $container->share(Log\Handler\StreamHandler::class, () ==> {
       $options = Shapes::idx($options, 'stream', shape());
       return new Log\Handler\StreamHandler(
         $options['url'] ?? sys_get_temp_dir().'/nuxed.log',
@@ -130,7 +130,7 @@ class LoggerServiceProvider extends AbstractServiceProvider {
         $options['use-lock'] ?? false,
       );
     });
-    $this->share(Log\Handler\SysLogHandler::class, () ==> {
+    $container->share(Log\Handler\SysLogHandler::class, () ==> {
       $options = Shapes::idx($options, 'syslog', shape());
       return new Log\Handler\SysLogHandler(
         $options['ident'] ?? 'nuxed',
@@ -140,7 +140,7 @@ class LoggerServiceProvider extends AbstractServiceProvider {
         $options['options'] ?? LOG_PID,
       );
     });
-    $this->share(Log\Processor\MessageLengthProcessor::class);
-    $this->share(Log\Processor\ContextProcessor::class);
+    $container->share(Log\Processor\MessageLengthProcessor::class);
+    $container->share(Log\Processor\ContextProcessor::class);
   }
 }

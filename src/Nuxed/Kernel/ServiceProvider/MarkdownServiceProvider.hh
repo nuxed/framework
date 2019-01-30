@@ -4,6 +4,7 @@ namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace Facebook;
 use namespace Nuxed\Markdown;
+use type Nuxed\Container\Container as ServiceContainer;
 use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 
 class MarkdownServiceProvider extends AbstractServiceProvider {
@@ -28,8 +29,8 @@ class MarkdownServiceProvider extends AbstractServiceProvider {
   }
 
   <<__Override>>
-  public function register(): void {
-    $environment = $this->share(Markdown\Environment::class)
+  public function register(ServiceContainer $container): void {
+    $environment = $container->share(Markdown\Environment::class)
       ->addArguments(vec[
         Shapes::idx(
           $this->config,
@@ -48,9 +49,9 @@ class MarkdownServiceProvider extends AbstractServiceProvider {
         ),
       ]);
 
-    $this->share(Facebook\Markdown\ParserContext::class);
-    $this->share(Facebook\Markdown\RenderContext::class);
-    $this->share(
+    $container->share(Facebook\Markdown\ParserContext::class);
+    $container->share(Facebook\Markdown\RenderContext::class);
+    $container->share(
       Facebook\Markdown\Renderer::class,
       Facebook\Markdown\HTMLRenderer::class,
     )

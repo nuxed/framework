@@ -12,6 +12,7 @@ use type Nuxed\Container\Exception\NotFoundException;
 use type Nuxed\Container\Inflector\InflectorAggregate;
 use type Nuxed\Container\Inflector\InflectorInterface;
 use type Nuxed\Container\Inflector\InflectorAggregateInterface;
+use type Nuxed\Container\ServiceProvider\ServiceProviderInterface;
 use type Nuxed\Container\ServiceProvider\ServiceProviderAggregate;
 use type Nuxed\Container\ServiceProvider\ServiceProviderAggregateInterface;
 use type Nuxed\Contract\Container\ContainerInterface;
@@ -82,7 +83,7 @@ class Container implements ContainerInterface {
    */
   public function extend(string $id): DefinitionInterface {
     if ($this->providers->provides($id)[0]) {
-      $this->providers->register($id);
+      $this->providers->register($id, $this);
     }
 
     if ($this->definitions->has($id)) {
@@ -99,10 +100,8 @@ class Container implements ContainerInterface {
 
   /**
    * Add a service provider.
-   *
-   * @param ServiceProviderInterface|string $provider
    */
-  public function addServiceProvider(mixed $provider): this {
+  public function addServiceProvider(ServiceProviderInterface $provider): this {
     $this->providers->add($provider);
 
     return $this;
@@ -128,7 +127,7 @@ class Container implements ContainerInterface {
 
     list($provided, $provider) = $this->providers->provides($id);
     if ($provided) {
-      $this->providers->register($id);
+      $this->providers->register($id, $this);
       if (!$this->definitions->has($id) && !$this->definitions->hasTag($id)) {
         throw new ContainerException(Str\format(
           'Service Provider (%s) lied about providing (%s) service.',

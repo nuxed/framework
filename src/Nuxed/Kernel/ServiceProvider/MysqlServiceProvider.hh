@@ -3,6 +3,7 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace HH\Asio;
+use type Nuxed\Container\Container;
 use type Nuxed\Container\Argument\RawArgument;
 use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 use type AsyncMysqlConnectionPool;
@@ -39,16 +40,16 @@ class MysqlServiceProvider extends AbstractServiceProvider {
   }
 
   <<__Override>>
-  public function register(): void {
-    $this->share(AsyncMysqlConnectionPool::class)
+  public function register(Container $container): void {
+    $container->share(AsyncMysqlConnectionPool::class)
       ->addArgument(
         new RawArgument(Shapes::idx($this->config, 'pool', shape())),
       );
 
-    $this->add(
+    $container->add(
       AsyncMysqlConnection::class,
       () ==> {
-        $pool = $this->getContainer()
+        $pool = $container
           ->get(AsyncMysqlConnectionPool::class) as AsyncMysqlConnectionPool;
 
         return Asio\join(
