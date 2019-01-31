@@ -6,7 +6,11 @@
         "hack",
         "hhvm",
         "nuxed",
-        "http"
+        "http",
+        "middleware",
+        "router",
+        "session",
+        "flash"
     ],
     "license": "MIT",
     "authors": [
@@ -23,6 +27,7 @@
     "require": {
         "hhvm": "^3.30.0",
         "hhvm/hsl": "^3.30.0",
+        "hhvm/hsl-experimental": "^3.30.0",
         "hhvm/hhvm-autoload": "dev-master",
         "facebook/hack-router": "^0.17",
         "nuxed/contract": "dev-master",
@@ -32,5 +37,23 @@
         "psr-4": {
             "Nuxed\\Http\\": "./"
         }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "lint": "hhast-lint -v ./",
+        "type-check": "hh_client ./",
+        "check": [
+            "@type-check",
+            "@lint"
+        ]
+    },
+    "support": {
+        "issues": "https://github.com/nuxed/framework/issues",
+        "chat": "https://gitter.im/nuxed/http",
+        "source": "https://github.com/nuxed/http"
     }
 }

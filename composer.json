@@ -53,6 +53,11 @@
             "Nuxed\\": "src/Nuxed/"
         }
     },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "scripts": {
         "lint": "hhast-lint -v src/",
         "type-check": "hh_client src/",
@@ -61,6 +66,9 @@
             "@lint"
         ]
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "support": {
+        "issues": "https://github.com/nuxed/framework/issues",
+        "chat": "https://gitter.im/nuxed/asset",
+        "source": "https://github.com/nuxed/asset"
+    }
 }

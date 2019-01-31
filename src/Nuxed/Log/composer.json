@@ -31,5 +31,23 @@
         "psr-4": {
             "Nuxed\\Log\\": "./"
         }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "lint": "hhast-lint -v ./",
+        "type-check": "hh_client ./",
+        "check": [
+            "@type-check",
+            "@lint"
+        ]
+    },
+    "support": {
+        "issues": "https://github.com/nuxed/framework/issues",
+        "chat": "https://gitter.im/nuxed/log",
+        "source": "https://github.com/nuxed/log"
     }
 }

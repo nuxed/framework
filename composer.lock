@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "207d7a6139cf8ffd242739bac27e6796",
+    "content-hash": "f2fc93cd761ff4df82a21b7b1513e12a",
     "packages": [
         {
             "name": "facebook/fbmarkdown",
@@ -441,11 +441,11 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
         "hhvm/hhvm-autoload": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "hhvm": "^3.30.0"

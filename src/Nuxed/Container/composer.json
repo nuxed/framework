@@ -30,5 +30,23 @@
         "psr-4": {
             "Nuxed\\Container\\": "./"
         }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "lint": "hhast-lint -v ./",
+        "type-check": "hh_client ./",
+        "check": [
+            "@type-check",
+            "@lint"
+        ]
+    },
+    "support": {
+        "issues": "https://github.com/nuxed/framework/issues",
+        "chat": "https://gitter.im/nuxed/container",
+        "source": "https://github.com/nuxed/container"
     }
 }
