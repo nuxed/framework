@@ -2,18 +2,17 @@ namespace Nuxed\Http\Message\__Private;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
+use namespace HH\Lib\Regex;
 use namespace Nuxed\Http\Message\Exception;
 use type Nuxed\Contract\Http\Message\UriInterface;
 use type Nuxed\Http\Message\Uri;
 use function explode;
-use function preg_match;
-use function preg_replace;
 use function gettype;
 
 class UriMarshaler {
   public function marshal(
-    dict<string, mixed> $server,
-    dict<string, vec<string>> $headers,
+    KeyedContainer<string, mixed> $server,
+    KeyedContainer<string, Container<string>> $headers,
   ): UriInterface {
     $uri = new Uri('');
     // URI scheme
@@ -58,7 +57,7 @@ class UriMarshaler {
     }
     // URI fragment
     $fragment = '';
-    if (Str\search($path, '#') !== null) {
+    if (Str\contains($path, '#')) {
       list($path, $fragment) = explode('#', $path, 2);
     }
     return $uri
@@ -68,7 +67,7 @@ class UriMarshaler {
   }
 
   private function marshalIpv6HostAndPort(
-    dict<string, mixed> $server,
+    KeyedContainer<string, mixed> $server,
     string $host,
     ?int $port,
   ): shape('host' => string, 'port' => ?int, ...) {
@@ -103,14 +102,15 @@ class UriMarshaler {
 
     // trim and remove port number from host
     // host is lowercase as per RFC 952/2181
-    $host = Str\lowercase(preg_replace('/:\d+$/', '', Str\trim((string)$host)));
+    $host =
+      Str\lowercase(Regex\replace(Str\trim((string)$host), re"/:\d+$/", ''));
 
     // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
     // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
     // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
     if (
       $host !== '' &&
-      '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)
+      '' !== Regex\replace($host, re"/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/", '')
     ) {
       return '';
     }
@@ -147,8 +147,8 @@ class UriMarshaler {
    * @return shape('host' => string, 'port' => ?int,...) shape of two items, host and port, in that order.
    */
   private function marshalHostAndPort(
-    dict<string, vec<string>> $headers,
-    dict<string, mixed> $server,
+    KeyedContainer<string, Container<string>> $headers,
+    KeyedContainer<string, mixed> $server,
   ): shape('host' => string, 'port' => ?int, ...) {
     static $defaults = shape('host' => '', 'port' => null);
 
@@ -171,7 +171,7 @@ class UriMarshaler {
 
     if (
       !C\contains_key($server, 'SERVER_ADDR') ||
-      !preg_match('/^\[[0-9a-fA-F\:]+\]$/', $host)
+      !Regex\matches($host, re"/^\[[0-9a-fA-F\:]+\]$/")
     ) {
       return shape('host' => $host, 'port' => $port);
     }
@@ -193,7 +193,9 @@ class UriMarshaler {
    * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
    * @license   http://framework.zend.com/license/new-bsd New BSD License
    */
-  private function marshalRequestPath(dict<string, mixed> $server): string {
+  private function marshalRequestPath(
+    KeyedContainer<string, mixed> $server,
+  ): string {
     // IIS7 with URL Rewrite: make sure we get the unencoded url
     // (double slash problem).
     $iisUrlRewritten = C\contains_key($server, 'IIS_WasUrlRewritten')
@@ -209,8 +211,8 @@ class UriMarshaler {
 
     $requestUri = $server['REQUEST_URI'] ?? null;
 
-    if (null !== $requestUri) {
-      return preg_replace('#^[^/:]+://[^/]+#', '', $requestUri as string);
+    if ($requestUri is string) {
+      return Regex\replace($requestUri, re"#^[^/:]+://[^/]+#", '');
     }
 
     $origPathInfo = $server['ORIG_PATH_INFO'] ?? null;
@@ -241,7 +243,7 @@ class UriMarshaler {
 
   private function getHeadersFromMap(
     string $name,
-    dict<string, vec<string>> $headers,
+    KeyedContainer<string, Container<string>> $headers,
     mixed $default = null,
   ): mixed {
     $header = Str\lowercase($name);

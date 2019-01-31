@@ -2,10 +2,10 @@ namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
+use namespace HH\Lib\Regex;
 use type Nuxed\Contract\Http\Message\UriInterface;
 use type Nuxed\Lib\StringableTrait;
 use function parse_url;
-use function preg_replace_callback;
 use function rawurlencode;
 
 final class Uri implements UriInterface {
@@ -15,10 +15,6 @@ final class Uri implements UriInterface {
     'http' => 80,
     'https' => 443,
   ];
-
-  private static string $charUnreserved = 'a-zA-Z0-9_\-\.~';
-
-  private static string $charSubDelims = '!\$&\'\(\)\*\+,;=';
 
   private string $scheme = '';
 
@@ -309,24 +305,18 @@ final class Uri implements UriInterface {
   }
 
   private function filterPath(string $path): string {
-    return preg_replace_callback(
-      '/(?:[^'.
-      self::$charUnreserved.
-      self::$charSubDelims.
-      '%:@\/]++|%(?![A-Fa-f0-9]{2}))/',
-      ($match) ==> rawurlencode($match[0]),
+    return Regex\replace_with(
       $path,
+      re"/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=%:@\/]++|%(?![A-Fa-f0-9]{2}))/",
+      ($match) ==> rawurlencode($match[0]),
     );
   }
 
   private function filterQueryAndFragment(string $str): string {
-    return preg_replace_callback(
-      '/(?:[^'.
-      self::$charUnreserved.
-      self::$charSubDelims.
-      '%:@\/\?]++|%(?![A-Fa-f0-9]{2}))/',
-      ($match) ==> rawurlencode($match[0]),
+    return Regex\replace_with(
       $str,
+      re"/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=%:@\/\?]++|%(?![A-Fa-f0-9]{2}))/",
+      ($match) ==> rawurlencode($match[0]),
     );
   }
 }
