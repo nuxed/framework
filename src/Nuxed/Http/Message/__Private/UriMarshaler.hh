@@ -15,7 +15,7 @@ use function gettype;
 class UriMarshaler {
   public function marshal(
     KeyedContainer<string, mixed> $server,
-    KeyedContainer<string, vec<string>> $headers,
+    KeyedContainer<string, Container<string>> $headers,
   ): UriInterface {
     $uri = new Uri('');
     // URI scheme
@@ -149,7 +149,7 @@ class UriMarshaler {
    * @return shape('host' => string, 'port' => ?int,...) shape of two items, host and port, in that order.
    */
   private function marshalHostAndPort(
-    KeyedContainer<string, vec<string>> $headers,
+    KeyedContainer<string, Container<string>> $headers,
     KeyedContainer<string, mixed> $server,
   ): shape('host' => string, 'port' => ?int, ...) {
     static $defaults = shape('host' => '', 'port' => null);
