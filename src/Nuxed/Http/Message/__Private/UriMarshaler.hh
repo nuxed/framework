@@ -14,8 +14,8 @@ use function gettype;
 
 class UriMarshaler {
   public function marshal(
-    dict<string, mixed> $server,
-    dict<string, vec<string>> $headers,
+    KeyedContainer<string, mixed> $server,
+    KeyedContainer<string, vec<string>> $headers,
   ): UriInterface {
     $uri = new Uri('');
     // URI scheme
@@ -70,7 +70,7 @@ class UriMarshaler {
   }
 
   private function marshalIpv6HostAndPort(
-    dict<string, mixed> $server,
+    KeyedContainer<string, mixed> $server,
     string $host,
     ?int $port,
   ): shape('host' => string, 'port' => ?int, ...) {
@@ -149,8 +149,8 @@ class UriMarshaler {
    * @return shape('host' => string, 'port' => ?int,...) shape of two items, host and port, in that order.
    */
   private function marshalHostAndPort(
-    dict<string, vec<string>> $headers,
-    dict<string, mixed> $server,
+    KeyedContainer<string, vec<string>> $headers,
+    KeyedContainer<string, mixed> $server,
   ): shape('host' => string, 'port' => ?int, ...) {
     static $defaults = shape('host' => '', 'port' => null);
 
@@ -195,7 +195,7 @@ class UriMarshaler {
    * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
    * @license   http://framework.zend.com/license/new-bsd New BSD License
    */
-  private function marshalRequestPath(dict<string, mixed> $server): string {
+  private function marshalRequestPath(KeyedContainer<string, mixed> $server): string {
     // IIS7 with URL Rewrite: make sure we get the unencoded url
     // (double slash problem).
     $iisUrlRewritten = C\contains_key($server, 'IIS_WasUrlRewritten')
@@ -243,7 +243,7 @@ class UriMarshaler {
 
   private function getHeadersFromMap(
     string $name,
-    dict<string, vec<string>> $headers,
+    KeyedContainer<string, Container<string>> $headers,
     mixed $default = null,
   ): mixed {
     $header = Str\lowercase($name);

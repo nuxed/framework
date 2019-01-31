@@ -6,7 +6,7 @@ use namespace HH\Lib\Regex;
 use namespace Nuxed\Http\Message\Exception;
 
 class ProtocolVersionMarshaler {
-  public function marshal(dict<string, mixed> $server): string {
+  public function marshal(KeyedContainer<string, mixed> $server): string {
     $protocol = (string) $server['SERVER_PROTOCOL'] ?? '1.1';
 
     if (!Regex\matches($protocol, re"#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#")) {

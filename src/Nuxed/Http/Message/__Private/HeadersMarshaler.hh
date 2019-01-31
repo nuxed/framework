@@ -8,8 +8,8 @@ use function strtr;
 
 class HeadersMarshaler {
   public function marshal(
-    dict<string, mixed> $server,
-  ): dict<string, vec<string>> {
+    KeyedContainer<string, mixed> $server,
+  ): KeyedContainer<string, Container<string>> {
     $headers = dict[];
 
     $valid = (mixed $value): bool ==> {

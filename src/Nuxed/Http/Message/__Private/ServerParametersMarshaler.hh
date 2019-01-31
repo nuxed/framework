@@ -8,7 +8,7 @@ use function function_exists;
 class ServerParametersMarshaler {
   public function marshale(
     KeyedContainer<string, mixed> $server,
-  ): dict<string, mixed> {
+  ): KeyedContainer<string, mixed> {
     $dict = dict[];
     foreach ($server as $key => $value) {
       $dict[$key] = $value;
@@ -17,7 +17,8 @@ class ServerParametersMarshaler {
     return $this->normalize($dict);
   }
 
-  private function normalize(dict<string, mixed> $server): dict<string, mixed> {
+  private function normalize(KeyedContainer<string, mixed> $server): KeyedContainer<string, mixed> {
+    $server = dict($server);
     if (C\contains_key($server, 'HTTP_AUTHORIZATION')) {
       return $server;
     }
