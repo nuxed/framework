@@ -55,9 +55,10 @@ class HeadersMarshaler {
         if (!$value is Container<_>) {
           $value = vec[(string)$value];
         }
-
-        $value = vec[$value as string];
-        $headers[$name] = $value;
+        $headers[$name] = vec[];
+        foreach($value as $v) {
+          $headers[$name][] = (string) $v;
+        }
         continue;
       }
     }
