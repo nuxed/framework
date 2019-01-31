@@ -104,7 +104,8 @@ class UriMarshaler {
 
     // trim and remove port number from host
     // host is lowercase as per RFC 952/2181
-    $host = Str\lowercase(Regex\replace(Str\trim((string)$host), re"/:\d+$/", ''));
+    $host =
+      Str\lowercase(Regex\replace(Str\trim((string)$host), re"/:\d+$/", ''));
 
     // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
     // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
@@ -194,7 +195,9 @@ class UriMarshaler {
    * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
    * @license   http://framework.zend.com/license/new-bsd New BSD License
    */
-  private function marshalRequestPath(KeyedContainer<string, mixed> $server): string {
+  private function marshalRequestPath(
+    KeyedContainer<string, mixed> $server,
+  ): string {
     // IIS7 with URL Rewrite: make sure we get the unencoded url
     // (double slash problem).
     $iisUrlRewritten = C\contains_key($server, 'IIS_WasUrlRewritten')

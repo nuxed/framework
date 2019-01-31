@@ -56,8 +56,8 @@ class HeadersMarshaler {
           $value = vec[(string)$value];
         }
         $headers[$name] = vec[];
-        foreach($value as $v) {
-          $headers[$name][] = (string) $v;
+        foreach ($value as $v) {
+          $headers[$name][] = (string)$v;
         }
         continue;
       }

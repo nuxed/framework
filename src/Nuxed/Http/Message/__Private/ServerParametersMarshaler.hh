@@ -17,7 +17,9 @@ class ServerParametersMarshaler {
     return $this->normalize($dict);
   }
 
-  private function normalize(KeyedContainer<string, mixed> $server): KeyedContainer<string, mixed> {
+  private function normalize(
+    KeyedContainer<string, mixed> $server,
+  ): KeyedContainer<string, mixed> {
     $server = dict($server);
     if (C\contains_key($server, 'HTTP_AUTHORIZATION')) {
       return $server;

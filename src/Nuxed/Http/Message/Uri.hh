@@ -318,7 +318,7 @@ final class Uri implements UriInterface {
     return Regex\replace_with(
       $str,
       re"/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=%:@\/\?]++|%(?![A-Fa-f0-9]{2}))/",
-      ($match) ==> rawurlencode($match[0])
+      ($match) ==> rawurlencode($match[0]),
     );
   }
 }

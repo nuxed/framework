@@ -7,14 +7,19 @@ use namespace Nuxed\Http\Message\Exception;
 
 class ProtocolVersionMarshaler {
   public function marshal(KeyedContainer<string, mixed> $server): string {
-    $protocol = (string) $server['SERVER_PROTOCOL'] ?? '1.1';
+    $protocol = (string)$server['SERVER_PROTOCOL'] ?? '1.1';
 
-    if (!Regex\matches($protocol, re"#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#")) {
+    if (
+      !Regex\matches($protocol, re"#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#")
+    ) {
       throw Exception\UnrecognizedProtocolVersionException::forVersion(
-        (string) $protocol
+        (string)$protocol,
       );
     }
-    $matches = Regex\first_match($protocol, re"#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#") as nonnull;
+    $matches = Regex\first_match(
+      $protocol,
+      re"#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#",
+    ) as nonnull;
     return $matches['version'];
   }
 }
