@@ -2,30 +2,19 @@
 
 namespace Nuxed\Http\Message\__Private;
 
-use namespace HH\Lib\C;
+use namespace HH\Lib\Regex;
 use namespace Nuxed\Http\Message\Exception;
-use function preg_match;
 
 class ProtocolVersionMarshaler {
   public function marshal(dict<string, mixed> $server): string {
-    if (!C\contains_key($server, 'SERVER_PROTOCOL')) {
-      return '1.1';
-    }
+    $protocol = (string) $server['SERVER_PROTOCOL'] ?? '1.1';
 
-    $matches = [];
-
-    if (
-      !preg_match(
-        '#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#',
-        (string)$server['SERVER_PROTOCOL'],
-        &$matches,
-      )
-    ) {
+    if (!Regex\matches($protocol, re"#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#")) {
       throw Exception\UnrecognizedProtocolVersionException::forVersion(
-        (string)$server['SERVER_PROTOCOL'],
+        (string) $protocol
       );
     }
-
+    $matches = Regex\first_match($protocol, re"#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#") as nonnull;
     return $matches['version'];
   }
 }
