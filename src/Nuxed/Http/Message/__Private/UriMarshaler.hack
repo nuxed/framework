@@ -1,7 +1,7 @@
 namespace Nuxed\Http\Message\__Private;
 
-use namespace HH\Lib\Str;
 use namespace HH\Lib\C;
+use namespace HH\Lib\Str;
 use namespace Nuxed\Http\Message\Exception;
 use type Nuxed\Contract\Http\Message\UriInterface;
 use type Nuxed\Http\Message\Uri;

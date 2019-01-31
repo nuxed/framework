@@ -2,12 +2,12 @@
 
 namespace Nuxed\Http\Message;
 
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Vec;
 use namespace HH\Lib\C;
+use namespace HH\Lib\Vec;
+use namespace HH\Lib\Str;
+use namespace HH\Lib\Regex;
 use type Nuxed\Contract\Http\Message\StreamInterface;
 use type Nuxed\Contract\Http\Message\MessageInterface;
-use function preg_match;
 
 /**
  * Trait implementing functionality common to requests and responses.
@@ -180,7 +180,7 @@ trait MessageTrait {
     string $header,
     Container<string> $values,
   ): Container<string> {
-    if (1 !== preg_match("@^[!#$%&'*+.^_`|~0-9A-Za-z-]+$@", $header)) {
+    if (!Regex\matches($header, re"@^[!#$%&'*+.^_`|~0-9A-Za-z-]+$@")) {
       throw new Exception\InvalidArgumentException(
         'Header name must be an RFC 7230 compatible string.',
       );
@@ -196,7 +196,7 @@ trait MessageTrait {
 
     foreach ($values as $value) {
 
-      if (1 !== preg_match("@^[ \t\x21-\x7E\x80-\xFF]*$@", $value)) {
+      if (!Regex\matches($value, re"@^[ \t\x21-\x7E\x80-\xFF]*$@")) {
         throw new Exception\InvalidArgumentException(
           'Header values must be RFC 7230 compatible strings.',
         );

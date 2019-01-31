@@ -2,9 +2,9 @@
 
 namespace Nuxed\Http\Message;
 
+use namespace HH\Lib\Regex;
 use type Nuxed\Contract\Http\Message\RequestInterface;
 use type Nuxed\Contract\Http\Message\UriInterface;
-use function preg_match;
 
 trait RequestTrait {
   require implements RequestInterface;
@@ -31,7 +31,7 @@ trait RequestTrait {
   }
 
   public function withRequestTarget(string $requestTarget): this {
-    if (preg_match('#\s#', $requestTarget)) {
+    if (Regex\matches($requestTarget, re"#\s#")) {
       throw new Exception\InvalidArgumentException(
         'Invalid request target provided; cannot contain whitespace',
       );

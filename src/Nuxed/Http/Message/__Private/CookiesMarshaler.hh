@@ -15,6 +15,10 @@ class CookiesMarshaler {
 
     foreach ($headers as $header) {
       $matches = [];
+      /**
+       * @todo [Http] use `HH\Lib\Regex` instead of `preg_*`
+       * @body i was unable to use hsl regex here, help wanted.
+       */
       preg_match_all(
         '(
                 (?:^\\n?[ \t]*|;[ ])

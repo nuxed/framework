@@ -2,14 +2,13 @@
 
 namespace Nuxed\Http\Message\__Private;
 
-use namespace HH\Lib\Str;
 use namespace HH\Lib\C;
+use namespace HH\Lib\Str;
+use namespace HH\Lib\Regex;
 use namespace Nuxed\Http\Message\Exception;
 use type Nuxed\Contract\Http\Message\UriInterface;
 use type Nuxed\Http\Message\Uri;
 use function explode;
-use function preg_match;
-use function preg_replace;
 use function gettype;
 
 class UriMarshaler {
@@ -60,7 +59,7 @@ class UriMarshaler {
     }
     // URI fragment
     $fragment = '';
-    if (Str\search($path, '#') !== null) {
+    if (Str\contains($path, '#')) {
       list($path, $fragment) = explode('#', $path, 2);
     }
     return $uri
@@ -105,14 +104,14 @@ class UriMarshaler {
 
     // trim and remove port number from host
     // host is lowercase as per RFC 952/2181
-    $host = Str\lowercase(preg_replace('/:\d+$/', '', Str\trim((string)$host)));
+    $host = Str\lowercase(Regex\replace(Str\trim((string)$host), re"/:\d+$/", ''));
 
     // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
     // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
     // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
     if (
       $host !== '' &&
-      '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)
+      '' !== Regex\replace($host, re"/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/", '')
     ) {
       return '';
     }
@@ -173,7 +172,7 @@ class UriMarshaler {
 
     if (
       !C\contains_key($server, 'SERVER_ADDR') ||
-      !preg_match('/^\[[0-9a-fA-F\:]+\]$/', $host)
+      !Regex\matches($host, re"/^\[[0-9a-fA-F\:]+\]$/")
     ) {
       return shape('host' => $host, 'port' => $port);
     }
@@ -211,8 +210,8 @@ class UriMarshaler {
 
     $requestUri = $server['REQUEST_URI'] ?? null;
 
-    if (null !== $requestUri) {
-      return preg_replace('#^[^/:]+://[^/]+#', '', $requestUri as string);
+    if ($requestUri is string) {
+      return Regex\replace($requestUri, re"#^[^/:]+://[^/]+#", '');
     }
 
     $origPathInfo = $server['ORIG_PATH_INFO'] ?? null;
