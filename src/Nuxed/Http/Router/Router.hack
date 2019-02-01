@@ -190,8 +190,12 @@ class Router implements RouterInterface {
 
     foreach ($regexps as $regexp => $sub_map) {
       $pattern = '#^'.$regexp.'#';
-      $matches = darray[];
+      $matches = [];
 
+      /**
+       * @todo [Http][Router] use hsl regex
+       * @body this is an issue with hack-router since it use string instead of regex pattern, its not possible to use hsl regex.
+       */
       if (preg_match($pattern, $path, &$matches) !== 1) {
         continue;
       }
