@@ -190,7 +190,7 @@ class Router implements RouterInterface {
 
     foreach ($regexps as $regexp => $sub_map) {
       $pattern = '#^'.$regexp.'#';
-      $matches = [];
+      $matches = darray[];
 
       if (preg_match($pattern, $path, &$matches) !== 1) {
         continue;
