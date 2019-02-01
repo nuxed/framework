@@ -75,7 +75,7 @@
     },
     "support": {
         "issues": "https://github.com/nuxed/framework/issues",
-        "chat": "https://gitter.im/nuxed/asset",
-        "source": "https://github.com/nuxed/asset"
+        "chat": "https://gitter.im/nuxed/framework",
+        "source": "https://github.com/nuxed/framework"
     }
 }
