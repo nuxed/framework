@@ -58,7 +58,7 @@ class Packages {
       return $this->defaultPackage;
     }
 
-    if (C\contains($this->packages, $name)) {
+    if (C\contains_key($this->packages, $name)) {
       return $this->packages[$name];
     } else {
       throw new InvalidArgumentException(
