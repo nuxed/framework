@@ -75,7 +75,7 @@ class Inflector implements ArgumentResolverInterface, InflectorInterface {
    * {@inheritdoc}
    */
   public function setProperties(
-    dict<string, mixed> $properties,
+    KeyedContainer<string, mixed> $properties,
   ): InflectorInterface {
     foreach ($properties as $property => $value) {
       $this->setProperty($property, $value);

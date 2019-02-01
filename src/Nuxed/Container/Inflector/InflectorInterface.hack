@@ -13,14 +13,14 @@ interface InflectorInterface {
    */
   public function invokeMethod(
     string $name,
-    vec<mixed> $args,
+    Container<mixed> $args,
   ): InflectorInterface;
 
   /**
    * Defines multiple methods to be invoked on the subject object.
    */
   public function invokeMethods(
-    dict<string, vec<mixed>> $methods,
+    KeyedContainer<string, Container<mixed>> $methods,
   ): InflectorInterface;
 
   /**
@@ -35,7 +35,7 @@ interface InflectorInterface {
    * Defines multiple properties to be set on the subject object.
    */
   public function setProperties(
-    dict<string, mixed> $properties,
+    KeyedContainer<string, mixed> $properties,
   ): InflectorInterface;
 
   /**
