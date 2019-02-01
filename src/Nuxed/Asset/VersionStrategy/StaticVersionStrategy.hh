@@ -5,14 +5,15 @@ namespace Nuxed\Asset\VersionStrategy;
 use namespace HH\Lib\Str;
 
 class StaticVersionStrategy implements VersionStrategyInterface {
+  private string $format;
+
   /**
    * @param string $version Version number
    * @param string $format  Url format
    */
-  public function __construct(
-    private string $version,
-    private string $format = "%s?%s",
-  ) {}
+  public function __construct(private string $version, ?string $format = null) {
+    $this->format = $format is nonnull && $format !== '' ? $format : '%s?%s';
+  }
 
 
   /**
