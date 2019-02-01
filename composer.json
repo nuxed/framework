@@ -46,11 +46,18 @@
         "nuxed/http": "self.version"
     },
     "require-dev": {
+        "facebook/fbexpect": "^2.3",
+        "hhvm/hacktest": "^1.3",
         "hhvm/hhast": "^3.30"
     },
     "autoload": {
         "psr-4": {
             "Nuxed\\": "src/Nuxed/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nuxed\\Test\\": "tests/Nuxed/"
         }
     },
     "config": {

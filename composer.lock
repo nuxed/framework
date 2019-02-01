@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f2fc93cd761ff4df82a21b7b1513e12a",
+    "content-hash": "548576542b912ac20213559c3964f4fe",
     "packages": [
         {
             "name": "facebook/fbmarkdown",
@@ -360,6 +360,35 @@
             "time": "2018-09-24T22:01:02+00:00"
         },
         {
+            "name": "facebook/fbexpect",
+            "version": "v2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hhvm/fbexpect.git",
+                "reference": "22b9d59d9ab5e22a07e66fe1d07ba8d0472ae49b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hhvm/fbexpect/zipball/22b9d59d9ab5e22a07e66fe1d07ba8d0472ae49b",
+                "reference": "22b9d59d9ab5e22a07e66fe1d07ba8d0472ae49b",
+                "shasum": ""
+            },
+            "require": {
+                "facebook/difflib": "^1.0.0",
+                "hhvm": "^3.28",
+                "hhvm/hacktest": "^1.0",
+                "hhvm/hhvm-autoload": "^1.6",
+                "hhvm/hsl": "^3.26"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Unit test helpers for Facebook projects",
+            "time": "2018-11-29T21:04:58+00:00"
+        },
+        {
             "name": "facebook/hh-clilib",
             "version": "v2.0.1",
             "source": {
@@ -394,6 +423,47 @@
                 "MIT"
             ],
             "time": "2018-12-05T19:10:19+00:00"
+        },
+        {
+            "name": "hhvm/hacktest",
+            "version": "v1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hhvm/hacktest.git",
+                "reference": "ed8eaf18c1a4443e0a735707ac3d0c2749273f08"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hhvm/hacktest/zipball/ed8eaf18c1a4443e0a735707ac3d0c2749273f08",
+                "reference": "ed8eaf18c1a4443e0a735707ac3d0c2749273f08",
+                "shasum": ""
+            },
+            "require": {
+                "facebook/hh-clilib": "^2.0.0",
+                "hhvm": "^3.28.0",
+                "hhvm/hhvm-autoload": "^1.6",
+                "hhvm/hsl": "^3.26",
+                "hhvm/type-assert": "^3.2"
+            },
+            "require-dev": {
+                "facebook/fbexpect": "^2.3.0",
+                "hhvm/hhast": "^3.27"
+            },
+            "bin": [
+                "bin/hacktest"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "The Hack Test Library",
+            "time": "2018-11-30T17:17:20+00:00"
         },
         {
             "name": "hhvm/hhast",
