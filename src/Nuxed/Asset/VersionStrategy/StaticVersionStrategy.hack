@@ -10,7 +10,7 @@ class StaticVersionStrategy implements VersionStrategyInterface {
    * @param string $format  Url format
    */
   public function __construct(private string $version, ?string $format = null) {
-    $this->format = $format is nonnull && $format !== '' ? $format : '%s?$s';
+    $this->format = $format is nonnull && $format !== '' ? $format : '%s?%s';
   }
 
 
