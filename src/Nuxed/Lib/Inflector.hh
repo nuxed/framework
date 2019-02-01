@@ -4,7 +4,6 @@ namespace Nuxed\Lib;
 
 use namespace HH\Lib\Str;
 use function ctype_upper;
-use function ucfirst;
 
 final abstract class Inflector {
   /**
@@ -181,7 +180,7 @@ final abstract class Inflector {
 
           foreach ($newSuffix as $newSuffixEntry) {
             $singulars[] = $newBase.
-              ($firstUpper ? ucfirst($newSuffixEntry) : $newSuffixEntry);
+              ($firstUpper ? Str\capitalize($newSuffixEntry) : $newSuffixEntry);
           }
 
           return $singulars;
