@@ -31,6 +31,7 @@ use function sys_get_temp_dir;
 use const LOCK_EX;
 use const LOCK_SH;
 use const LOCK_UN;
+use const LOCK_NB;
 use const PATHINFO_EXTENSION;
 use const FILEINFO_MIME_TYPE;
 use const PATHINFO_BASENAME;
@@ -40,15 +41,11 @@ class File extends Node {
 
   /**
    * Resource handle.
-   *
-   * @var resource
    */
   protected ?resource $handle;
 
   /**
    * Current read / write mode.
-   *
-   * @var string
    */
   protected string $mode = '';
 
@@ -61,9 +58,6 @@ class File extends Node {
 
   /**
    * Append data to the end of a file.
-   *
-   * @param string $data
-   * @return bool
    */
   public function append(string $data): bool {
     return $this->write($data, 'ab', false);
@@ -71,8 +65,6 @@ class File extends Node {
 
   /**
    * Close the current file resource handler.
-   *
-   * @return bool
    */
   public function close(): bool {
     if ($this->handle is resource) {
@@ -145,8 +137,6 @@ class File extends Node {
 
   /**
    * Remove the file if it exists.
-   *
-   * @return bool
    */
   <<__Override>>
   public function delete(): bool {
@@ -164,8 +154,6 @@ class File extends Node {
 
   /**
    * Return the file extension.
-   *
-   * @return string
    */
   public function ext(): string {
     return Str\lowercase(pathinfo($this->path(), PATHINFO_EXTENSION));
@@ -173,11 +161,8 @@ class File extends Node {
 
   /**
    * Lock a file for reading or writing.
-   *
-   * @param int $mode
-   * @return bool
    */
-  public function lock(int $mode = LOCK_SH): bool {
+  public function lock(int $mode = LOCK_SH | LOCK_NB): bool {
     if ($this->handle is resource) {
       return flock($this->handle, $mode);
     }
@@ -187,9 +172,6 @@ class File extends Node {
 
   /**
    * Return an MD5 checksum of the file.
-   *
-   * @param bool $raw
-   * @return string
    */
   public function md5(bool $raw = false): string {
     if ($this->exists()) {
@@ -201,8 +183,6 @@ class File extends Node {
 
   /**
    * Return the mime type for the file.
-   *
-   * @return string
    */
   public function mimeType(): string {
     if (!$this->exists()) {
@@ -218,9 +198,6 @@ class File extends Node {
 
   /**
    * Open a file resource handler for reading and writing.
-   *
-   * @param string $mode
-   * @return bool
    */
   public function open(string $mode): bool {
     if (!$this->exists()) {
@@ -246,9 +223,6 @@ class File extends Node {
 
   /**
    * Prepend data to the beginning of a file.
-   *
-   * @param string $data
-   * @return bool
    */
   public function prepend(string $data): bool {
     $content = $this->read();
@@ -257,10 +231,6 @@ class File extends Node {
 
   /**
    * Open a file for reading. If $length is provided, will only read up to that limit.
-   *
-   * @param int $length
-   * @param string $mode
-   * @return string
    */
   public function read(int $length = -1, string $mode = 'rb'): string {
     if (!$this->open($mode)) {
@@ -294,9 +264,7 @@ class File extends Node {
   /**
    * Reset the cache and path.
    *
-   * @param string $path
-   * @return $this
-   * @throws \Nuxed\Io\Exception\InvalidPathException
+   * @throws InvalidPathException
    */
   <<__Override>>
   public function reset(string $path = ''): this {
@@ -325,12 +293,10 @@ class File extends Node {
 
   /**
    * Unlock a file for reading or writing.
-   *
-   * @return bool
    */
   public function unlock(): bool {
     if ($this->handle is resource) {
-      return flock($this->handle, LOCK_UN);
+      return flock($this->handle, LOCK_UN | LOCK_NB);
     }
 
     return false;
@@ -338,11 +304,6 @@ class File extends Node {
 
   /**
    * Write data to a file (will erase any previous contents).
-   *
-   * @param string $data
-   * @param string $mode
-   * @param bool $close
-   * @return bool
    */
   public function write(
     string $data,
@@ -353,7 +314,7 @@ class File extends Node {
       return false;
     }
 
-    if ($this->lock(LOCK_EX)) {
+    if ($this->lock(LOCK_EX | LOCK_NB)) {
       $result = fwrite($this->handle, $data);
 
       $this->unlock();
