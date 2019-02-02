@@ -17,13 +17,9 @@ class ContainerTest extends HackTest {
    */
   public function testContainerAddsAndGets(): void {
     $container = new Container();
-
     $container->add(Foo::class);
-
     expect($container->has(Foo::class))->toBeTrue();
-
     $foo = $container->get(Foo::class);
-
     expect($foo)->toBeInstanceOf(Foo::class);
   }
 
@@ -32,14 +28,10 @@ class ContainerTest extends HackTest {
    */
   public function testContainerAddsAndGetsShared(): void {
     $container = new Container();
-
     $container->share(Foo::class);
-
     expect($container->has(Foo::class))->toBeTrue();
-
     $fooOne = $container->get(Foo::class);
     $fooTwo = $container->get(Foo::class);
-
     expect($fooOne)->toBeInstanceOf(Foo::class);
     expect($fooTwo)->toBeInstanceOf(Foo::class);
     expect($fooTwo)->toBeSame($fooOne);
@@ -50,14 +42,10 @@ class ContainerTest extends HackTest {
    */
   public function testContainerAddsAndGetsSharedByDefault(): void {
     $container = (new Container())->defaultToShared();
-
     $container->add(Foo::class);
-
     expect($container->has(Foo::class))->toBeTrue();
-
     $fooOne = $container->get(Foo::class);
     $fooTwo = $container->get(Foo::class);
-
     expect($fooOne)->toBeInstanceOf(Foo::class);
     expect($fooTwo)->toBeInstanceOf(Foo::class);
     expect($fooTwo)->toBeSame($fooOne);
@@ -68,14 +56,10 @@ class ContainerTest extends HackTest {
    */
   public function testContainerAddsNonSharedWithSharedByDefault(): void {
     $container = (new Container())->defaultToShared();
-
     $container->add(Foo::class, null, false);
-
     expect($container->has(Foo::class))->toBeTrue();
-
     $fooOne = $container->get(Foo::class);
     $fooTwo = $container->get(Foo::class);
-
     expect($fooOne)->toBeInstanceOf(Foo::class);
     expect($fooTwo)->toBeInstanceOf(Foo::class);
     expect($fooTwo)->toNotBeSame($fooOne);
@@ -86,21 +70,15 @@ class ContainerTest extends HackTest {
    */
   public function testContainerAddsAndGetsFromTag(): void {
     $container = new Container();
-
     $container->add(Foo::class)->addTag('foobar');
     $container->add(Bar::class)->addTag('foobar');
-
     expect($container->has(Foo::class))->toBeTrue();
-
     expect($container->has('foobar'))->toBeTrue();
-
     $vec = $container->get('foobar');
-
-    /* HH_IGNORE_ERROR[4110] */
+    expect($vec)->toBeType('vec');
+    $vec as vec<_>;
     expect(C\count($vec))->toBePHPEqual(2);
-    /* HH_IGNORE_ERROR[4110] */
     expect(C\firstx($vec))->toBeInstanceOf(Foo::class);
-    /* HH_IGNORE_ERROR[4110] */
     expect(C\lastx($vec))->toBeInstanceOf(Bar::class);
   }
 
@@ -109,15 +87,10 @@ class ContainerTest extends HackTest {
    */
   public function testContainerAddsAndGetsWithServiceProvider(): void {
     $provider = new FooServiceProvider();
-
     $container = new Container();
-
     $container->addServiceProvider($provider);
-
-    //expect($container->has(Foo::class))->toBeTrue();
-
+    expect($container->has(Foo::class))->toBeTrue();
     $foo = $container->get(Foo::class);
-
     expect($foo)->toBeInstanceOf(Foo::class);
   }
 
@@ -127,11 +100,8 @@ class ContainerTest extends HackTest {
   public function testContainerAddsAndGetsFromDelegate(): void {
     $delegate = new ReflectionContainer();
     $container = new Container();
-
     $container->delegate($delegate);
-
     $foo = $container->get(Foo::class);
-
     expect($foo)->toBeInstanceOf(Foo::class);
   }
 
@@ -151,11 +121,8 @@ class ContainerTest extends HackTest {
    */
   public function testContainerCanExtendDefinition(): void {
     $container = new Container();
-
     $container->add(Foo::class);
-
     $definition = $container->extend(Foo::class);
-
     expect($definition)->toBeInstanceOf(DefinitionInterface::class);
   }
 
@@ -164,13 +131,9 @@ class ContainerTest extends HackTest {
    */
   public function testContainerCanExtendDefinitionFromServiceProvider(): void {
     $provider = new FooServiceProvider();
-
     $container = new Container();
-
     $container->addServiceProvider($provider);
-
     $definition = $container->extend(Foo::class);
-
     expect($definition)->toBeInstanceOf(DefinitionInterface::class);
   }
 
@@ -190,16 +153,12 @@ class ContainerTest extends HackTest {
    */
   public function testContainerAddsAndInvokesInflector(): void {
     $container = new Container();
-
     $container->inflector(Foo::class)->setProperty('bar', Bar::class);
-
     $container->add(Foo::class);
     $container->add(Bar::class);
-
     $foo = $container->get(Foo::class);
-
     expect($foo)->toBeInstanceOf(Foo::class);
-    /* HH_IGNORE_ERROR[4064] */
+    $foo as Foo;
     expect($foo->bar)->toBeInstanceOf(Bar::class);
   }
 }

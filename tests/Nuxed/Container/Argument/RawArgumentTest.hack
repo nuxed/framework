@@ -27,7 +27,6 @@ class RawArgumentTest extends HackTest {
       false,
       expect(false),
     ];
-
     foreach ($arguments as $expected) {
       $argument = new RawArgument($expected);
       expect($argument->getValue())->toBeSame($expected);

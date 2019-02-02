@@ -18,11 +18,8 @@ class DefinitionTest extends HackTest {
   public function testDefinitionResolvesClosureWithDefinedArgs(): void {
     $definition =
       new Definition('callable', (string ...$args) ==> Str\join($args, ' '));
-
     $definition->addArguments(vec['hello', 'world']);
-
     $actual = $definition->resolve();
-
     expect($actual)->toBeSame('hello world');
   }
 
@@ -32,9 +29,7 @@ class DefinitionTest extends HackTest {
   public function testDefinitionResolvesClosureReturningRawArgument(): void {
     $definition =
       new Definition('callable', () ==> new RawArgument('hello world'));
-
     $actual = $definition->resolve();
-
     expect($actual)->toBeSame('hello world');
   }
 
@@ -43,11 +38,8 @@ class DefinitionTest extends HackTest {
    */
   public function testDefinitionResolvesCallableClass(): void {
     $definition = new Definition('callable', new FooCallable());
-
     $definition->addArgument(new Bar());
-
     $actual = $definition->resolve();
-
     expect($actual)->toBeInstanceOf(Foo::class);
   }
 
@@ -56,11 +48,8 @@ class DefinitionTest extends HackTest {
    */
   public function testDefinitionResolvesArrayCallable(): void {
     $definition = new Definition('callable', [new FooCallable(), '__invoke']);
-
     $definition->addArgument(new Bar());
-
     $actual = $definition->resolve();
-
     expect($actual)->toBeInstanceOf(Foo::class);
   }
 
@@ -68,47 +57,34 @@ class DefinitionTest extends HackTest {
    * Asserts that the definition can resolve a class method calls.
    */
   public function testDefinitionResolvesClassWithMethodCalls(): void {
-
     $container = new Container();
-
     $bar = new Bar();
-
     $container->add(Bar::class, (): Bar ==> $bar);
-
     $definition = new Definition('callable', Foo::class);
-
     $definition->setContainer($container);
     $definition->addArgument(null);
     $definition->addMethodCalls(dict[
       'setBar' => vec[Bar::class],
     ]);
-
     $actual = $definition->resolve();
-
     expect($actual)->toBeInstanceOf(Foo::class);
-    /* HH_IGNORE_ERROR[4064] */
+    $actual as Foo;
     expect($actual->bar)->toBeInstanceOf(Bar::class);
-
   }
 
   /**
    * Asserts that the definition can resolve a class with defined args.
    */
   public function testDefinitionResolvesClassWithDefinedArgs(): void {
-
     $container = new Container();
     $bar = new Bar();
     $container->add(Bar::class, (): Bar ==> $bar);
-
     $definition = new Definition('callable', Foo::class);
-
     $definition->setContainer($container);
     $definition->addArgument(Bar::class);
-
     $actual = $definition->resolve();
-
     expect($actual)->toBeInstanceOf(Foo::class);
-    /* HH_IGNORE_ERROR[4064] */
+    $actual as Foo;
     expect($actual->bar)->toBeInstanceOf(Bar::class);
   }
 
@@ -119,16 +95,12 @@ class DefinitionTest extends HackTest {
     $container = new Container();
     $bar = new Bar();
     $container->add(Bar::class, (): Bar ==> $bar);
-
     $definition = new Definition('callable', new ClassNameArgument(Foo::class));
-
     $definition->setContainer($container);
     $definition->addArgument(new ClassNameArgument(Bar::class));
-
     $actual = $definition->resolve();
-
     expect($actual)->toBeInstanceOf(Foo::class);
-    /* HH_IGNORE_ERROR[4064] */
+    $actual as Foo;
     expect($actual->bar)->toBeInstanceOf(Bar::class);
   }
 
@@ -137,13 +109,10 @@ class DefinitionTest extends HackTest {
    */
   public function testDefinitionResolvesSharedItemOnlyOnce(): void {
     $definition = new Definition('callable', new ClassNameArgument(Bar::class));
-
     $definition->setShared(true);
-
     $actual1 = $definition->resolve();
     $actual2 = $definition->resolve();
     $actual3 = $definition->resolve(true);
-
     expect($actual2)->toBeSame($actual1);
     expect($actual1)->toNotBeSame($actual3);
   }
@@ -153,11 +122,9 @@ class DefinitionTest extends HackTest {
    */
   public function testDefinitionCanAddTags(): void {
     $definition = new Definition('callable', new ClassNameArgument(Foo::class));
-
     $definition
       ->addTag('tag1')
       ->addTag('tag2');
-
     expect($definition->hasTag('tag1'))->toBeTrue();
     expect($definition->hasTag('tag2'))->toBeTrue();
     expect($definition->hasTag('tag3'))->toBeFalse();
@@ -169,7 +136,6 @@ class DefinitionTest extends HackTest {
   public function testDefinitionCanGetConcrete(): void {
     $concrete = new ClassNameArgument(Foo::class);
     $definition = new Definition('callable', $concrete);
-
     expect($definition->getConcrete())->toBeSame($concrete);
   }
 
@@ -178,10 +144,8 @@ class DefinitionTest extends HackTest {
    */
   public function testDefinitionCanSetConcrete(): void {
     $definition = new Definition('callable', null);
-
     $concrete = new ClassNameArgument(Foo::class);
     $definition->setConcrete($concrete);
-
     expect($definition->getConcrete())->toBeSame($concrete);
   }
 }

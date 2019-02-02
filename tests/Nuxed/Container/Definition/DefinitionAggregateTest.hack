@@ -18,10 +18,8 @@ class DefinitionAggregateTest extends HackTest {
     $container = new Container();
     $foo = new Foo(null);
     $definition = new Definition('service', (): Foo ==> $foo);
-
     $aggregate = (new DefinitionAggregate())->setContainer($container);
     $definition = $aggregate->add('alias', $definition);
-
     expect($definition)->toBeInstanceOf(DefinitionInterface::class);
     expect($aggregate->resolve('alias'))->toBeSame($foo);
   }
@@ -33,7 +31,6 @@ class DefinitionAggregateTest extends HackTest {
     $container = new Container();
     $aggregate = (new DefinitionAggregate())->setContainer($container);
     $definition = $aggregate->add('alias', Foo::class);
-
     expect($definition)->toBeInstanceOf(DefinitionInterface::class);
     expect($definition->getAlias())->toBeSame('alias');
   }
@@ -45,7 +42,6 @@ class DefinitionAggregateTest extends HackTest {
     $container = new Container();
     $aggregate = (new DefinitionAggregate())->setContainer($container);
     $definition = $aggregate->add('alias', Foo::class);
-
     expect($definition)->toBeInstanceOf(DefinitionInterface::class);
     expect($aggregate->has('alias'))->toBeTrue();
     expect($aggregate->has('nope'))->toBeFalse();
@@ -57,21 +53,16 @@ class DefinitionAggregateTest extends HackTest {
   public function testAggregateIteratesAndResolvesDefinition(): void {
     $aggregate = new DefinitionAggregate();
     $container = new Container();
-
     $bar = new Bar();
     $foo = new Foo($bar);
-
     $definition1 = $container->add('bar', (): Bar ==> $bar);
     $definition2 = $container->add('foo', (): Foo ==> $foo);
-
     $aggregate->setContainer($container);
-
     $aggregate->add('alias1', $definition1);
     $aggregate->add('alias2', $definition2, true);
-
     $resolved = $aggregate->resolve('alias2');
     expect($resolved)->toBeSame($foo);
-    /* HH_IGNORE_ERROR[4064] */
+    $resolved as Foo;
     expect($resolved->bar)->toBeSame($bar);
   }
 
@@ -80,24 +71,17 @@ class DefinitionAggregateTest extends HackTest {
    */
   public function testAggregateCanResolveArrayOfTaggedDefinitions(): void {
     $container = new Container();
-
     $definition1 = $container->add('bar', (): string ==> 'definition1');
     $definition2 = $container->add('foo', (): string ==> 'definition2');
-
     $definition1->addTag('tag');
     $definition2->addTag('tag');
-
     $aggregate = new DefinitionAggregate(vec[
       $definition1,
       $definition2,
     ]);
-
     $aggregate->setContainer($container);
-
     expect($aggregate->hasTag('tag'))->toBeTrue();
-
     $resolved = $aggregate->resolveTagged('tag');
-
     expect($resolved)->toBeSame(vec[
       'definition1',
       'definition2',
@@ -110,15 +94,11 @@ class DefinitionAggregateTest extends HackTest {
   public function testAggregateThrowsExceptionWhenCannotResolve(): void {
     expect(() ==> {
       $container = new Container();
-
       $definition1 = $container->add('bar', (): string ==> 'definition1');
       $definition2 = $container->add('foo', (): string ==> 'definition2');
-
       $definition1->addTag('tag');
       $definition2->addTag('tag');
-
       $aggregate = new DefinitionAggregate();
-
       $aggregate->setContainer($container);
       $aggregate->add('alias1', $definition1);
       $aggregate->add('alias2', $definition2, true);

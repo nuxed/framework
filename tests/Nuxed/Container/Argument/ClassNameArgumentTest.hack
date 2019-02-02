@@ -13,7 +13,6 @@ class ClassNameArgumentTest extends HackTest {
       'string',
       'string2',
     ];
-
     foreach ($arguments as $expected) {
       $argument = new ClassNameArgument($expected);
       expect($argument->getValue())->toBeSame($expected);

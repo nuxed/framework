@@ -15,7 +15,6 @@ class InflectorAggregateTest extends HackTest {
   public function testAggregateAddsInflector(): void {
     $aggregate = new InflectorAggregate();
     $inflector = $aggregate->add('Some\Type');
-
     expect($inflector)->toBeInstanceOf(Inflector::class);
     expect($inflector->getType())->toBeSame('Some\Type');
   }
@@ -27,12 +26,9 @@ class InflectorAggregateTest extends HackTest {
     $aggregate = new InflectorAggregate();
     $container = new Container();
     $aggregate->setContainer($container);
-
     $aggregate->add(ContainerAwareInterface::class)
       ->invokeMethod('setContainer', vec[$container]);
-
     $aggregate->add('Ignored\Type');
-
     $containerAware = new BarContainerAware();
     $aggregate->inflect($containerAware);
     expect($containerAware->getContainer())->toBeSame($container);

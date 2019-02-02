@@ -10,8 +10,6 @@ use function Facebook\FBExpect\expect;
 class ServiceProviderAggregateTest extends HackTest {
   /**
    * Return a service provider fake
-   *
-   * @return \Nuxed\Container\ServiceProvider\ServiceProviderInterface
    */
   protected function getServiceProvider(): FakeServiceProvider {
     return new FakeServiceProvider();
@@ -22,11 +20,9 @@ class ServiceProviderAggregateTest extends HackTest {
    */
   public function testAggregateAddsClassNameServiceProvider(): void {
     $aggregate = new ServiceProviderAggregate();
-
     $serviceProvider = $this->getServiceProvider();
     $serviceProvider->setIdentifier('foo');
     $aggregate->add($serviceProvider);
-
     list($provides, $provider) = $aggregate->provides('SomeService');
     expect($provides)->toBeTrue();
     expect($provider)->toBeSame('foo');
@@ -57,13 +53,10 @@ class ServiceProviderAggregateTest extends HackTest {
   public function testAggregateInvokesCorrectRegisterMethodOnlyOnce(): void {
     $aggregate = new ServiceProviderAggregate();
     $provider = $this->getServiceProvider();
-
     $aggregate->add($provider);
-
     $container = new Container();
     $aggregate->register('SomeService', $container);
     $aggregate->register('AnotherService', $container);
-
     expect($provider->registered)->toBeSame(1);
   }
 }

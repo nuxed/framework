@@ -13,7 +13,6 @@ class ReflectionContainerTest extends HackTest {
    */
   public function testHasReturnsTrueIfClassExists(): void {
     $container = new ReflectionContainer();
-
     expect($container->has(ReflectionContainer::class))->toBeTrue();
   }
 
@@ -22,7 +21,6 @@ class ReflectionContainerTest extends HackTest {
    */
   public function testHasReturnsFalseIfClassDoesNotExist(): void {
     $container = new ReflectionContainer();
-
     expect($container->has('blah'))->toBeFalse();
   }
 
@@ -31,9 +29,7 @@ class ReflectionContainerTest extends HackTest {
    */
   public function testContainerInstantiatesClassWithoutConstructor(): void {
     $classWithoutConstructor = \stdClass::class;
-
     $container = new ReflectionContainer();
-
     expect($container->get($classWithoutConstructor))->toBeInstanceOf(
       $classWithoutConstructor,
     );
@@ -45,12 +41,9 @@ class ReflectionContainerTest extends HackTest {
   public function testContainerInstantiatesAndCachesClassWithoutConstructor(
   ): void {
     $classWithoutConstructor = \stdClass::class;
-
     $container = (new ReflectionContainer())->cacheResolutions();
-
     $classWithoutConstructorOne = $container->get($classWithoutConstructor);
     $classWithoutConstructorTwo = $container->get($classWithoutConstructor);
-
     expect($classWithoutConstructorOne)->toBeInstanceOf(
       $classWithoutConstructor,
     );
@@ -66,15 +59,11 @@ class ReflectionContainerTest extends HackTest {
   public function testGetInstantiatesClassWithConstructor(): void {
     $classWithConstructor = Foo::class;
     $dependencyClass = Bar::class;
-
     $container = new ReflectionContainer();
-
     $container->setContainer($container);
-
     $item = $container->get($classWithConstructor);
-
     expect($item)->toBeInstanceOf($classWithConstructor);
-    /* HH_IGNORE_ERROR[4064] */
+    $item as Foo;
     expect($item->bar)->toBeInstanceOf($dependencyClass);
   }
 
@@ -84,24 +73,17 @@ class ReflectionContainerTest extends HackTest {
   public function testGetInstantiatesAndCachedClassWithConstructor(): void {
     $classWithConstructor = Foo::class;
     $dependencyClass = Bar::class;
-
     $container = (new ReflectionContainer())->cacheResolutions();
-
     $container->setContainer($container);
-
     $itemOne = $container->get($classWithConstructor);
     $itemTwo = $container->get($classWithConstructor);
-
     expect($itemOne)->toBeInstanceOf($classWithConstructor);
-    /* HH_IGNORE_ERROR[4064] */
+    $itemOne as Foo;
     expect($itemOne->bar)->toBeInstanceOf($dependencyClass);
-
     expect($itemTwo)->toBeInstanceOf($classWithConstructor);
-    /* HH_IGNORE_ERROR[4064] */
+    $itemTwo as Foo;
     expect($itemTwo->bar)->toBeInstanceOf($dependencyClass);
-
     expect($itemTwo)->toBeSame($itemOne);
-    /* HH_IGNORE_ERROR[4064] */
     expect($itemTwo->bar)->toBeSame($itemOne->bar);
   }
 
@@ -113,19 +95,14 @@ class ReflectionContainerTest extends HackTest {
   ): void {
     $classWithConstructor = Foo::class;
     $dependencyClass = Bar::class;
-
     $dependency = new Bar();
     $container = new ReflectionContainer();
-
     $innerContainer = new Container();
     $innerContainer->add($dependencyClass, () ==> $dependency);
-
     $container->setContainer($innerContainer);
-
     $item = $container->get($classWithConstructor);
-
     expect($item)->toBeInstanceOf($classWithConstructor);
-    /* HH_IGNORE_ERROR[4064] */
+    $item as Foo;
     expect($item->bar)->toBeSame($dependency);
   }
 
@@ -137,19 +114,14 @@ class ReflectionContainerTest extends HackTest {
   ): void {
     $classWithConstructor = Foo::class;
     $dependencyClass = Bar::class;
-
     $dependency = new Bar();
     $container = new ReflectionContainer();
-
     $innerContainer = new Container();
     $innerContainer->add($dependencyClass, () ==> $dependency);
-
     $container->setContainer($innerContainer);
-
     $item = $container->get($classWithConstructor);
-
     expect($item)->toBeInstanceOf($classWithConstructor);
-    /* HH_IGNORE_ERROR[4064] */
+    $item as Foo;
     expect($item->bar)->toBeSame($dependency);
   }
 
@@ -168,13 +140,9 @@ class ReflectionContainerTest extends HackTest {
    */
   public function testCallReflectsOnClosureArguments(): void {
     $container = new ReflectionContainer();
-
-    $foo = $container->call(function(Foo $foo) {
-      return $foo;
-    });
-
+    $foo = $container->call((Foo $foo): Foo ==> $foo);
     expect($foo)->toBeInstanceOf(Foo::class);
-    /* HH_IGNORE_ERROR[4064] */
+    $foo as Foo;
     expect($foo->bar)->toBeInstanceOf(Bar::class);
   }
 
@@ -184,9 +152,7 @@ class ReflectionContainerTest extends HackTest {
   public function testCallReflectsOnInstanceMethodArguments(): void {
     $container = new ReflectionContainer();
     $foo = new Foo(null);
-
-    $container->call([$foo, 'setBar']);
-
+    $container->call(inst_meth($foo, 'setBar'));
     expect($foo)->toBeInstanceOf(Foo::class);
     expect($foo->bar)->toBeInstanceOf(Bar::class);
   }
@@ -196,11 +162,8 @@ class ReflectionContainerTest extends HackTest {
    */
   public function testCallReflectsOnStaticMethodArguments(): void {
     $container = new ReflectionContainer();
-
     $container->setContainer($container);
-
-    $container->call('Nuxed\Test\Container\Asset\Foo::staticSetBar');
-
+    $container->call(class_meth(Asset\Foo::class, 'staticSetBar'));
     expect(Asset\Foo::$staticBar)->toBeInstanceOf(Bar::class);
     expect(Asset\Foo::$staticHello)->toBePHPEqual('hello world');
   }
@@ -215,16 +178,17 @@ class ReflectionContainerTest extends HackTest {
     })->toThrow(NotFoundException::class);
   }
 
-  /**
-   * Tests the support for __invokable/callable classes for the ReflectionContainer::call method.
-   */
   public function testInvokableClass(): void {
     $container = new ReflectionContainer();
-
-    $foo = $container->call(new FooCallable(), dict['bar' => new Bar()]);
-
+    $call = (Bar $x) ==> $x;
+    $bar = $container->call($call);
+    expect($bar)->toBeInstanceOf(Bar::class);
+    $call = inst_meth(new FooCallable(), 'call');
+    $foo = $container->call($call, dict['bar' => $bar]);
     expect($foo)->toBeInstanceOf(Foo::class);
-    /* HH_IGNORE_ERROR[4064] */
+    $bar as Bar;
+    $foo as Foo;
     expect($foo->bar)->toBeInstanceOf(Bar::class);
+    expect($foo->bar)->toBeSame($bar);
   }
 }

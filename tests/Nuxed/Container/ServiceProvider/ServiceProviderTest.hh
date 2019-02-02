@@ -8,11 +8,8 @@ use type Facebook\HackTest\HackTest;
 use function Facebook\FBExpect\expect;
 
 class ServiceProviderTest extends HackTest {
-
   /**
    * Return a service provider fake
-   *
-   * @return \Nuxed\Container\ServiceProvider\ServiceProviderInterface
    */
   protected function getFakeServiceProvider(): ServiceProviderInterface {
     return new FakeServiceProvider();
