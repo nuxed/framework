@@ -34,26 +34,6 @@ class DefinitionTest extends HackTest {
   }
 
   /**
-   * Asserts that the definition can resolve a callable class.
-   */
-  public function testDefinitionResolvesCallableClass(): void {
-    $definition = new Definition('callable', new FooCallable());
-    $definition->addArgument(new Bar());
-    $actual = $definition->resolve();
-    expect($actual)->toBeInstanceOf(Foo::class);
-  }
-
-  /**
-   * Asserts that the definition can resolve an array callable.
-   */
-  public function testDefinitionResolvesArrayCallable(): void {
-    $definition = new Definition('callable', [new FooCallable(), '__invoke']);
-    $definition->addArgument(new Bar());
-    $actual = $definition->resolve();
-    expect($actual)->toBeInstanceOf(Foo::class);
-  }
-
-  /**
    * Asserts that the definition can resolve a class method calls.
    */
   public function testDefinitionResolvesClassWithMethodCalls(): void {
