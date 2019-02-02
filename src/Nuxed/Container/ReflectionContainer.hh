@@ -11,7 +11,6 @@ use type Nuxed\Contract\Container\ContainerInterface;
 use type ReflectionClass;
 use type ReflectionFunction;
 use type ReflectionMethod;
-use function is_object;
 use function class_exists;
 use function explode;
 
@@ -82,6 +81,10 @@ class ReflectionContainer
     mixed $callable,
     dict<string, mixed> $args = dict[],
   ): mixed {
+    /* HH_IGNORE_ERROR[2049] */
+    /* HH_IGNORE_ERROR[4107] */
+    $vargs = (Container<mixed> $c): varray<mixed> ==> \varray($c);
+
     if (($callable is string) && Str\search($callable, '::') !== null) {
       $callable = explode('::', $callable);
     }
@@ -102,39 +105,18 @@ class ReflectionContainer
         $callable[0] = null;
       }
 
-
-      $arguments = varray[];
-      foreach ($this->reflectArguments($reflection, $args) as $arg) {
-        $arguments[] = $arg;
-      }
-
-
       return $reflection->invokeArgs(
         /* HH_IGNORE_ERROR[4110] */
         $callable[0],
-        $arguments,
+        $vargs($this->reflectArguments($reflection, $args)),
       );
-    }
-
-    if (is_object($callable)) {
-      $reflection = new ReflectionMethod($callable, '__invoke');
-
-      $arguments = varray[];
-      foreach ($this->reflectArguments($reflection, $args) as $arg) {
-        $arguments[] = $arg;
-      }
-
-      return $reflection->invokeArgs($callable, $arguments);
     }
 
     $reflection = new ReflectionFunction($callable);
 
-    $arguments = varray[];
-    foreach ($this->reflectArguments($reflection, $args) as $arg) {
-      $arguments[] = $arg;
-    }
-
-    return $reflection->invokeArgs($arguments);
+    return $reflection->invokeArgs(
+      $vargs($this->reflectArguments($reflection, $args)),
+    );
   }
 
   /**
