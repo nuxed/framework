@@ -4,7 +4,7 @@ namespace Nuxed\Http\Message\Response;
 
 use namespace Nuxed\Http\Message\__Private;
 use type Nuxed\Http\Message\Response;
-use type Nuxed\Lib\Json;
+use type Nuxed\Util\Json;
 use function is_object;
 use const JSON_ERROR_NONE;
 

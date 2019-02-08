@@ -4,7 +4,7 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Regex;
 use type Nuxed\Contract\Http\Message\UriInterface;
-use type Nuxed\Lib\StringableTrait;
+use type Nuxed\Util\StringableTrait;
 use function parse_url;
 use function rawurlencode;
 

@@ -1,8 +1,8 @@
 <?hh // strict
 
-namespace Nuxed\Lib;
+namespace Nuxed\Util;
 
-use type Nuxed\Contract\Lib\Jsonable;
+use type Nuxed\Contract\Util\Jsonable;
 use function json_encode;
 use function json_decode;
 use function json_last_error;

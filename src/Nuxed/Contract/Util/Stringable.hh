@@ -1,4 +1,6 @@
-namespace Nuxed\Contract\Lib;
+<?hh // strict
+
+namespace Nuxed\Contract\Util;
 
 interface Stringable {
   /**

@@ -1,4 +1,6 @@
-namespace Nuxed\Lib\Exception;
+<?hh // strict
+
+namespace Nuxed\Util\Exception;
 
 use type Exception;
 

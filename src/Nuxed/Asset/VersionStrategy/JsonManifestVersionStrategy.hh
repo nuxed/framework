@@ -4,7 +4,7 @@ namespace Nuxed\Asset\VersionStrategy;
 
 use namespace HH\Lib\Str;
 use namespace Nuxed\Io;
-use namespace Nuxed\Lib;
+use namespace Nuxed\Util;
 use namespace Nuxed\Asset\Exception;
 
 /**
@@ -52,7 +52,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface {
       }
 
       // UNSAFE
-      $this->manifestData = dict(Lib\Json::decode($this->manifest->read()));
+      $this->manifestData = dict(Util\Json::decode($this->manifest->read()));
     }
 
     return idx($this->manifestData, $path, null);

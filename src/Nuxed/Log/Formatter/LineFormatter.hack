@@ -3,7 +3,7 @@ namespace Nuxed\Log\Formatter;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
 use namespace HH\Lib\C;
-use namespace Nuxed\Lib;
+use namespace Nuxed\Util;
 use type Nuxed\Log\record;
 use function strtr;
 
@@ -74,9 +74,9 @@ class LineFormatter implements FormatterInterface {
     $replaces = dict[
       '%message%' => $record['message'],
       '%time%' => $record['time']->format($this->dateFormat),
-      '%context%' => Lib\stringify($record['context']),
+      '%context%' => Util\stringify($record['context']),
       '%level%' => Str\uppercase((string)$record['level']),
-      '%extra%' => Lib\stringify($record['extra']),
+      '%extra%' => Util\stringify($record['extra']),
     ];
 
     $output = strtr($output, $replaces);
@@ -92,7 +92,7 @@ class LineFormatter implements FormatterInterface {
   }
 
   public function stringify(mixed $value): string {
-    return $this->replaceNewlines(Lib\stringify($value));
+    return $this->replaceNewlines(Util\stringify($value));
   }
 
   protected function replaceNewlines(string $str): string {

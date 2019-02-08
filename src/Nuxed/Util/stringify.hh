@@ -1,9 +1,9 @@
 <?hh // strict
 
-namespace Nuxed\Lib;
+namespace Nuxed\Util;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Lib\Json;
+use type Nuxed\Util\Json;
 use type DateTimeInterface;
 use type Throwable;
 use function is_object;

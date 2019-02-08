@@ -3,7 +3,7 @@
 namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
-use type Nuxed\Lib\Dict;
+use type Nuxed\Util\Dict;
 use type Nuxed\Contract\Http\Message\RequestInterface;
 use type Nuxed\Contract\Http\Message\StreamInterface;
 use type Nuxed\Contract\Http\Message\UriInterface;

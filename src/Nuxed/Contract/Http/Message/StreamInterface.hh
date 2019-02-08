@@ -2,7 +2,7 @@
 
 namespace Nuxed\Contract\Http\Message;
 
-use type Nuxed\Contract\Lib\Stringable;
+use type Nuxed\Contract\Util\Stringable;
 use const SEEK_SET;
 
 /**

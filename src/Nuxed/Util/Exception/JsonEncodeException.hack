@@ -1,8 +1,8 @@
-namespace Nuxed\Lib\Exception;
+namespace Nuxed\Util\Exception;
 
 use type InvalidArgumentException;
 
-class JsonDecodeException
+class JsonEncodeException
   extends InvalidArgumentException
   implements ExceptionInterface {
 }

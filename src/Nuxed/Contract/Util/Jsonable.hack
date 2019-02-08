@@ -1,16 +1,16 @@
-namespace Nuxed\Contract\Lib;
+namespace Nuxed\Contract\Util;
 
 interface Jsonable {
   /**
    * Return a valid json string.
-   * the implementation MUST not call Nuxed\Lib\Json::encode
+   * the implementation MUST not call Nuxed\Util\Json::encode
    * on it self, instead the inner data.
    *
    * e.g :
    * <code>
    *     public function toJson(): string
    *     {
-   *         return \Nuxed\Lib\Json::encode($this->data);
+   *         return \Nuxed\Util\Json::encode($this->data);
    *     }
    * </code>
    */

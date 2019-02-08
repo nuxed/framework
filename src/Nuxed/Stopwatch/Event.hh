@@ -6,7 +6,7 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Math;
-use type Nuxed\Lib\StringableTrait;
+use type Nuxed\Util\StringableTrait;
 use function microtime;
 
 class Event {

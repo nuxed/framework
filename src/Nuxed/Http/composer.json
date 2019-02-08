@@ -31,7 +31,7 @@
         "hhvm/hhvm-autoload": "dev-master",
         "facebook/hack-router": "^0.17",
         "nuxed/contract": "dev-master",
-        "nuxed/lib": "dev-master"
+        "nuxed/util": "dev-master"
     },
     "autoload": {
         "psr-4": {

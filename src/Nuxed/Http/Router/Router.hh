@@ -6,7 +6,7 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
-use namespace Nuxed\Lib;
+use namespace Nuxed\Util;
 use namespace Facebook\HackRouter;
 use namespace Facebook\HackRouter\PatternParser;
 use namespace Facebook\HackRouter\PrefixMatching;
@@ -73,7 +73,7 @@ class Router implements RouterInterface {
   ): UriInterface {
     if (!C\contains_key($this->routes, $route)) {
       $message = Str\format('Route %s doesn\'t exist', $route);
-      $alternatives = Lib\alternatives($route, Vec\keys($this->routes));
+      $alternatives = Util\alternatives($route, Vec\keys($this->routes));
       if (0 !== C\count($alternatives)) {
         $message .=
           Str\format(', did you mean %s.', Str\join($alternatives, ', '));

@@ -1,6 +1,4 @@
-<?hh // strict
-
-namespace Nuxed\Lib;
+namespace Nuxed\Util;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;

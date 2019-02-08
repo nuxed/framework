@@ -1,9 +1,9 @@
 namespace Nuxed\Period;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Lib\Json;
-use type Nuxed\Contract\Lib\Jsonable;
-use type Nuxed\Lib\StringableTrait;
+use type Nuxed\Util\Json;
+use type Nuxed\Contract\Util\Jsonable;
+use type Nuxed\Util\StringableTrait;
 use type DateInterval;
 use type DatePeriod;
 use type DateTimeImmutable;

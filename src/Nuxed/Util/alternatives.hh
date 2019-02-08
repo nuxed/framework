@@ -1,4 +1,6 @@
-namespace Nuxed\Lib;
+<?hh // strict
+
+namespace Nuxed\Util;
 
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;

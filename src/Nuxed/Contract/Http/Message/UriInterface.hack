@@ -1,6 +1,6 @@
 namespace Nuxed\Contract\Http\Message;
 
-use type Nuxed\Contract\Lib\Stringable;
+use type Nuxed\Contract\Util\Stringable;
 
 /**
  * Value object representing a URI.

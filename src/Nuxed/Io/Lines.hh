@@ -5,7 +5,7 @@ namespace Nuxed\Io;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
-use type Nuxed\Lib\StringableTrait;
+use type Nuxed\Util\StringableTrait;
 use type Vector;
 use type Iterator;
 use type Countable;

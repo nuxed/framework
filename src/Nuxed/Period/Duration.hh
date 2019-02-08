@@ -3,7 +3,7 @@
 namespace Nuxed\Period;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Lib\StringableTrait;
+use type Nuxed\Util\StringableTrait;
 use type DateInterval;
 use function gettype;
 use function is_object;

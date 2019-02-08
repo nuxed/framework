@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace Nuxed\Lib\Exception;
+namespace Nuxed\Util\Exception;
 
 use type InvalidArgumentException;
 

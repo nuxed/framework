@@ -2,7 +2,7 @@
 
 namespace Nuxed\Markdown;
 
-use type Nuxed\Lib\StringableTrait;
+use type Nuxed\Util\StringableTrait;
 use type XHPUnsafeRenderable;
 
 // Probably don't need XHPAlwaysValidChild - this is likely to be in a <div />

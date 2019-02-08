@@ -1,6 +1,8 @@
-namespace Nuxed\Lib;
+<?hh // strict
 
-use type Nuxed\Contract\Lib\Stringable;
+namespace Nuxed\Util;
+
+use type Nuxed\Contract\Util\Stringable;
 use type Throwable;
 use type Stringish;
 

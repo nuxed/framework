@@ -2,7 +2,7 @@ namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
 use type Nuxed\Contract\Http\Message\StreamInterface;
-use type Nuxed\Lib\StringableTrait;
+use type Nuxed\Util\StringableTrait;
 use function fclose;
 use function fwrite;
 use function fstat;

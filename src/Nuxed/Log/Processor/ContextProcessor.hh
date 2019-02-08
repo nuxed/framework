@@ -3,7 +3,7 @@
 namespace Nuxed\Log\Processor;
 
 use namespace HH\Lib\Str;
-use namespace Nuxed\Lib;
+use namespace Nuxed\Util;
 use type Nuxed\Log\record;
 
 class ContextProcessor implements ProcessorInterface {
@@ -20,7 +20,7 @@ class ContextProcessor implements ProcessorInterface {
       }
 
       $record['message'] =
-        Str\replace($record['message'], $placeholder, Lib\stringify($value));
+        Str\replace($record['message'], $placeholder, Util\stringify($value));
     }
 
     return $record;
