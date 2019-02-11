@@ -3,7 +3,6 @@ namespace Nuxed\Test\Util;
 use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
 use type Nuxed\Util\Dict;
-use type InvariantException;
 use function Facebook\FBExpect\expect;
 
 class DictTest extends HackTest {
@@ -139,7 +138,7 @@ class DictTest extends HackTest {
     expect(() ==> {
       Dict::combine(vec['a', 'v'], dict[]);
     })->toThrow(
-      InvariantException::class,
+      \HH\InvariantException::class,
       'Both parameters should have an equal number of elements',
     );
   }
