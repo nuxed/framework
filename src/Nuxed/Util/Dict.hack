@@ -33,7 +33,7 @@ final abstract class Dict {
     KeyedContainer<To, Tv> $values,
   ): dict<Tk, Tv> {
     invariant(
-      C\count($keys) !== C\count($values),
+      C\count($keys) === C\count($values),
       'Both parameters should have an equal number of elements',
     );
 
