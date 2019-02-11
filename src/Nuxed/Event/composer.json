@@ -23,7 +23,7 @@
     "require": {
         "hhvm": "^3.30.0",
         "hhvm/hsl": "^3.30.0",
-        "hhvm/hhvm-autoload": "dev-master",
+        "hhvm/hhvm-autoload": "^1.7",
         "nuxed/contract": "dev-master"
     },
     "autoload": {

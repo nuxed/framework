@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "548576542b912ac20213559c3964f4fe",
+    "content-hash": "fcfd1187d8913a0a8870dc05ce542414",
     "packages": [
         {
             "name": "facebook/fbmarkdown",
@@ -167,16 +167,16 @@
         },
         {
             "name": "hhvm/hhvm-autoload",
-            "version": "dev-master",
+            "version": "v1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hhvm-autoload.git",
-                "reference": "5d3fdbf7c203b05e13edab7b4f9981b19877f368"
+                "reference": "2e8b1ec08f00101d63f5ec797d9db47faa99a6dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hhvm-autoload/zipball/5d3fdbf7c203b05e13edab7b4f9981b19877f368",
-                "reference": "5d3fdbf7c203b05e13edab7b4f9981b19877f368",
+                "url": "https://api.github.com/repos/hhvm/hhvm-autoload/zipball/2e8b1ec08f00101d63f5ec797d9db47faa99a6dc",
+                "reference": "2e8b1ec08f00101d63f5ec797d9db47faa99a6dc",
                 "shasum": ""
             },
             "require": {
@@ -214,7 +214,7 @@
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
-            "time": "2019-01-22T22:32:09+00:00"
+            "time": "2018-12-14T20:41:25+00:00"
         },
         {
             "name": "hhvm/hsl",
@@ -361,24 +361,26 @@
         },
         {
             "name": "facebook/fbexpect",
-            "version": "v2.3.0",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/fbexpect.git",
-                "reference": "22b9d59d9ab5e22a07e66fe1d07ba8d0472ae49b"
+                "reference": "a0fd5e57c15bc580dd130e3298f01ca51421c189"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/fbexpect/zipball/22b9d59d9ab5e22a07e66fe1d07ba8d0472ae49b",
-                "reference": "22b9d59d9ab5e22a07e66fe1d07ba8d0472ae49b",
+                "url": "https://api.github.com/repos/hhvm/fbexpect/zipball/a0fd5e57c15bc580dd130e3298f01ca51421c189",
+                "reference": "a0fd5e57c15bc580dd130e3298f01ca51421c189",
                 "shasum": ""
             },
             "require": {
                 "facebook/difflib": "^1.0.0",
-                "hhvm": "^3.28",
+                "hhvm": "^3.28|^4.0",
                 "hhvm/hacktest": "^1.0",
-                "hhvm/hhvm-autoload": "^1.6",
-                "hhvm/hsl": "^3.26"
+                "hhvm/hsl": "^3.26|^4.0"
+            },
+            "require-dev": {
+                "hhvm/hhvm-autoload": "^2.0"
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
@@ -386,7 +388,7 @@
                 "MIT"
             ],
             "description": "Unit test helpers for Facebook projects",
-            "time": "2018-11-29T21:04:58+00:00"
+            "time": "2019-02-08T16:39:19+00:00"
         },
         {
             "name": "facebook/hh-clilib",
@@ -512,9 +514,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "hhvm/hhvm-autoload": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
