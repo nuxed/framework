@@ -138,7 +138,7 @@ class InflectorTest extends HackTest {
       tuple('SubTrees', vec['SubTre', 'SubTree']),
     ];
   }
-  
+
   <<DataProvider('provideSingularizeData')>>
   public function testSingularize(
     string $word,

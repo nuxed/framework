@@ -25,11 +25,10 @@
         }
     ],
     "require": {
-        "hhvm": "^3.30.0",
-        "hhvm/hsl": "^3.30.0",
-        "hhvm/hsl-experimental": "^3.30.0",
-        "hhvm/hhvm-autoload": "^1.7",
-        "facebook/hack-router": "^0.17",
+        "hhvm": "^4.0",
+        "hhvm/hsl": "^4.0",
+        "hhvm/hhvm-autoload": "^2.0",
+        "facebook/hack-router": "^0.18",
         "nuxed/contract": "dev-master",
         "nuxed/util": "dev-master"
     },
