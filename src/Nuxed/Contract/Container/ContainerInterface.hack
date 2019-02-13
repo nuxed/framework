@@ -14,9 +14,9 @@ interface ContainerInterface extends ResetInterface {
    * @throws NotFoundExceptionInterface  No entry was found for **this** identifier.
    * @throws ContainerExceptionInterface Error while retrieving the entry.
    *
-   * @return mixed Entry.
+   * @return dynamic Entry.
    */
-  public function get(string $id): mixed;
+  public function get(string $id): dynamic;
 
   /**
    * Returns true if the container can return an entry for the given identifier.

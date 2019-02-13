@@ -108,7 +108,7 @@ class Container implements ContainerInterface {
   /**
    * {@inheritdoc}
    */
-  public function get(string $id, bool $new = false): mixed {
+  public function get(string $id, bool $new = false): dynamic {
     if ($this->definitions->has($id)) {
 
       $resolved = $this->definitions->resolve($id, $new);

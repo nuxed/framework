@@ -20,7 +20,7 @@ class ReflectionContainer
   /**
   * Cache of reslutions.
   */
-  protected dict<string, mixed> $cache;
+  protected dict<string, dynamic> $cache;
 
   public function __construct(protected bool $cacheResolutions = false) {
     $this->cache = dict[];
@@ -29,8 +29,8 @@ class ReflectionContainer
   /**
    * {@inheritdoc}
    */
-  public function get(string $id, dict<string, mixed> $args = dict[]): mixed {
-    if ($this->cacheResolutions === true && C\contains_key($this->cache, $id)) {
+  public function get(string $id, dict<string, dynamic> $args = dict[]): dynamic {
+    if ($this->cacheResolutions && C\contains_key($this->cache, $id)) {
       return $this->cache[$id];
     }
 
