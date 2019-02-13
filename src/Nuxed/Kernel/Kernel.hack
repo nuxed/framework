@@ -6,6 +6,7 @@ use type Nuxed\Contract\Kernel\KernelInterface;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Emitter\EmitterInterface;
+use type Nuxed\Contract\Http\Server\MiddlewareInterface;
 use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
 use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
 use type Nuxed\Contract\Http\Router\RouteInterface;
@@ -79,8 +80,7 @@ final class Kernel implements KernelInterface {
   /*
    * Pipe middleware like unix pipes.
    */
-  public function pipe(mixed $middleware, int $priority = 0): void {
-    $middleware = $this->middleware->prepare($middleware);
+  public function pipe(MiddlewareInterface $middleware, int $priority = 0): void {
     $event = $this->events
       ->dispatch(new Event\PipeEvent($middleware, $priority));
     $this->pipe->pipe($event->middleware, $event->priority);
@@ -134,19 +134,17 @@ final class Kernel implements KernelInterface {
    */
   public function route(
     string $path,
-    mixed $middleware,
+    MiddlewareInterface $middleware,
     ?Container<string> $methods = null,
     ?string $name = null,
   ): RouteInterface {
-    $middleware = $this->middleware->prepare($middleware);
-
     return $this->collector->route($path, $middleware, $methods, $name);
   }
 
   /**
    * Register fallback middleware.
    */
-  public function fallback(mixed $middleware): void {
+  public function fallback(MiddlewareInterface $middleware): void {
     $this->pipe($middleware, -0x9950);
   }
 
@@ -155,7 +153,7 @@ final class Kernel implements KernelInterface {
    */
   public function get(
     string $path,
-    mixed $middleware,
+    MiddlewareInterface $middleware,
     ?string $name = null,
   ): RouteInterface {
     return $this->route($path, $middleware, vec['GET'], $name);
@@ -166,7 +164,7 @@ final class Kernel implements KernelInterface {
    */
   public function post(
     string $path,
-    mixed $middleware,
+    MiddlewareInterface $middleware,
     ?string $name = null,
   ): RouteInterface {
     return $this->route($path, $middleware, vec['POST'], $name);
@@ -177,7 +175,7 @@ final class Kernel implements KernelInterface {
    */
   public function put(
     string $path,
-    mixed $middleware,
+    MiddlewareInterface $middleware,
     ?string $name = null,
   ): RouteInterface {
     return $this->route($path, $middleware, vec['PUT'], $name);
@@ -188,7 +186,7 @@ final class Kernel implements KernelInterface {
    */
   public function patch(
     string $path,
-    mixed $middleware,
+    MiddlewareInterface $middleware,
     ?string $name = null,
   ): RouteInterface {
     return $this->route($path, $middleware, vec['PATCH'], $name);
@@ -199,7 +197,7 @@ final class Kernel implements KernelInterface {
    */
   public function delete(
     string $path,
-    mixed $middleware,
+    MiddlewareInterface $middleware,
     ?string $name = null,
   ): RouteInterface {
     return $this->route($path, $middleware, vec['DELETE'], $name);
@@ -210,7 +208,7 @@ final class Kernel implements KernelInterface {
    */
   public function any(
     string $path,
-    mixed $middleware,
+    MiddlewareInterface $middleware,
     ?string $name = null,
   ): RouteInterface {
     return $this->route($path, $middleware, null, $name);
