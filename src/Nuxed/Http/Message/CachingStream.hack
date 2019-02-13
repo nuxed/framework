@@ -50,7 +50,7 @@ class CachingStream extends Stream {
       throw Exception\UnreadableStreamException::dueToConfiguration();
     }
 
-    $contents = stream_get_contents($this->stream, $maxLength);
+    $contents = stream_get_contents($this->stream as nonnull, $maxLength);
 
     if (false === $contents) {
       throw Exception\UnreadableStreamException::dueToPhpError();

@@ -3,6 +3,7 @@ namespace Nuxed\Test\Http\Message;
 use namespace HH\Lib\C;
 use namespace Nuxed\Http\Message\__Private;
 use type Facebook\HackTest\HackTest;
+use type Facebook\HackTest\DataProvider;
 use type Nuxed\Contract\Http\Message\StreamInterface;
 use type Nuxed\Http\Message\Response;
 use type Nuxed\Http\Message\Cookie;

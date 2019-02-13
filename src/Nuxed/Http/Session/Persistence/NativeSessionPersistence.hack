@@ -41,6 +41,7 @@ class NativeSessionPersistence extends AbstractSessionPersistence {
     $sessionId = $this->getCookieFromRequest($request);
     $id = $sessionId === '' ? $this->generateSessionId() : $sessionId;
     $this->startSession($id);
+    /* HH_IGNORE_ERROR[2050] */
     $session = new Session($_SESSION, $sessionId);
     $session->expire($this->cookieOptions['lifetime']);
     return $session;

@@ -48,7 +48,7 @@ class StreamHandler extends AbstractHandler {
 
   <<__Override>>
   public function close(): void {
-    if ($this->url && $this->stream is resource) {
+    if ($this->url !== '' && $this->stream is resource) {
       fclose($this->stream);
     }
 
@@ -111,7 +111,7 @@ class StreamHandler extends AbstractHandler {
     $this->streamWrite($this->stream, $message);
 
     if ($this->useLocking) {
-      flock($this->stream, LOCK_UN);
+      flock($this->stream as nonnull, LOCK_UN);
     }
   }
 
@@ -122,8 +122,7 @@ class StreamHandler extends AbstractHandler {
     fwrite($stream, $message);
   }
 
-  <<Internal>>
-  public function customErrorHandler(int $_, string $msg): void {
+  protected function customErrorHandler(int $_, string $msg): void {
     $this->errorMessage = preg_replace('{^(fopen|mkdir)\(.*?\): }', '', $msg);
   }
 

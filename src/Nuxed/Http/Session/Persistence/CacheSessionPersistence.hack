@@ -41,7 +41,7 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
     $this->pathTranslated =
       (string)($request->getServerParams()['PATH_TRANSLATED'] ?? '');
     $id = $this->getCookieFromRequest($request);
-    $sessionData = $id ? $this->getSessionDataFromCache($id) : dict[];
+    $sessionData = $id !== '' ? $this->getSessionDataFromCache($id) : dict[];
     $session = new Session($sessionData, $id);
     $session->expire($this->cookieOptions['lifetime']);
     return $session;

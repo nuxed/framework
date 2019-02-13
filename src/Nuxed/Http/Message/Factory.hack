@@ -40,10 +40,10 @@ class Factory
     /* HH_IGNORE_ERROR[2050] */
     $server = (new __Private\ServerParametersMarshaler())->marshale($_SERVER);
     $headers = (new __Private\HeadersMarshaler())->marshal($server);
-    /* HH_IGNORE_ERROR[2050] */
     $cookies = (new __Private\CookiesMarshaler())->marshal(
       $headers['cookie'] ?? vec[],
-      $_COOKIE,
+      /* HH_IGNORE_ERROR[2050] */
+      $_COOKIE ?? dict[],
     );
     $uri = (new __Private\UriMarshaler())->marshal($server, $headers);
     /* HH_IGNORE_ERROR[2050] */

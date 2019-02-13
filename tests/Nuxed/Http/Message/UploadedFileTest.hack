@@ -7,6 +7,7 @@ use type Nuxed\Http\Message\Factory;
 use type Nuxed\Http\Message\Stream;
 use type Nuxed\Http\Message\UploadedFile;
 use type Facebook\HackTest\HackTest;
+use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
 use function is_scalar;
 use function file_exists;

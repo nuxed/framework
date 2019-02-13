@@ -120,7 +120,7 @@ class Stream implements StreamInterface {
       throw Exception\UnseekableStreamException::dueToConfiguration();
     }
 
-    $retval = fseek($this->stream, $offset, $whence);
+    $retval = fseek($this->stream as nonnull, $offset, $whence);
 
     if ($retval === -1) {
       throw Exception\UnseekableStreamException::dueToPhpError();
@@ -159,7 +159,7 @@ class Stream implements StreamInterface {
 
     $this->size = null;
 
-    $result = fwrite($this->stream, $string);
+    $result = fwrite($this->stream as nonnull, $string);
 
     if (false === $result) {
       throw Exception\UnwritableStreamException::dueToPhpError();
@@ -188,7 +188,7 @@ class Stream implements StreamInterface {
       throw Exception\UnreadableStreamException::dueToConfiguration();
     }
 
-    $result = fread($this->stream, $length);
+    $result = fread($this->stream as nonnull, $length);
 
     if (false === $result) {
       throw Exception\UnreadableStreamException::dueToPhpError();
@@ -206,7 +206,7 @@ class Stream implements StreamInterface {
       throw Exception\UnreadableStreamException::dueToConfiguration();
     }
 
-    $contents = stream_get_contents($this->stream);
+    $contents = stream_get_contents($this->stream as nonnull);
 
     if (false === $contents) {
       throw Exception\UnreadableStreamException::dueToPhpError();

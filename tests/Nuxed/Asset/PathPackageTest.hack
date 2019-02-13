@@ -2,6 +2,7 @@ namespace Nuxed\Test\Asset;
 
 use namespace Nuxed\Asset;
 use type Facebook\HackTest\HackTest;
+use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
 
 class PathPackageTest extends HackTest {

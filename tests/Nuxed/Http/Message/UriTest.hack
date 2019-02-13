@@ -1,6 +1,7 @@
 namespace Nuxed\Test\Http\Message;
 
 use type Facebook\HackTest\HackTest;
+use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
 use namespace Nuxed\Http\Message;
 use type Nuxed\Http\Message\Uri;

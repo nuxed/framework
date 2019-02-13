@@ -68,7 +68,7 @@ class File extends Node {
     if ($this->handle is resource) {
       $this->unlock();
 
-      return fclose($this->handle);
+      return fclose($this->handle as nonnull);
     }
 
     return false;
@@ -240,7 +240,7 @@ class File extends Node {
         $length = $this->size() ?: 1;
       }
 
-      $content = fread($this->handle, $length);
+      $content = fread($this->handle as nonnull, $length);
 
       $this->close();
 
@@ -266,7 +266,7 @@ class File extends Node {
    */
   <<__Override>>
   public function reset(string $path = ''): this {
-    if ($path && file_exists($path) && is_dir($path)) {
+    if ($path !== '' && file_exists($path) && is_dir($path)) {
       throw new InvalidPathException(
         Str\format('Invalid file path %s, folders are not allowed', $path),
       );
@@ -313,7 +313,7 @@ class File extends Node {
     }
 
     if ($this->lock(LOCK_EX | LOCK_NB)) {
-      $result = fwrite($this->handle, $data);
+      $result = fwrite($this->handle as nonnull, $data);
 
       $this->unlock();
 

@@ -1,6 +1,7 @@
 namespace Nuxed\Util;
 
 use type Nuxed\Contract\Util\Jsonable;
+use type Throwable;
 use function json_encode;
 use function json_decode;
 use function json_last_error;
@@ -21,8 +22,11 @@ final abstract class Json {
 
     $flags = JSON_UNESCAPED_UNICODE |
       JSON_UNESCAPED_SLASHES |
-      ($pretty ? JSON_PRETTY_PRINT : 0) |
       JSON_PRESERVE_ZERO_FRACTION;
+    if ($pretty) {
+      $flags |= JSON_PRETTY_PRINT;
+    }
+
     $json = json_encode($value, $flags);
     $error = json_last_error();
     if (JSON_ERROR_NONE !== $error) {
@@ -33,17 +37,22 @@ final abstract class Json {
   }
 
   public static function decode(string $json, bool $assoc = true): mixed {
-    $value = json_decode(
-      $json,
-      $assoc,
-      512,
-      JSON_BIGINT_AS_STRING | JSON_FB_HACK_ARRAYS,
-    );
-    $error = json_last_error();
-    if (JSON_ERROR_NONE !== $error) {
-      throw new Exception\JsonDecodeException(json_last_error_msg(), $error);
-    }
+    try {
+      $value = json_decode(
+        $json,
+        $assoc,
+        512,
+        JSON_BIGINT_AS_STRING | JSON_FB_HACK_ARRAYS,
+      );
+      $error = json_last_error();
+      if (JSON_ERROR_NONE !== $error) {
+        throw new Exception\JsonDecodeException(json_last_error_msg(), $error);
+      }
 
-    return $value;
+      return $value;
+    } catch (Throwable $e) {
+      throw
+        new Exception\JsonDecodeException($e->getMessage(), (int)$e->getCode());
+    }
   }
 }

@@ -85,7 +85,7 @@ class UploadedFilesMarshaler {
       );
     }
 
-    $stream = new Stream(fopen($tmpName, 'r'));
+    $stream = new Stream(fopen($tmpName, 'rb'));
 
     $error = $fileSpec['error'];
 

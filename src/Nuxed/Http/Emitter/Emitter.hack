@@ -71,7 +71,7 @@ class Emitter implements EmitterInterface {
         'HTTP/%s %d%s',
         $response->getProtocolVersion(),
         $statusCode,
-        ($reasonPhrase ? ' '.$reasonPhrase : ''),
+        (!Str\is_empty($reasonPhrase) ? ' '.$reasonPhrase : ''),
       ),
       true,
       $statusCode,

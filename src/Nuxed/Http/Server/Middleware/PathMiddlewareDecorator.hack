@@ -36,7 +36,7 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
 
     // Skip if match is not at a border ('/' or end)
     $border = $this->getBorder($path);
-    if ($border && '/' !== $border) {
+    if ('' !== $border && '/' !== $border) {
       return await $handler->handle($request);
     }
 

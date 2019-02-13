@@ -23,7 +23,7 @@ class ApcStore extends Store {
 
   <<__Override>>
   public function doStore(string $id, mixed $value, num $ttl = 0): bool {
-    return apc_store($id, $this->serializer->serialize($value), $ttl);
+    return apc_store($id, $this->serializer->serialize($value), (int)$ttl);
   }
 
   <<__Override>>

@@ -52,7 +52,7 @@ class PathPackage extends Package {
     // if absolute or begins with /, we're done
     if (
       $this->isAbsoluteUrl($versionedPath) ||
-      ($versionedPath && '/' === $versionedPath[0])
+      (!Str\is_empty($versionedPath) && Str\starts_with($versionedPath, '/'))
     ) {
       return $versionedPath;
     }
