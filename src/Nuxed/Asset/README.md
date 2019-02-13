@@ -9,7 +9,9 @@ The Asset component manages URL generation and versioning of web assets such as 
 > Note! This package is a hack implementation of Symfonys `symfony/asset` package,
 > we would like to thank everyone how have contributed to the Symfony Asset package
 > and Symfony Framework.
+>
 > Symfony : <https://github.com/symfony/symfony>
+>
 > Symfony Contributors : <https://github.com/symfony/symfony/graphs/contributors>
 
 ---

@@ -8,7 +8,9 @@ The Nuxed Period component is a time range API.
 
 > Note! This package is a hack implementation of The PHP Leagues `league/period` package.
 > we would like to thank everyone how have contributed to the League/Period package.
+>
 > League Period : <https://github.com/thephpleague/period>
+>
 > League Period Contributors : <https://github.com/thephpleague/period/graphs/contributors>
 
 ---

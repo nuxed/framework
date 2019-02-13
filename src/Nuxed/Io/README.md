@@ -9,7 +9,9 @@ The IO component provides classes that interact with input and output of data on
 > Note! This package is a more-strict and hhvm-4-compatiable version of the
 > `titon/io` package, we would like to thank everyone how have contributed to
 > the Titon Io package and Titon Framework.
+>
 > Titon : <https://github.com/titon/framework>
+>
 > Titon Contributors : <https://github.com/titon/framework/graphs/contributors>
 
 ---

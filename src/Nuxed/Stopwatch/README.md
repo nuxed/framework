@@ -9,7 +9,9 @@ The Nuxed Stopwatch component provides a way to profile code.
 > Note! This package is a hack implementation of Symfonys `symfony/stopwatch` package,
 > we would like to thank everyone how have contributed to the Symfony Stopwatch package
 > and Symfony Framework.
+>
 > Symfony : <https://github.com/symfony/symfony>
+>
 > Symfony Contributors : <https://github.com/symfony/symfony/graphs/contributors>
 
 ---
