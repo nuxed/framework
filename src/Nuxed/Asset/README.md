@@ -1,10 +1,28 @@
 # The Nuxed Asset Component
 
->Nuxed/Asset is a Hack implementation of [Symfony/Asset](https://github.com/symfony/asset)
+This repository is read-only. Please refer to the official framework repository for any issues or pull requests.
 
 ---
 
->The Asset component manages URL generation and versioning of web assets such as CSS stylesheets, JavaScript files and image files.
+The Asset component manages URL generation and versioning of web assets such as CSS stylesheets, JavaScript files and image files.
+
+> Note! This package is a hack implementation of Symfonys `symfony/asset` package,
+> we would like to thank everyone how have contributed to the Symfony Asset package
+> and Symfony Framework.
+> Symfony : <https://github.com/symfony/symfony>
+> Symfony Contributors : <https://github.com/symfony/symfony/graphs/contributors>
+
+---
+
+## Installation
+
+This package can be install with Composer.
+
+```console
+composer install nuxed/asset
+```
+
+## Usage
 
 In the past, it was common for web applications to hardcode URLs of web assets. For example:
 
@@ -318,3 +336,15 @@ print $localPackage->getUrl('/logo.png');
 print $ftpPackage->getUrl('/logo.png');
 // result: ftp://example.com/images/logo.png
 ```
+
+---
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Nuxed Asset, please send an e-mail to Saif Eddin Gmati via azjezz@protonmail.com.
+
+---
+
+## License
+
+The Nuxed framework is open-sourced software licensed under the MIT-licensed.

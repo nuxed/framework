@@ -43,11 +43,9 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "lint": "hhast-lint -v ./",
         "type-check": "hh_client ./",
         "check": [
-            "@type-check",
-            "@lint"
+            "@type-check"
         ]
     },
     "support": {

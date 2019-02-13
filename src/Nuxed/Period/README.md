@@ -1,18 +1,35 @@
-# The Nuxed Period Component
+# The Nuxed Perid Component
+
+This repository is read-only. Please refer to the official framework repository for any issues or pull requests.
+
+---
+
+The Nuxed Period component is a time range API.
+
+> Note! This package is a hack implementation of The PHP Leagues `league/period` package.
+> we would like to thank everyone how have contributed to the League/Period package.
+> League Period : <https://github.com/thephpleague/period>
+> League Period Contributors : <https://github.com/thephpleague/period/graphs/contributors>
+
+---
+
+## Installation
+
+This package can be install with Composer.
+
+```console
+composer install nuxed/markdown
+```
+
+---
+
+## Usage
 
 > The Period component is Hack's missing time range API. it is based on [`league/period`](https://github.com/thephpleague/period) php packages, which is based on [Resolving Feature Envy in the Domain](https://verraes.net/2014/08/resolving-feature-envy-in-the-domain/) By Mathias Verraes and extends the concept to cover all basic operations regarding interval.
 
 In your code, you will always have to typehint against the `Nuxed\Period\Period` class directly because it is a immutable value object class marked as final and the library does not provide an interface.
 
----
-
-## Getting Started
-
----
-
-### Overview
-
-#### Accessing the interval properties
+### Accessing the interval properties
 
 ```hack
 use type Nuxed\Period\Period;
@@ -33,7 +50,7 @@ print $interval->toString();
 // result: 2014-10-03T08:12:37Z/2014-10-03T09:12:37Z
 ```
 
-#### Iterate over the interval
+### Iterate over the interval
 
 A simple example on how to get all the days from a selected month.
 
@@ -43,7 +60,7 @@ foreach (Period::fromMonth(2014, 10)->getDatePeriod('1 DAY') as $day) {
 }
 ```
 
-#### Comparing intervals
+### Comparing intervals
 
 ```hack
 $interval = Period::after('2014-01-01', '1 WEEK');
@@ -52,7 +69,7 @@ $interval->durationEquals($alt_interval); // returns true
 $interval->equals($alt_interval);         // returns false
 ```
 
-#### Modifying Interval
+### Modifying Interval
 
 ```hack
 $period = Period::after('2014-01-01', '1 WEEK');
@@ -61,7 +78,7 @@ $period->contains($altPeriod); //return false;
 $altPeriod->durationGreaterThan($period); //return true;
 ```
 
-#### Accessing all gaps between intervals
+### Accessing all gaps between intervals
 
 ```hack
 $sequence = new Sequence(
@@ -74,23 +91,11 @@ print $gaps->count();
 // result: 2
 ```
 
----
+### Building Blocks
 
-### Installation
+#### Definitions
 
-```console
-➜ composer require nuxed/period
-```
-
----
-
-## Building Blocks
-
----
-
-### Definitions
-
-#### Concepts
+##### Concepts
 
 - *interval* - `Period` is a Hack implementation of a datetime interval which consists of :
   - two datepoints;
@@ -106,7 +111,7 @@ print $gaps->count();
 
 > infinite or unbounded intervals are not supported.
 
-#### Arguments
+##### Arguments
 
 Since this package relies heavily on `DateTimeImmutable` and `DateInterval` objects and because it is sometimes complicated to get your hands on such objects the package comes bundled with:
 
@@ -114,9 +119,7 @@ Since this package relies heavily on `DateTimeImmutable` and `DateInterval` obje
   - `Nuxed\Period\DatePoint`
   - `Nuxed\Period\Duration`
 
----
-
-### The DatePoint Object
+### DatePoint
 
 A datepoint is a position in time expressed as a `DateTimeImmutable` object.
 
@@ -140,7 +143,7 @@ Returns a `DatePoint` object or throws:
 >Because we are using Hack's parser, values exceeding ranges will be added to their parent values.
 >If no timezone information is given, the returned `DatePoint` object will use the current timezone.
 
-##### Examples
+#### Examples
 
 Using the `$datepoint` argument
 
@@ -195,9 +198,7 @@ $hour->contains($datepoint); // true
 $month->contains($hour); // true
 ```
 
----
-
-### The Duration object
+### Duration
 
 A duration is the continuous portion of time between two datepoints expressed as a `DateInterval` object. The duration cannot be negative.
 
@@ -268,17 +269,13 @@ print $duration->toString();
 
 As per the specification the smallest value (ie the second) can accept a decimal fraction.
 
----
+### Period
 
-## Period
-
----
-
-### Instatiation
+#### Instatiation
 
 >datepoint and duration conversions are done internally using the `Nuxed\Period\DatePoint` and the `Nuxed\Period\Duration` classes.
 
-#### The constructor
+##### The constructor
 
 ```hack
   public Period::__construct(
@@ -309,3 +306,15 @@ $period1 = new Period(
     PeriodBoundaryType::EXCLUDE_ALL
 );
 ```
+
+---
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Nuxed Markdown, please send an e-mail to Saif Eddin Gmati via azjezz@protonmail.com.
+
+---
+
+## License
+
+The Nuxed framework is open-sourced software licensed under the MIT-licensed.

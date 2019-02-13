@@ -1,0 +1,15 @@
+{
+    "roots": [ "./" ],
+    "builtinLinters": "all",
+    "overrides": [
+      {
+        "patterns": [ "./*" ],
+        "disabledLinters": [
+            "Facebook\\HHAST\\Linters\\LicenseHeaderLinter",
+            "Facebook\\HHAST\\Linters\\AsyncFunctionAndMethodLinter",
+            "Facebook\\HHAST\\Linters\\UseStatementWithAsLinter"
+        ],
+        "disableAllAutoFixes": false
+      }
+    ]
+  }
