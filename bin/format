@@ -1,19 +1,21 @@
 #!/usr/bin/env hhvm
 <?hh // strict
 
-require __DIR__.'/../vendor/hh_autoload.hh';
+require __DIR__.'/../vendor/autoload.hack';
 
 <<__EntryPoint>>
 async function format(): Awaitable<noreturn> {
+  Facebook\AutoloadMap\initialize();
+
   $source = new Nuxed\Io\Folder(__DIR__ . '/../src/Nuxed');
   $tests = new Nuxed\Io\Folder(__DIR__ . '/../tests/Nuxed');
   foreach ($source->files(true, true) as $file) {
-    if ($file->ext() === 'hh') {
+    if ($file->ext() === 'hack') {
      exec('hackfmt -i '.$file->path());
     }
   }
   foreach ($tests->files(true, true) as $file) {
-    if ($file->ext() === 'hh') {
+    if ($file->ext() === 'hack') {
      exec('hackfmt -i '.$file->path());
     }
   }
