@@ -134,7 +134,8 @@ class Emitter implements EmitterInterface {
     string $name,
     CookieInterface $cookie,
   ): string {
-    $cookieStringParts = vec[urlencode($name).'='.urlencode($cookie->getValue())];
+    $cookieStringParts =
+      vec[urlencode($name).'='.urlencode($cookie->getValue())];
 
     $domain = $cookie->getDomain();
     if (null !== $domain) {
