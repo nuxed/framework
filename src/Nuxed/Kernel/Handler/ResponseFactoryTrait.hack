@@ -14,7 +14,7 @@ trait ResponseFactoryTrait {
 
   protected function redirect(
     UriInterface $uri,
-    int $status = 302,
+    int $status = 301,
     KeyedContainer<string, Container<string>> $headers = dict[],
   ): Message\Response\RedirectResponse {
     return new Message\Response\RedirectResponse($uri, $status, $headers);
