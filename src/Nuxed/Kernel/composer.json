@@ -24,10 +24,10 @@
         "hhvm": "^4.0",
         "hhvm/hsl": "^4.0",
         "hhvm/hhvm-autoload": "^2.0",
-        "nuxed/contract": "^0.1.0",
-        "nuxed/container": "^0.1.0",
-        "nuxed/http": "^0.1.0",
-        "nuxed/event": "^0.1.0"
+        "nuxed/contract": "^0.1",
+        "nuxed/container": "^0.1",
+        "nuxed/http": "^0.1",
+        "nuxed/event": "^0.1"
     },
     "autoload": {
         "psr-4": {
