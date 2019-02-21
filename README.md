@@ -1,84 +1,22 @@
+<p align="center"><img src="https://avatars3.githubusercontent.com/u/45311177?s=200&v=4"></p>
+
+<p align="center">
+<a href="https://travis-ci.org/nuxed/framework"><img src="https://travis-ci.org/nuxed/framework.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/nuxed/framework"><img src="https://poser.pugx.org/nuxed/framework/d/total.svg" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/nuxed/framework"><img src="https://poser.pugx.org/nuxed/framework/v/stable.svg" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/nuxed/framework"><img src="https://poser.pugx.org/nuxed/framework/license.svg" alt="License"></a>
+<a href="https://gitter.im/Nuxed/framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/Nuxed/framework.svg" alt="License"></a>
+</p>
 
 # Nuxed
 
 ## Hack framework for building web applications with expressive, elegant syntax
 
-> *DO NOT USE; Nuxed is under heavy active development*
-
----
-[![Build Status](https://travis-ci.org/nuxed/framework.svg?branch=master)](https://travis-ci.org/nuxed/framework) [![Join the chat at https://gitter.im/Nuxed/framework](https://badges.gitter.im/Nuxed/framework.svg)](https://gitter.im/Nuxed/framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 ---
 
-### Usage Example
-
-A simple example using `Nuxed\Kernel\Kernel`, the heart of the `Nuxed` framework.
-
-`main.hack` :
-
-```hack
-<?hh // strict
-
-use namespace Nuxed\Kernel;
-use namespace Nuxed\Http\Message;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface as Request;
-use type Nuxed\Contract\Http\Message\ResponseInterface as Response;
-
-require __DIR__.'/../../vendor/hh_autoload.hh';
-
-<<__EntryPoint>>
-async function main(): Awaitable<noreturn> {
-  /**
-   * Create the container and kernel instances.
-   *
-   * you can use the container instance to register
-   * services.
-   */
-  list($container, $kernel) = Kernel\Kernel::create();
-  
-  /**
-   * Add a simple route
-   */
-  $kernel->get(
-    '/',
-    (Request $request): Response ==>
-      new Message\Response\JsonResponse(dict[
-        'message' => 'Hello, World'
-      ])
-  );
-
-  /**
-   * run the kernel application.
-   */
-  return await $kernel->run();
-}
-```
-
-`server.ini`
-
-```ini
-hhvm.force_hh=true
-hhvm.server.port = 8080
-hhvm.server.type = "proxygen"
-hhvm.server.default_document = "main.hack"
-hhvm.server.error_document404 = "main.hack"
-hhvm.server.utf8ize_replace = true
-```
-
-Run the application :
-
-```console
-➜ hhvm -m daemon -c /etc/hhvm/server.ini -d hhvm.log.file=log.txt
-```
+> Note: This repository contains the core code of the Nuxed framework. If you want to build an application using Nuxed, visit the main Nuxed repository.
 
 ---
-
-### Advanced Usage: Repo Authoritative
-
-Nuxed doesn't use eval, or create classes / functions at runtime. meaning you can use it in repo authoritative mode. however compiling [`Hsl`](https://github.com/hhvm/hsl) 3.30 fails and crashs the hip-hop compiler, so we need to wait until it get fixed.
-
-see : [@facebook/hhvm#8395](https://github.com/facebook/hhvm/issues/8395)
-see : [@hhvm/hsl#71](https://github.com/hhvm/hsl/issues/71)
 
 ### Security Vulnerabilities
 
