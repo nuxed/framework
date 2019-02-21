@@ -141,7 +141,8 @@ class SessionServiceProvider extends AbstractServiceProvider {
       'lifetime' => $this->config['cookie']['lifetime'] ?? 0,
       'path' => $this->config['cookie']['path'] ?? '/',
       'domain' => $this->config['cookie']['domain'] ?? null,
-      'secure' => $this->config['cookie']['http_only'] ?? false,
+      'http_only' => $this->config['cookie']['http_only'] ?? false,
+      'secure' => $this->config['cookie']['secure'] ?? false,
       'same_site' => $this->config['cookie']['same_site'] ??
         Http\Message\CookieSameSite::STRICT,
     );
