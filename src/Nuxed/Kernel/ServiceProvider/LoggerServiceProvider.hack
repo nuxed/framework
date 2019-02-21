@@ -18,63 +18,63 @@ class LoggerServiceProvider extends AbstractServiceProvider {
     Log\Processor\MessageLengthProcessor::class,
   ];
 
-  <<__Override>>
-  public function __construct(
-    private shape(
-      #───────────────────────────────────────────────────────────────────────#
-      # Log Handlers                                                          #
-      #───────────────────────────────────────────────────────────────────────#
-      # You may define as much log handlers as you want here.                 #
-      #───────────────────────────────────────────────────────────────────────#
-      ?'handlers' => Container<classname<Log\Handler\HandlerInterface>>,
+  const type TConfig = shape(
+    #───────────────────────────────────────────────────────────────────────#
+    # Log Handlers                                                          #
+    #───────────────────────────────────────────────────────────────────────#
+    # You may define as much log handlers as you want here.                 #
+    #───────────────────────────────────────────────────────────────────────#
+    ?'handlers' => Container<classname<Log\Handler\HandlerInterface>>,
 
-      #───────────────────────────────────────────────────────────────────────#
-      # Log Processors                                                        #
-      #───────────────────────────────────────────────────────────────────────#
-      # Log processors process the log record before passing it to the        #
-      # handlers, allowing you to add extra information to the record.        #
-      #───────────────────────────────────────────────────────────────────────#
-      ?'processors' => Container<classname<Log\Processor\ProcessorInterface>>,
+    #───────────────────────────────────────────────────────────────────────#
+    # Log Processors                                                        #
+    #───────────────────────────────────────────────────────────────────────#
+    # Log processors process the log record before passing it to the        #
+    # handlers, allowing you to add extra information to the record.        #
+    #───────────────────────────────────────────────────────────────────────#
+    ?'processors' => Container<classname<Log\Processor\ProcessorInterface>>,
 
-      #───────────────────────────────────────────────────────────────────────#
-      # Handlers Options                                                      #
-      #───────────────────────────────────────────────────────────────────────#
-      # Here we define the options for all the log handlers.                  #
-      #───────────────────────────────────────────────────────────────────────#
-      ?'options' => shape(
-        ?'syslog' => shape(
-          ?'ident' => string,
-          ?'facility' => Log\Handler\SysLogFacility,
-          ?'level' => Contract\LogLevel,
-          ?'bubble' => bool,
-          ?'options' => int,
-          ?'formatter' => classname<Log\Formatter\FormatterInterface>,
-          ...
-        ),
-        ?'rotating-file' => shape(
-          ?'filename' => string,
-          ?'max-files' => int,
-          ?'level' => Contract\LogLevel,
-          ?'bubble' => bool,
-          ?'file-permission' => ?int,
-          ?'use-lock' => bool,
-          ?'formatter' => classname<Log\Formatter\FormatterInterface>,
-          ...
-        ),
-        ?'stream' => shape(
-          ?'url' => string,
-          ?'level' => Contract\LogLevel,
-          ?'bubble' => bool,
-          ?'file-permission' => ?int,
-          ?'use-lock' => bool,
-          ?'formatter' => classname<Log\Formatter\FormatterInterface>,
-          ...
-        ),
+    #───────────────────────────────────────────────────────────────────────#
+    # Handlers Options                                                      #
+    #───────────────────────────────────────────────────────────────────────#
+    # Here we define the options for all the log handlers.                  #
+    #───────────────────────────────────────────────────────────────────────#
+    ?'options' => shape(
+      ?'syslog' => shape(
+        ?'ident' => string,
+        ?'facility' => Log\Handler\SysLogFacility,
+        ?'level' => Contract\LogLevel,
+        ?'bubble' => bool,
+        ?'options' => int,
+        ?'formatter' => classname<Log\Formatter\FormatterInterface>,
+        ...
+      ),
+      ?'rotating-file' => shape(
+        ?'filename' => string,
+        ?'max-files' => int,
+        ?'level' => Contract\LogLevel,
+        ?'bubble' => bool,
+        ?'file-permission' => ?int,
+        ?'use-lock' => bool,
+        ?'formatter' => classname<Log\Formatter\FormatterInterface>,
+        ...
+      ),
+      ?'stream' => shape(
+        ?'url' => string,
+        ?'level' => Contract\LogLevel,
+        ?'bubble' => bool,
+        ?'file-permission' => ?int,
+        ?'use-lock' => bool,
+        ?'formatter' => classname<Log\Formatter\FormatterInterface>,
         ...
       ),
       ...
-    ) $config = shape(),
-  ) {
+    ),
+    ...
+  );
+
+  <<__Override>>
+  public function __construct(private this::TConfig $config = shape()) {
     parent::__construct();
   }
 

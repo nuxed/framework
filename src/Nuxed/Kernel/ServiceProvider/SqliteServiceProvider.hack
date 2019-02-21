@@ -13,15 +13,15 @@ class SqliteServiceProvider extends AbstractServiceProvider {
     SQLite3::class,
   ];
 
+  const type TConfig = shape(
+    ?'filename' => string,
+    ?'flags' => int,
+    ?'encryption_key' => string,
+    ...
+  );
+
   <<__Override>>
-  public function __construct(
-    private shape(
-      ?'filename' => string,
-      ?'flags' => int,
-      ?'encryption_key' => string,
-      ...
-    ) $config = shape(),
-  ) {
+  public function __construct(private this::TConfig $config = shape()) {
     parent::__construct();
   }
 

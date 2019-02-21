@@ -24,44 +24,44 @@ class CacheServiceProvider extends AbstractServiceProvider {
     Store\ApcStore::class,
   ];
 
+  const type TConfig = shape(
+    #───────────────────────────────────────────────────────────────────────#
+    # Cache Store                                                           #
+    #───────────────────────────────────────────────────────────────────────#
+    # This option controls the cache store that gets used while using       #
+    # the cache component.                                                  #
+    #───────────────────────────────────────────────────────────────────────#
+    ?'store' => classname<Store\StoreInterface>,
+
+    #───────────────────────────────────────────────────────────────────────#
+    # Cache Items Serializer                                                #
+    #───────────────────────────────────────────────────────────────────────#
+    # Define the serializer to use for serializing the cache items value    #
+    #───────────────────────────────────────────────────────────────────────#
+    ?'serializer' => classname<Serializer\SerializerInterface>,
+
+    #───────────────────────────────────────────────────────────────────────#
+    # Cache Namespace                                                       #
+    #───────────────────────────────────────────────────────────────────────#
+    # When utilizing a RAM based store such as APC or Memcached,            #
+    # there might be other applications utilizing the same cache. So, we'll #
+    # specify a unique value to use as the namespace so we can avoid        #
+    # colloisions.                                                          #
+    #───────────────────────────────────────────────────────────────────────#
+    ?'namespace' => string,
+
+    #───────────────────────────────────────────────────────────────────────#
+    # Default Cache TTL ( Time To Live )                                    #
+    #───────────────────────────────────────────────────────────────────────#
+    # Here we define the default ttl for cached items.                      #
+    #───────────────────────────────────────────────────────────────────────#
+    ?'default_ttl' => int,
+
+    ...
+  );
+
   <<__Override>>
-  public function __construct(
-    private shape(
-      #───────────────────────────────────────────────────────────────────────#
-      # Cache Store                                                           #
-      #───────────────────────────────────────────────────────────────────────#
-      # This option controls the cache store that gets used while using       #
-      # the cache component.                                                  #
-      #───────────────────────────────────────────────────────────────────────#
-      ?'store' => classname<Store\StoreInterface>,
-
-      #───────────────────────────────────────────────────────────────────────#
-      # Cache Items Serializer                                                #
-      #───────────────────────────────────────────────────────────────────────#
-      # Define the serializer to use for serializing the cache items value    #
-      #───────────────────────────────────────────────────────────────────────#
-      ?'serializer' => classname<Serializer\SerializerInterface>,
-
-      #───────────────────────────────────────────────────────────────────────#
-      # Cache Namespace                                                       #
-      #───────────────────────────────────────────────────────────────────────#
-      # When utilizing a RAM based store such as APC or Memcached,            #
-      # there might be other applications utilizing the same cache. So, we'll #
-      # specify a unique value to use as the namespace so we can avoid        #
-      # colloisions.                                                          #
-      #───────────────────────────────────────────────────────────────────────#
-      ?'namespace' => string,
-
-      #───────────────────────────────────────────────────────────────────────#
-      # Default Cache TTL ( Time To Live )                                    #
-      #───────────────────────────────────────────────────────────────────────#
-      # Here we define the default ttl for cached items.                      #
-      #───────────────────────────────────────────────────────────────────────#
-      ?'default_ttl' => int,
-
-      ...
-    ) $config = shape(),
-  ) {
+  public function __construct(private this::TConfig $config = shape()) {
     parent::__construct();
   }
 

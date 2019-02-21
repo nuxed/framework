@@ -9,17 +9,17 @@ class RedisServiceProvider extends AbstractServiceProvider {
     Redis::class,
   ];
 
+  const type TConfig = shape(
+    ?'host' => string,
+    ?'port' => int,
+    ?'database' => int,
+    ?'password' => string,
+    ?'timeout' => int,
+    ...
+  );
+
   <<__Override>>
-  public function __construct(
-    private shape(
-      ?'host' => string,
-      ?'port' => int,
-      ?'database' => int,
-      ?'password' => string,
-      ?'timeout' => int,
-      ...
-    ) $config = shape(),
-  ) {
+  public function __construct(private this::TConfig $config = shape()) {
     parent::__construct();
   }
 

@@ -13,27 +13,27 @@ class MysqlServiceProvider extends AbstractServiceProvider {
     AsyncMysqlConnectionPool::class,
   ];
 
-  <<__Override>>
-  public function __construct(
-    private shape(
-      ?'pool' => shape(
-        ?'per_key_connection_limit' => int,
-        ?'pool_connection_limit' => int,
-        ?'idle_timeout_micros' => int,
-        ?'age_timeout_micros' => int,
-        ?'expiration_policy' => string,
-        ...
-      ),
-      ?'host' => string,
-      ?'port' => int,
-      ?'database' => string,
-      ?'username' => string,
-      ?'password' => string,
-      ?'timeout-micros' => int,
-      ?'extra-key' => string,
+  const type TConfig = shape(
+    ?'pool' => shape(
+      ?'per_key_connection_limit' => int,
+      ?'pool_connection_limit' => int,
+      ?'idle_timeout_micros' => int,
+      ?'age_timeout_micros' => int,
+      ?'expiration_policy' => string,
       ...
-    ) $config = shape(),
-  ) {
+    ),
+    ?'host' => string,
+    ?'port' => int,
+    ?'database' => string,
+    ?'username' => string,
+    ?'password' => string,
+    ?'timeout-micros' => int,
+    ?'extra-key' => string,
+    ...
+  );
+
+  <<__Override>>
+  public function __construct(private this::TConfig $config = shape()) {
     parent::__construct();
   }
 

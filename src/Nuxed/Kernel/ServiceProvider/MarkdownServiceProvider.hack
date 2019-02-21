@@ -13,16 +13,16 @@ class MarkdownServiceProvider extends AbstractServiceProvider {
     Facebook\Markdown\Renderer::class,
   ];
 
+  const type TConfig = shape(
+    ?'parser' => classname<Facebook\Markdown\ParserContext>,
+    ?'context' => classname<Facebook\Markdown\RenderContext>,
+    ?'renderer' => classname<Facebook\Markdown\Renderer<string>>,
+    ?'extensions' => Container<Markdown\Extension\ExtensionInterface>,
+    ...
+  );
+
   <<__Override>>
-  public function __construct(
-    private shape(
-      ?'parser' => classname<Facebook\Markdown\ParserContext>,
-      ?'context' => classname<Facebook\Markdown\RenderContext>,
-      ?'renderer' => classname<Facebook\Markdown\Renderer<string>>,
-      ?'extensions' => Container<Markdown\Extension\ExtensionInterface>,
-      ...
-    ) $config = shape(),
-  ) {
+  public function __construct(private this::TConfig $config = shape()) {
     parent::__construct();
   }
 
