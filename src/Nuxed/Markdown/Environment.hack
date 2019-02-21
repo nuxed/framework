@@ -10,8 +10,7 @@ use type Facebook\Markdown\UnparsedBlocks\Context as BlockContext;
 use type Facebook\Markdown\Inlines\Context as InlineContext;
 use type Facebook\Markdown\ASTNode;
 
-<<__ConsistentConstruct>>
-class Environment<T> {
+final class Environment<T> {
   public function __construct(
     private ParserContext $parser,
     private RenderContext $context,
