@@ -80,7 +80,10 @@ final class Kernel implements KernelInterface {
   /*
    * Pipe middleware like unix pipes.
    */
-  public function pipe(MiddlewareInterface $middleware, int $priority = 0): void {
+  public function pipe(
+    MiddlewareInterface $middleware,
+    int $priority = 0,
+  ): void {
     $event = $this->events
       ->dispatch(new Event\PipeEvent($middleware, $priority));
     $this->pipe->pipe($event->middleware, $event->priority);
