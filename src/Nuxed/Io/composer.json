@@ -24,7 +24,7 @@
         "hhvm": "^4.0",
         "hhvm/hsl": "^4.0",
         "hhvm/hhvm-autoload": "^2.0",
-        "nuxed/util": "dev-master"
+        "nuxed/util": "^0.0.1"
     },
     "autoload": {
         "psr-4": {
