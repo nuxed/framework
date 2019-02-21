@@ -29,7 +29,10 @@ class ReflectionContainer
   /**
    * {@inheritdoc}
    */
-  public function get(string $id, dict<string, dynamic> $args = dict[]): dynamic {
+  public function get(
+    string $id,
+    KeyedContainer<string, dynamic> $args = dict[],
+  ): dynamic {
     if ($this->cacheResolutions && C\contains_key($this->cache, $id)) {
       return $this->cache[$id];
     }
