@@ -134,7 +134,7 @@ class Emitter implements EmitterInterface {
     string $name,
     CookieInterface $cookie,
   ): string {
-    $cookieStringParts = [urlencode($name).'='.urlencode($cookie->getValue())];
+    $cookieStringParts = vec[urlencode($name).'='.urlencode($cookie->getValue())];
 
     $domain = $cookie->getDomain();
     if (null !== $domain) {
@@ -157,7 +157,7 @@ class Emitter implements EmitterInterface {
     }
     $sameSite = $cookie->getSameSite();
     if ($sameSite is nonnull) {
-      $cookieStringParts[] = $sameSite;
+      $cookieStringParts[] = Str\format('SameSite=%s', $sameSite as string);
     }
 
     return Str\join($cookieStringParts, '; ');
