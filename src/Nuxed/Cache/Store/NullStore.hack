@@ -4,49 +4,53 @@ class NullStore implements StoreInterface {
   /**
    * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
    */
-  public function store(string $_id, mixed $_value, ?num $_ttl = null): bool {
+  public async function store(
+    string $_id,
+    mixed $_value,
+    ?int $_ttl = null,
+  ): Awaitable<bool> {
     return false;
   }
 
   /**
    * Sets a cache item to be persisted later.
    */
-  public function defer(string $_id, mixed $_value, ?num $_ttl = null): bool {
+  public function defer(string $_id, mixed $_value, ?int $_ttl = null): bool {
     return false;
   }
 
   /**
    * Determines whether an item is present in the cache.
    */
-  public function contains(string $_id): bool {
+  public async function contains(string $_id): Awaitable<bool> {
     return false;
   }
 
   /**
    * Delete an item from the cache by its unique key.
    */
-  public function delete(string $_id): bool {
+  public async function delete(string $_id): Awaitable<bool> {
     return false;
   }
 
   /**
    * Fetches a value from the cache.
    */
-  public function get(string $_id): mixed {
+  public async function get(string $_id): Awaitable<mixed> {
     return null;
   }
 
   /**
    * Wipes clean the entire cache's keys.
    */
-  public function clear(): bool {
+  public async function clear(): Awaitable<bool> {
     return false;
   }
 
   /**
    * Persists any deferred cache items.
    */
-  public function commit(): bool {
+  public async function commit(): Awaitable<bool> {
     return false;
   }
 }

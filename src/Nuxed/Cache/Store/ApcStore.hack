@@ -15,30 +15,35 @@ use const APC_ITER_KEY;
 class ApcStore extends Store {
   public function __construct(
     string $namespace = '',
-    num $defaultTtl = 0,
+    int $defaultTtl = 0,
     protected SerializerInterface $serializer = new DefaultSerializer(),
   ) {
     parent::__construct($namespace, $defaultTtl);
   }
 
   <<__Override>>
-  public function doStore(string $id, mixed $value, num $ttl = 0): bool {
-    return apc_store($id, $this->serializer->serialize($value), (int)$ttl);
+  public async function doStore(
+    string $id,
+    mixed $value,
+    int $ttl = 0,
+  ): Awaitable<bool> {
+    return apc_store($id, $this->serializer->serialize($value), $ttl);
   }
 
   <<__Override>>
-  public function doContains(string $id): bool {
+  public async function doContains(string $id): Awaitable<bool> {
     return apc_exists($id);
   }
 
   <<__Override>>
-  public function doDelete(string $id): bool {
+  public async function doDelete(string $id): Awaitable<bool> {
     return apc_delete($id);
   }
 
   <<__Override>>
-  public function doGet(string $id): mixed {
-    if (!$this->doContains($id)) {
+  public async function doGet(string $id): Awaitable<mixed> {
+    $exist = await $this->doContains($id);
+    if (!$exist) {
       return null;
     }
 
@@ -46,7 +51,7 @@ class ApcStore extends Store {
   }
 
   <<__Override>>
-  public function doClear(string $namespace): bool {
+  public function doClear(string $namespace): Awaitable<bool> {
     if (Str\is_empty($namespace)) {
       return apc_clear_cache();
     }

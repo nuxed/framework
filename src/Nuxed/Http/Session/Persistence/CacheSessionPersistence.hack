@@ -1,5 +1,6 @@
 namespace Nuxed\Http\Session\Persistence;
 
+use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
@@ -55,8 +56,8 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
     $id = $session->getId();
 
     if ($session->flushed()) {
-      if (!Str\is_empty($id)) {
-        $this->cache->contains($id) && $this->cache->forget($id);
+      if (!Str\is_empty($id) && Asio\join($this->cache->contains($id))) {
+        Asio\join($this->cache->forget($id));
       }
 
       return $this->flush($session, $response);
@@ -78,7 +79,7 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
       $id = $this->regenerateSession($id);
     }
 
-    $this->cache->put($id, $session->items(), $session->age());
+    Asio\join($this->cache->put($id, $session->items(), $session->age()));
 
     return $this->withCacheHeaders(
       $response->withCookie(
@@ -96,8 +97,8 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
    * Regardless, it generates and returns a new session identifier.
    */
   private function regenerateSession(string $id): string {
-    if (!Str\is_empty($id) && $this->cache->contains($id)) {
-      $this->cache->forget($id);
+    if (!Str\is_empty($id) && Asio\join($this->cache->contains($id))) {
+      Asio\join($this->cache->forget($id));
     }
     return $this->generateSessionId();
   }
