@@ -1,3 +1,4 @@
 namespace Nuxed\Contract\Event;
 
-type EventListener = (function(EventInterface): void);
+type EventListener<TEvent as EventInterface> =
+  (function(TEvent): Awaitable<void>);

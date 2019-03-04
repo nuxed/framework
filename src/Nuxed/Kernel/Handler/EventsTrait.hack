@@ -7,7 +7,7 @@ trait EventsTrait {
 
   protected function dispatch<TEvent as Event\EventInterface>(
     TEvent $event,
-  ): TEvent {
+  ): Awaitable<TEvent> {
     return $this->getService(Event\EventDispatcherInterface::class)
       ->dispatch($event);
   }
