@@ -1,25 +1,28 @@
 namespace Nuxed\Cache\Store;
 
-use namespace HH\Lib\Str;
+use namespace HH\Asio;
 use namespace HH\Lib\C;
+use namespace HH\Lib\Str;
 use function microtime;
-
-type Item = shape(
-  'value' => mixed,
-  'expiry' => float,
-  ...
-);
 
 class ArrayStore extends Store {
   public function __construct(
-    num $defaultTtl = 0,
-    protected dict<string, Item> $cache = dict[],
+    int $defaultTtl = 0,
+    protected dict<string, shape(
+      'value' => mixed,
+      'expiry' => float,
+      ...
+    )> $cache = dict[],
   ) {
     parent::__construct('', $defaultTtl);
   }
 
   <<__Override>>
-  public function doStore(string $id, mixed $value, num $ttl = 0): bool {
+  public async function doStore(
+    string $id,
+    mixed $value,
+    int $ttl = 0,
+  ): Awaitable<bool> {
     $this->cache[$id] = shape(
       'value' => $value,
       'expiry' => 0 === $ttl ? 0.0 : microtime(true) + $ttl,
@@ -29,7 +32,7 @@ class ArrayStore extends Store {
   }
 
   <<__Override>>
-  public function doContains(string $id): bool {
+  public async function doContains(string $id): Awaitable<bool> {
     if (!C\contains_key($this->cache, $id)) {
       return false;
     }
@@ -50,23 +53,40 @@ class ArrayStore extends Store {
   }
 
   <<__Override>>
-  public function doDelete(string $id): bool {
+  public async function doDelete(string $id): Awaitable<bool> {
     unset($this->cache[$id]);
     return true;
   }
 
   <<__Override>>
-  public function doGet(string $id): mixed {
+  public async function doGet(string $id): Awaitable<mixed> {
     return $this->cache[$id]['value'] ?? null;
   }
 
   <<__Override>>
-  public function doClear(string $namespace): bool {
+  public async function doClear(string $namespace): Awaitable<bool> {
+    if (Str\is_empty($namespace)) {
+      $wrappers = await Asio\vmkw(
+        $this->cache,
+        ($k, $item) ==> {
+          return $this->doDelete($k);
+        },
+      );
+    } else {
+      $wrappers = await Asio\vmkw(
+        $this->cache,
+        async ($k, $item) ==> {
+          if (Str\starts_with($k, $namespace)) {
+            return await $this->doDelete($k);
+          }
+
+          return true;
+        },
+      );
+    }
     $ok = true;
-    foreach ($this->cache as $key => $item) {
-      if (Str\is_empty($namespace) || Str\starts_with($key, $namespace)) {
-        $ok = $this->delete($key) && $ok;
-      }
+    foreach ($wrappers as $wrapper) {
+      $ok = $ok && $wrapper->getResult();
     }
     return $ok;
   }

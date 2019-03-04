@@ -1,18 +1,18 @@
 namespace Nuxed\Cache\Store;
 
+use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
-use type Nuxed\Cache\Cache;
-use type Nuxed\Contract\Service\ResetInterface;
+use namespace HH\Lib\SecureRandom;
+use namespace Nuxed\Cache\_Private;
 use function pack;
-use function mt_rand;
 use function base64_encode;
 use function time;
 use function hash;
 
-abstract class Store implements StoreInterface, ResetInterface {
+abstract class Store implements StoreInterface {
   protected dict<string, string> $ids = dict[];
-  protected dict<string, shape('value' => mixed, 'ttl' => ?num, ...)>
+  protected dict<string, shape('value' => mixed, 'ttl' => ?int, ...)>
     $deferred = dict[];
 
   protected string $namespace = '';
@@ -22,88 +22,104 @@ abstract class Store implements StoreInterface, ResetInterface {
 
   public function __construct(
     string $namespace = '',
-    protected num $defaultTtl = 0,
+    protected int $defaultTtl = 0,
   ) {
-    $this->namespace = Str\is_empty($namespace)
-      ? $namespace
-      : Cache::validateKey($namespace).':';
+    if ('' !== $namespace) {
+      _Private\validate_key($namespace);
+      $this->namespace = $namespace.':';
+    }
   }
 
   /**
    * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
    */
-  abstract protected function doStore(string $id, mixed $value, num $ttl): bool;
+  abstract protected function doStore(
+    string $id,
+    mixed $value,
+    int $ttl,
+  ): Awaitable<bool>;
 
   /**
    * Determines whether an item is present in the cache.
    */
-  abstract protected function doContains(string $id): bool;
+  abstract protected function doContains(string $id): Awaitable<bool>;
 
   /**
    * Delete an item from the cache by its unique key.
    */
-  abstract protected function doDelete(string $id): bool;
+  abstract protected function doDelete(string $id): Awaitable<bool>;
 
   /**
    * Fetches a value from the cache.
    */
-  abstract protected function doGet(string $id): mixed;
+  abstract protected function doGet(string $id): Awaitable<mixed>;
 
   /**
    * Wipes clean the entire cache's keys.
    */
-  abstract protected function doClear(string $namespace): bool;
+  abstract protected function doClear(string $namespace): Awaitable<bool>;
 
   /**
    * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
    */
-  public function store(string $id, mixed $value, ?num $ttl = null): bool {
-    $id = $this->getId($id);
+  public async function store<T>(
+    string $id,
+    T $value,
+    ?int $ttl = null,
+  ): Awaitable<bool> {
+    $id = await $this->getId($id);
     $ttl = $ttl ?? $this->defaultTtl;
-    return $this->doStore($id, $value, $ttl);
+    return await $this->doStore($id, $value, $ttl);
   }
 
   /**
    * Determines whether an item is present in the cache.
    */
-  public function contains(string $key): bool {
-    $id = $this->getId($key);
+  public async function contains(string $key): Awaitable<bool> {
+    $id = await $this->getId($key);
 
     if (C\contains_key($this->deferred, $key)) {
-      $this->commit();
+      await $this->commit();
     }
 
-    return $this->doContains($id);
+    return await $this->doContains($id);
   }
 
   /**
    * Delete an item from the cache by its unique key.
    */
-  public function delete(string $key): bool {
-    $id = $this->getId($key);
-    unset($this->deferred[$key]);
-    return $this->doDelete($id);
+  public async function delete(string $key): Awaitable<bool> {
+    $id = await $this->getId($key);
+    $def = false;
+    if (C\contains_key($this->deferred, $key)) {
+      unset($this->deferred[$key]);
+      $def = true;
+    }
+
+    $deleted = await $this->doDelete($id);
+    return $deleted || $def;
   }
 
   /**
    * Fetches a value from the cache.
    */
-  public function get(string $key): mixed {
+  public async function get(string $key): Awaitable<mixed> {
     if (0 !== C\count($this->deferred)) {
-      $this->commit();
+      await $this->commit();
     }
 
-    $id = $this->getId($key);
-    return $this->doGet($id);
+    $id = await $this->getId($key);
+    return await $this->doGet($id);
   }
 
-  public function clear(): bool {
+  public async function clear(): Awaitable<bool> {
     $this->deferred = dict[];
     if ($cleared = $this->versioningIsEnabled) {
       $namespaceVersion =
-        Str\splice(base64_encode(pack('V', mt_rand())), ':', 5);
+        Str\splice(base64_encode(pack('V', SecureRandom\int())), ':', 5);
       try {
-        $cleared = $this->store('/'.$this->namespace, $namespaceVersion, 0);
+        $cleared =
+          await $this->store('/'.$this->namespace, $namespaceVersion, 0);
       } catch (\Exception $e) {
         $cleared = false;
       }
@@ -114,13 +130,14 @@ abstract class Store implements StoreInterface, ResetInterface {
       }
     }
 
-    return $this->doClear($this->namespace) || $cleared;
+    $result = await $this->doClear($this->namespace);
+    return $result || $cleared;
   }
 
   /**
    * Sets a cache item to be persisted later.
    */
-  public function defer(string $id, mixed $value, ?num $ttl = null): bool {
+  public function defer(string $id, mixed $value, ?int $ttl = null): bool {
     $this->deferred[$id] = shape(
       'value' => $value,
       'ttl' => $ttl,
@@ -131,13 +148,18 @@ abstract class Store implements StoreInterface, ResetInterface {
   /**
    * Persists any deferred cache items.
    */
-  public function commit(): bool {
+  public async function commit(): Awaitable<bool> {
+    $wrappers = await Asio\vmkw(
+      $this->deferred,
+      ($key, $value) ==> {
+        return $this->store($key, $value['value'], $value['ttl']);
+      },
+    );
     $ok = true;
-    foreach ($this->deferred as $key => $value) {
-      $ok = $this->store($key, $value['value'], $value['ttl']) && $ok;
+    foreach ($wrappers as $wrapper) {
+      $ok = $ok && $wrapper->getResult();
     }
     $this->deferred = dict[];
-
     return $ok;
   }
 
@@ -149,8 +171,6 @@ abstract class Store implements StoreInterface, ResetInterface {
    *
    * Calling this method also clears the memoized namespace version and thus forces a resynchonization of it.
    *
-   * @param bool $enable
-   *
    * @return bool the previous state of versioning
    */
   public function enableVersioning(bool $enable = true): bool {
@@ -158,20 +178,24 @@ abstract class Store implements StoreInterface, ResetInterface {
     $this->versioningIsEnabled = $enable;
     $this->namespaceVersion = '';
     $this->ids = dict[];
-
     return $wasEnabled;
   }
 
-  protected function getId(string $key): string {
+  protected async function getId(string $key): Awaitable<string> {
     if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
       $this->ids = dict[];
       $this->namespaceVersion = '1/';
       try {
-        $this->namespaceVersion = $this->get('/'.$this->namespace) as string;
+        $namespaceVersion = await $this->doGet('/'.$this->namespace);
+        $this->namespaceVersion = $namespaceVersion as string;
         if ('1:' === $this->namespaceVersion) {
           $this->namespaceVersion =
             Str\splice(base64_encode(pack('V', time())), ':', 5);
-          $this->doStore('@'.$this->namespace, $this->namespaceVersion, 0);
+          await $this->doStore(
+            '@'.$this->namespace,
+            $this->namespaceVersion,
+            0,
+          );
         }
       } catch (\Throwable $e) {
       }
@@ -181,7 +205,7 @@ abstract class Store implements StoreInterface, ResetInterface {
       return $this->namespace.$this->namespaceVersion.$this->ids[$key];
     }
 
-    Cache::validateKey($key);
+    _Private\validate_key($key);
     $this->ids[$key] = $key;
 
     if (null === $this->maxIdLength) {
@@ -200,13 +224,5 @@ abstract class Store implements StoreInterface, ResetInterface {
     }
 
     return $id;
-  }
-
-  public function reset(): void {
-    if (0 !== C\count($this->deferred)) {
-      $this->commit();
-    }
-    $this->namespaceVersion = '';
-    $this->ids = dict[];
   }
 }

@@ -1,7 +1,9 @@
 namespace Nuxed\Cache\Store;
 
+use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
+use namespace HH\Lib\Vec;
 use type Nuxed\Cache\Serializer\SerializerInterface;
 use type Nuxed\Cache\Serializer\DefaultSerializer;
 use type Nuxed\Cache\Exception\InvalidArgumentException;
@@ -13,7 +15,7 @@ class RedisStore extends Store {
   public function __construct(
     protected Redis $redis,
     string $namespace = '',
-    num $defaultTtl = 0,
+    int $defaultTtl = 0,
     protected SerializerInterface $serializer = new DefaultSerializer(),
   ) {
     $redis->ping();
@@ -26,8 +28,9 @@ class RedisStore extends Store {
   }
 
   <<__Override>>
-  public function doGet(string $id): mixed {
-    if (!$this->doContains($id)) {
+  public async function doGet(string $id): Awaitable<mixed> {
+    $exists = await $this->doContains($id);
+    if (!$exists) {
       return null;
     }
 
@@ -35,17 +38,21 @@ class RedisStore extends Store {
   }
 
   <<__Override>>
-  public function doDelete(string $id): bool {
+  public async function doDelete(string $id): Awaitable<bool> {
     return (bool)$this->redis->del($id);
   }
 
   <<__Override>>
-  public function doContains(string $id): bool {
+  public async function doContains(string $id): Awaitable<bool> {
     return (bool)$this->redis->exists($id);
   }
 
   <<__Override>>
-  public function doStore(string $id, mixed $value, num $ttl = 0): bool {
+  public async function doStore(
+    string $id,
+    mixed $value,
+    int $ttl = 0,
+  ): Awaitable<bool> {
     $value = $this->serializer->serialize($value);
 
     if (0 >= $ttl) {
@@ -56,7 +63,7 @@ class RedisStore extends Store {
   }
 
   <<__Override>>
-  public function doClear(string $namespace): bool {
+  public async function doClear(string $namespace): Awaitable<bool> {
     if (Str\is_empty($namespace)) {
       return $this->redis->flushDB();
     }
@@ -70,26 +77,31 @@ class RedisStore extends Store {
       // Whenever you hit this scale, you should really consider upgrading to Redis 2.8 or above.
       return (bool)$this->redis->evaluate(
         "local keys=redis.call('KEYS',ARGV[1]..'*') for i=1,#keys,5000 do redis.call('DEL',unpack(keys,i,math.min(i+4999,#keys))) end return 1",
-        [$namespace],
+        vec[$namespace],
         0,
       );
     }
 
-    $cleared = true;
+    $keys = vec[];
     $cursor = null;
     do {
-      $keys = $this->redis->scan(&$cursor, $namespace.'*', 1000);
-      if (C\contains_key($keys, 1) && $keys[1] is Container<_>) {
-        $cursor = $keys[0];
-        $keys = $keys[1];
+      $scanned = $this->redis->scan(&$cursor, $namespace.'*', 1000);
+      if (C\contains_key($scanned, 1) && $scanned[1] is Traversable<_>) {
+        $cursor = (int)$scanned[0];
+        $keys = Vec\concat($keys, $scanned[1]);
       }
+    } while ($cursor is nonnull && $cursor > 0);
 
-      if (!C\is_empty($keys)) {
-        foreach ($keys as $key) {
-          $cleared = $this->doDelete((string)$key) && $cleared;
-        }
+    $keys = Vec\unique($keys);
+    $cleared = true;
+    if (!C\is_empty($keys)) {
+      $wrappers = await Asio\vmw($keys, ($key) ==> {
+        return $this->doDelete((string)$key);
+      });
+      foreach ($wrappers as $wrapper) {
+        $cleared = $cleared && $wrapper->getResult();
       }
-    } while ($cursor = (int)$cursor);
+    }
 
     return $cleared;
   }
