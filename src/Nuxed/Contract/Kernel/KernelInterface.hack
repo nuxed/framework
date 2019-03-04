@@ -21,9 +21,9 @@ interface KernelInterface
   /**
    * Register an event listener with the kernel.
    */
-  public function on(
-    classname<EventInterface> $event,
-    EventListener $listener,
+  public function on<TEvent as EventInterface>(
+    classname<TEvent> $event,
+    EventListener<TEvent> $listener,
     int $priority = 0,
   ): void;
 
