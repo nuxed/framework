@@ -1,5 +1,6 @@
 namespace Nuxed\Kernel;
 
+use namespace HH\Asio;
 use type Nuxed\Contract\Container\ContainerInterface;
 use type Nuxed\Contract\Event\EventDispatcherInterface;
 use type Nuxed\Contract\Kernel\KernelInterface;
@@ -65,13 +66,14 @@ final class Kernel implements KernelInterface {
   }
 
   public function subscribe(EventSubscriberInterface $subscriber): void {
-    $event = $this->events->dispatch(new Event\SubscribeEvent($subscriber));
+    $event =
+      Asio\join($this->events->dispatch(new Event\SubscribeEvent($subscriber)));
     $this->events->subscribe($event->subscriber);
   }
 
-  public function on(
-    classname<EventInterface> $event,
-    EventListener $listener,
+  public function on<TEvent as EventInterface>(
+    classname<TEvent> $event,
+    EventListener<TEvent> $listener,
     int $priority = 0,
   ): void {
     $this->events->on($event, $listener, $priority);
@@ -84,8 +86,10 @@ final class Kernel implements KernelInterface {
     MiddlewareInterface $middleware,
     int $priority = 0,
   ): void {
-    $event = $this->events
-      ->dispatch(new Event\PipeEvent($middleware, $priority));
+    $event = Asio\join(
+      $this->events
+        ->dispatch(new Event\PipeEvent($middleware, $priority)),
+    );
     $this->pipe->pipe($event->middleware, $event->priority);
   }
 
@@ -97,7 +101,7 @@ final class Kernel implements KernelInterface {
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
   ): Awaitable<ResponseInterface> {
-    $event = $this->events
+    $event = await $this->events
       ->dispatch(new Event\ProcessEvent($request, $handler));
 
     return await $this->pipe->process($event->request, $event->handler);
@@ -109,7 +113,7 @@ final class Kernel implements KernelInterface {
   public async function handle(
     ServerRequestInterface $request,
   ): Awaitable<ResponseInterface> {
-    $event = $this->events->dispatch(new Event\HandleEvent($request));
+    $event = await $this->events->dispatch(new Event\HandleEvent($request));
 
     return await $this->pipe->handle($event->request);
   }
@@ -121,7 +125,7 @@ final class Kernel implements KernelInterface {
    * according to the environment.
    */
   public async function emit(ResponseInterface $response): Awaitable<bool> {
-    $event = $this->events->dispatch(new Event\EmitEvent($response));
+    $event = await $this->events->dispatch(new Event\EmitEvent($response));
 
     return await $this->emitter->emit($event->response);
   }
@@ -228,8 +232,8 @@ final class Kernel implements KernelInterface {
     ServerRequestInterface $request,
     ResponseInterface $response,
   ): Awaitable<void> {
-    $event =
-      $this->events->dispatch(new Event\TerminateEvent($request, $response));
+    $event = await $this->events
+      ->dispatch(new Event\TerminateEvent($request, $response));
     $event->request->getBody()->close();
     $event->response->getBody()->close();
   }

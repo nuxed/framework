@@ -8,7 +8,7 @@ use type Nuxed\Log\Logger;
 class LogExtension extends AbstractExtension {
   <<__Override>>
   public function subscribe(EventDispatcherInterface $events): void {
-    $events->on(TerminateEvent::class, ($event): void ==> {
+    $events->on(TerminateEvent::class, async ($event) ==> {
       /**
        * Close Logger after sending the response.
        */

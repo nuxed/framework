@@ -1,14 +1,12 @@
 namespace Nuxed\Contract\Event;
 
-use type Nuxed\Contract\Service\ResetInterface;
-
-interface EventDispatcherInterface extends ResetInterface {
+interface EventDispatcherInterface {
   /**
    * Register an event listener with the dispatcher.
    */
-  public function on(
-    classname<EventInterface> $event,
-    EventListener $listener,
+  public function on<TEvent as EventInterface>(
+    classname<TEvent> $event,
+    EventListener<TEvent> $listener,
     int $priority = 0,
   ): void;
 
@@ -20,7 +18,9 @@ interface EventDispatcherInterface extends ResetInterface {
   /**
    * Dispatch an event and call the listeners.
    */
-  public function dispatch<TEvent as EventInterface>(TEvent $event): TEvent;
+  public function dispatch<TEvent as EventInterface>(
+    TEvent $event,
+  ): Awaitable<TEvent>;
 
   /**
    * Remove a set of listeners from the dispatcher.
