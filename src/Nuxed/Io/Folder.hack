@@ -5,11 +5,13 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
 use type Nuxed\Io\Exception\InvalidPathException;
+use type Iterator;
 use type Exception;
 use type GlobIterator;
+use type IteratorAggregate;
 use type FilesystemIterator;
-use type RecursiveDirectoryIterator;
 use type RecursiveIteratorIterator;
+use type RecursiveDirectoryIterator;
 use function file_exists;
 use function mkdir;
 use function is_file;
@@ -17,7 +19,7 @@ use function unlink;
 use function rmdir;
 use function clearstatcache;
 
-final class Folder extends Node {
+final class Folder extends Node  implements IteratorAggregate<Node> {
 
   const ALL = 0;
   const FILES = 1;
@@ -348,4 +350,8 @@ final class Folder extends Node {
     return 0;
   }
 
+  public function getIterator(): Iterator<Node> {
+    $nodes = new Vector(Asio\join($this->read(true, true)));
+    return $nodes->getIterator();
+  }
 }
