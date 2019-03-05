@@ -1,5 +1,6 @@
 namespace Nuxed\Asset\VersionStrategy;
 
+use namespace HH\Asio;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Io;
 use namespace Nuxed\Util;
@@ -45,12 +46,14 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface {
       if (!$this->manifest->exists()) {
         throw new Exception\RuntimeException(Str\format(
           'Asset manifest file "%s" does not exist.',
-          $this->manifest->path(),
+          $this->manifest->path()->toString(),
         ));
       }
 
+      $manifest = Util\Json::decode(Asio\join($this->manifest->read())) as
+        KeyedTraversable<_, _>;
       // UNSAFE
-      $this->manifestData = dict(Util\Json::decode($this->manifest->read()));
+      $this->manifestData = dict($manifest);
     }
 
     return idx($this->manifestData, $path, null);

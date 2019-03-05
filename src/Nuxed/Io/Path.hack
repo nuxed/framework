@@ -3,9 +3,8 @@ namespace Nuxed\Io;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
+use namespace HH\Lib\Experimental\Filesystem;
 use type Nuxed\Io\Exception\InvalidArgumentException;
-use function preg_match;
-use function pathinfo;
 use function realpath;
 use const PATHINFO_BASENAME;
 use const PATHINFO_FILENAME;
@@ -16,8 +15,7 @@ use const DIRECTORY_SEPARATOR;
 /**
  * Provides convenience functions for inflecting notation paths and file system paths.
  */
-final abstract class Path {
-
+final class Path {
   /**
    * Directory separator.
    */
@@ -28,29 +26,40 @@ final abstract class Path {
    */
   const string DELIMITER = PATH_SEPARATOR;
 
+  public function __construct(private Filesystem\Path $path) {
+  }
+
+  public static function create(string $path): Path {
+    return new self(new Filesystem\Path(static::normalize($path)));
+  }
+
+  public function toString(): string {
+    return $this->path->toString();
+  }
+
+  public function __toString(): string {
+    return $this->toString();
+  }
+
   /**
    * Return the extension from a file path.
    */
-  public static function extension(string $path): string {
-    return Str\lowercase(pathinfo($path, PATHINFO_EXTENSION));
+  public function extension(): ?string {
+    return $this->path->getExtension();
   }
 
   /**
    * Verify a path is absolute by checking the first path part.
    */
-  public static function isAbsolute(string $path): bool {
-    return (
-      Str\starts_with($path, '/') ||
-      Str\starts_with($path, '\\') ||
-      preg_match('/^[a-zA-Z0-9]+:/', $path)
-    );
+  public function isAbsolute(): bool {
+    return $this->path->isAbsolute();
   }
 
   /**
    * Verify a path is relative.
    */
-  public static function isRelative(string $path): bool {
-    return !static::isAbsolute($path);
+  public function isRelative(): bool {
+    return $this->path->isRelative();
   }
 
   /**
@@ -108,19 +117,19 @@ final abstract class Path {
   }
 
   /**
-   * Determine the relative path between two absolute paths.
+   * Determine the relative path between this and another absolute path.
    *
    * @throws InvalidArgumentException
    */
-  public static function relativeTo(string $from, string $to): string {
-    if (static::isRelative($from) || static::isRelative($to)) {
+  public function relativeTo(Path $to): Path {
+    if ($this->isRelative() || $to->isRelative()) {
       throw new InvalidArgumentException(
         'Cannot determine relative path without two absolute paths',
       );
     }
 
-    $from = Str\split(static::normalize($from), '/');
-    $to = Str\split(static::normalize($to), '/');
+    $from = Str\split($this->toString(), '/');
+    $to = Str\split($to->toString(), '/');
     $relative = $to;
 
     foreach ($from as $depth => $dir) {
@@ -147,20 +156,37 @@ final abstract class Path {
     }
 
     if (!$relative) {
-      return './';
+      return self::create('./');
     }
 
-    return Str\join($relative, '/');
+    return self::create(Str\join($relative, '/'));
   }
 
-  /**
-   * Strip off the extension if it exists.
-   */
-  public static function stripExt(string $path): string {
-    if (Str\contains($path, '.')) {
-      $path = Str\slice($path, 0, Str\search($path, '.'));
-    }
+  public function isDirectory(): bool {
+    return $this->path->isDirectory();
+  }
 
-    return $path;
+  public function isFile(): bool {
+    return $this->path->isFile();
+  }
+
+  public function isSymlink(): bool {
+    return $this->path->isSymlink();
+  }
+
+  public function exists(): bool {
+    return $this->path->exists();
+  }
+
+  public function parent(): Path {
+    return new self($this->path->getParent());
+  }
+
+  public function basename(): string {
+    return $this->path->getBaseName();
+  }
+
+  public function parts(): Container<string> {
+    return $this->path->getParts();
   }
 }

@@ -1,5 +1,6 @@
 namespace Nuxed\Io;
 
+use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
@@ -16,7 +17,7 @@ use function unlink;
 use function rmdir;
 use function clearstatcache;
 
-class Folder extends Node {
+final class Folder extends Node {
 
   const ALL = 0;
   const FILES = 1;
@@ -34,16 +35,20 @@ class Folder extends Node {
    * If $recursive is true, set the group on all children.
    */
   <<__Override>>
-  public function chgrp(int $group, bool $recursive = false): bool {
+  public async function chgrp(
+    int $group,
+    bool $recursive = false,
+  ): Awaitable<bool> {
     if ($recursive) {
-      if ($contents = $this->read()) {
-        foreach ($contents as $file) {
-          $file->chgrp($group, true);
-        }
+      $contents = await $this->read();
+      $awaitables = vec[];
+      foreach ($contents as $file) {
+        $awaitables[] = $file->chgrp($group, true);
       }
+      await Asio\v($awaitables);
     }
 
-    return parent::chgrp($group);
+    return await parent::chgrp($group);
   }
 
   /**
@@ -51,16 +56,20 @@ class Folder extends Node {
    * If $recursive is true, set the mode on all children.
    */
   <<__Override>>
-  public function chmod(int $mode, bool $recursive = false): bool {
+  public async function chmod(
+    int $mode,
+    bool $recursive = false,
+  ): Awaitable<bool> {
     if ($recursive) {
-      if ($contents = $this->read()) {
-        foreach ($contents as $file) {
-          $file->chmod($mode, true);
-        }
+      $contents = await $this->read();
+      $awaitables = vec[];
+      foreach ($contents as $file) {
+        $awaitables[] = $file->chmod($mode, true);
       }
+      await Asio\v($awaitables);
     }
 
-    return parent::chmod($mode);
+    return await parent::chmod($mode);
   }
 
   /**
@@ -68,26 +77,30 @@ class Folder extends Node {
    * If $recursive is true, set the owner on all children.
    */
   <<__Override>>
-  public function chown(int $user, bool $recursive = false): bool {
+  public async function chown(
+    int $user,
+    bool $recursive = false,
+  ): Awaitable<bool> {
     if ($recursive) {
-      if ($contents = $this->read()) {
-        foreach ($contents as $file) {
-          $file->chown($user, true);
-        }
+      $contents = await $this->read();
+      $awaitables = vec[];
+      foreach ($contents as $file) {
+        $awaitables[] = $file->chown($user, true);
       }
+      await Asio\v($awaitables);
     }
 
-    return parent::chown($user);
+    return await parent::chown($user);
   }
 
   /**
    * {@inheritdoc}
    */
   <<__Override>>
-  public function create(int $mode = 0755): bool {
+  public async function create(int $mode = 0755): Awaitable<bool> {
     $ret = false;
     if (!$this->exists()) {
-      $ret = (bool)@mkdir($this->path(), $mode, true);
+      $ret = (bool)@mkdir($this->path()->toString(), $mode, true);
     }
     $this->reset();
 
@@ -98,18 +111,18 @@ class Folder extends Node {
    * {@inheritdoc}
    */
   <<__Override>>
-  public function copy(
+  public async function copy(
     string $target,
-    int $process = self::MERGE,
+    OperationType $process = OperationType::MERGE,
     int $mode = 0755,
-  ): ?Node {
+  ): Awaitable<?Folder> {
     if (!$this->exists()) {
       return null;
     }
 
     // Delete the target folder if overwrite is true
-    if ($process === self::OVERWRITE && file_exists($target)) {
-      static::destroy($target);
+    if ($process === OperationType::OVERWRITE && file_exists($target)) {
+      await static::destroy($target);
     }
 
     // Create the target folder and reset folder path
@@ -117,26 +130,33 @@ class Folder extends Node {
     $target = $destination->path();
 
     // Recursively copy over contents to new destination
-    if ($contents = $this->read()) {
-      foreach ($contents as $file) {
-        $to = Str\replace($file->path(), $this->path(), $target);
+    $contents = await $this->read();
 
-        // Skip copy if target exists
-        if ($process === self::SKIP && file_exists($to)) {
-          continue;
-        }
+    $awaitables = vec[];
+    foreach ($contents as $file) {
+      $to = Str\replace(
+        $file->path()->toString(),
+        $this->path()->toString(),
+        $target->toString(),
+      );
 
-        // Delete target since File::copy() will throw exception
-        if ($process === self::MERGE && file_exists($to) && is_file($to)) {
-          @unlink($to);
-        }
-
-        $file->copy($to, $process, $mode);
+      // Skip copy if target exists
+      if ($process === OperationType::SKIP && file_exists($to)) {
+        continue;
       }
+
+      // Delete target since File::copy() will throw exception
+      if (
+        $process === OperationType::MERGE && file_exists($to) && is_file($to)
+      ) {
+        @unlink($to);
+      }
+
+      $awaitables[] = $file->copy($to, $process, $mode);
     }
 
+    await Asio\v($awaitables);
     clearstatcache();
-
     return $destination;
   }
 
@@ -144,45 +164,31 @@ class Folder extends Node {
    * {@inheritdoc}
    */
   <<__Override>>
-  public function delete(): bool {
+  public async function delete(): Awaitable<bool> {
     if (!$this->exists()) {
       return false;
     }
-
-    $this->flush()->reset();
-
-    return rmdir($this->path());
+    await $this->flush();
+    $this->reset();
+    return rmdir($this->path()->toString());
   }
 
   /**
    * Recursively delete all files and folders within this folder.
    */
-  public function flush(): this {
-    foreach ($this->read(false, true) as $file) {
-      $file->delete();
-    }
-
+  public async function flush(): Awaitable<this> {
+    $nodes = await $this->read(false, true);
+    await Asio\v(Vec\map($nodes, ($node) ==> $node->delete()));
     return $this;
-  }
-
-  /**
-   * Scan the folder and return a list of File objects.
-   */
-  public function files(
-    bool $sort = false,
-    bool $recursive = false,
-  ): Container<File> {
-    /* HH_IGNORE_ERROR[4110] `read()` returns `Container<Node>` while we need `Container<File>` */
-    return $this->read($sort, $recursive, self::FILES);
   }
 
   /**
    * Find all files and folders within the current folder that match a specific pattern.
    */
-  public function find(
+  public async function find<T super Node>(
     string $pattern,
-    int $filter = self::ALL,
-  ): Container<Node> {
+    classname<T> $filter = Node::class,
+  ): Awaitable<Container<T>> {
     $contents = vec[];
 
     if (!$this->exists()) {
@@ -200,12 +206,12 @@ class Folder extends Node {
 
     foreach ($iterator as $file) {
       if (
-        $file->isDir() && ($filter === self::ALL || $filter === self::FOLDERS)
+        $file->isDir() && ($filter === Node::class || $filter === Folder::class)
       ) {
         $contents[] = new Folder($file->getPathname());
 
       } else if (
-        $file->isFile() && ($filter === self::ALL || $filter === self::FILES)
+        $file->isFile() && ($filter === Node::class || $filter === File::class)
       ) {
         $contents[] = new File($file->getPathname());
       }
@@ -215,38 +221,36 @@ class Folder extends Node {
   }
 
   /**
+   * Scan the folder and return a list of File objects.
+   */
+  public function files(
+    bool $sort = false,
+    bool $recursive = false,
+  ): Awaitable<Container<File>> {
+    return $this->read($sort, $recursive, File::class);
+  }
+
+  /**
    * Scan the folder and return a list of Folder objects.
    */
   public function folders(
     bool $sort = false,
     bool $recursive = false,
-  ): Container<Folder> {
-    /* HH_IGNORE_ERROR[4110] `read()` returns `Container<Node>` while we need `Container<Folder>` */
-    return $this->read($sort, $recursive, self::FOLDERS);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  <<__Override>>
-  public function move(string $target, bool $overwrite = true): bool {
-    if (Path::normalize($target) === Path::normalize($this->path())) {
-      return true; // Don't move to the same location
-    }
-
-    return parent::move($target, $overwrite);
+  ): Awaitable<Container<Folder>> {
+    return $this->read($sort, $recursive, Folder::class);
   }
 
   /**
    * Scan the folder and return a list of File and Folder objects.
    */
-  public function read(
+  public async function read<T as Node>(
     bool $sort = false,
     bool $recursive = false,
-    int $filter = self::ALL,
-  ): Container<Node> {
-    $contents = vec[];
+    ?classname<T> $filter = null,
+  ): Awaitable<Container<T>> {
+    $filter = $filter ?? Node::class;
 
+    $contents = vec[];
     if (!$this->exists()) {
       return $contents;
     }
@@ -268,12 +272,12 @@ class Folder extends Node {
 
     foreach ($iterator as $file) {
       if (
-        $file->isDir() && ($filter === self::ALL || $filter === self::FOLDERS)
+        $file->isDir() && ($filter === Node::class || $filter === Folder::class)
       ) {
         $contents[] = new Folder($file->getPathname());
 
       } else if (
-        $file->isFile() && ($filter === self::ALL || $filter === self::FILES)
+        $file->isFile() && ($filter === Node::class || $filter === File::class)
       ) {
         $contents[] = new File($file->getPathname());
       }
@@ -282,11 +286,31 @@ class Folder extends Node {
     if ($sort) {
       $contents = Vec\sort(
         $contents,
-        (Node $a, Node $b) ==> Str\compare($a->path(), $b->path()),
+        (Node $a, Node $b) ==>
+          Str\compare($a->path()->toString(), $b->path()->toString()),
       );
     }
 
+    // UNSAFE
     return $contents;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  <<__Override>>
+  public async function move(
+    string $target,
+    bool $overwrite = true,
+  ): Awaitable<bool> {
+    if (
+      Path::normalize($target) === Path::normalize($this->path()->toString())
+    ) {
+      return true; // Don't move to the same location
+    }
+
+    return await parent::move($target, $overwrite);
   }
 
   /**
@@ -315,9 +339,10 @@ class Folder extends Node {
    * Return the number of files in the current folder.
    */
   <<__Override>>
-  public function size(): int {
+  public async function size(): Awaitable<int> {
     if ($this->exists()) {
-      return C\count($this->read());
+      $nodes = await $this->read();
+      return C\count($nodes);
     }
 
     return 0;

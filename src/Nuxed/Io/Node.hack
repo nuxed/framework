@@ -1,14 +1,13 @@
 namespace Nuxed\Io;
 
+use namespace HH\Asio;
 use namespace HH\Lib\Str;
 use type Nuxed\Io\Exception\MissingFileException;
 use type Nuxed\Io\Exception\ExistingFileException;
 use function is_dir;
 use function is_writable;
 use function is_readable;
-use function is_link;
 use function is_executable;
-use function dirname;
 use function rename;
 use function basename;
 use function preg_replace;
@@ -31,15 +30,9 @@ use const PATHINFO_FILENAME;
 
 /**
  * Shared functionality between file and folder objects.
- *
- * @package Nuxed\Io
  */
+<<__Sealed(File::class, Folder::class)>>
 abstract class Node {
-
-  const int OVERWRITE = 0;
-  const int MERGE = 1;
-  const int SKIP = 2;
-
   /**
    * Parent folder.
    */
@@ -48,7 +41,7 @@ abstract class Node {
   /**
    * Current path.
    */
-  protected string $path = '';
+  protected Path $path;
 
   /**
    * Initialize the file path. If the file doesn't exist, create it.
@@ -58,10 +51,11 @@ abstract class Node {
     bool $create = false,
     int $mode = 0755,
   ) {
+    $this->path = Path::create($path);
     $this->reset($path);
 
     if ($create) {
-      $this->create($mode);
+      Asio\join($this->create($mode));
     }
   }
 
@@ -70,7 +64,7 @@ abstract class Node {
    */
   public function accessTime(): int {
     if ($this->exists()) {
-      return fileatime($this->path());
+      return fileatime($this->path()->toString());
     }
 
     return 0;
@@ -80,7 +74,7 @@ abstract class Node {
    * Return the file name with extension.
    */
   public function basename(): string {
-    return pathinfo($this->path(), PATHINFO_BASENAME);
+    return pathinfo($this->path()->toString(), PATHINFO_BASENAME);
   }
 
   /**
@@ -88,7 +82,7 @@ abstract class Node {
    */
   public function changeTime(): int {
     if ($this->exists()) {
-      return filectime($this->path());
+      return filectime($this->path()->toString());
     }
 
     return 0;
@@ -97,7 +91,10 @@ abstract class Node {
   /**
    * Change the group of the file.
    */
-  public function chgrp(int $group, bool $_recursive = false): bool {
+  public async function chgrp(
+    int $group,
+    bool $_recursive = false,
+  ): Awaitable<bool> {
     if (!$this->exists()) {
       return false;
     }
@@ -106,30 +103,36 @@ abstract class Node {
 
     $this->reset();
 
-    if (is_link($path)) {
-      return lchgrp($path, $group);
+    if ($path->isSymlink()) {
+      return lchgrp($path->toString(), $group);
     }
 
-    return chgrp($path, $group);
+    return chgrp($path->toString(), $group);
   }
 
   /**
    * Change the permissions mode of the file.
    */
-  public function chmod(int $mode, bool $_recursive = false): bool {
+  public async function chmod(
+    int $mode,
+    bool $_recursive = false,
+  ): Awaitable<bool> {
     if (!$this->exists()) {
       return false;
     }
 
     $this->reset();
 
-    return chmod($this->path(), $mode);
+    return chmod($this->path()->toString(), $mode);
   }
 
   /**
    * Change the owner of the file.
    */
-  public function chown(int $user, bool $_recursive = false): bool {
+  public async function chown(
+    int $user,
+    bool $_recursive = false,
+  ): Awaitable<bool> {
     if (!$this->exists()) {
       return false;
     }
@@ -138,11 +141,11 @@ abstract class Node {
 
     $this->reset();
 
-    if (is_link($path)) {
-      return lchown($path, $user);
+    if ($path->isSymlink()) {
+      return lchown($path->toString(), $user);
     }
 
-    return chown($path, $user);
+    return chown($path->toString(), $user);
   }
 
   /**
@@ -156,51 +159,52 @@ abstract class Node {
    */
   abstract public function copy(
     string $target,
-    int $process = self::OVERWRITE,
+    OperationType $process = OperationType::OVERWRITE,
     int $mode = 0755,
-  ): ?Node;
+  ): Awaitable<?Node>;
 
   /**
    * Create the node if it doesn't exist.
    */
-  abstract public function create(int $mode = 0755): bool;
+  abstract public function create(int $mode = 0755): Awaitable<bool>;
 
   /**
    * Remove the node if it exists.
    */
-  abstract public function delete(): bool;
+  abstract public function delete(): Awaitable<bool>;
 
   /**
    * Helper method for deleting a file or folder.
    */
-  public static function destroy(string $path): bool {
+  public static async function destroy(string $path): Awaitable<bool> {
     if (!file_exists($path)) {
       return false;
     }
 
-    return static::load($path)->delete();
+    return await static::load($path)->delete();
   }
 
   /**
    * Return the parent directory as a string.
    * Will always end in a trailing slash.
    */
-  public function dir(): string {
-    return dirname($this->path()).'/';
+  public function dir(): Path {
+    $dir = $this->path()->parent()->toString().'/';
+    return Path::create($dir);
   }
 
   /**
    * Is the file executable.
    */
   public function executable(): bool {
-    return is_executable($this->path());
+    return is_executable($this->path()->toString());
   }
 
   /**
    * Check if the file exists.
    */
   public function exists(): bool {
-    return file_exists($this->path());
+    return $this->path()->exists();
   }
 
   /**
@@ -208,7 +212,7 @@ abstract class Node {
    */
   public function group(): int {
     if ($this->exists()) {
-      return filegroup($this->path());
+      return filegroup($this->path()->toString()) as int;
     }
 
     return 0;
@@ -218,14 +222,14 @@ abstract class Node {
    * Return true if the current path is absolute.
    */
   public function isAbsolute(): bool {
-    return Path::isAbsolute($this->path());
+    return $this->path()->isAbsolute();
   }
 
   /**
    * Return true if the current path is relative.
    */
   public function isRelative(): bool {
-    return Path::isRelative($this->path());
+    return $this->path()->isRelative();
   }
 
   /**
@@ -250,7 +254,7 @@ abstract class Node {
    */
   public function modifyTime(): int {
     if ($this->exists()) {
-      return filemtime($this->path());
+      return filemtime($this->path()->toString());
     }
 
     return 0;
@@ -264,7 +268,10 @@ abstract class Node {
    *
    * @throws ExistingFileException
    */
-  public function move(string $target, bool $overwrite = true): bool {
+  public async function move(
+    string $target,
+    bool $overwrite = true,
+  ): Awaitable<bool> {
     if (!$this->exists()) {
       return false;
     }
@@ -272,7 +279,7 @@ abstract class Node {
     // Don't move if the target exists and overwrite is disabled
     if (file_exists($target)) {
       if ($overwrite) {
-        static::destroy($target);
+        await static::destroy($target);
       } else {
         throw new ExistingFileException(
           'Cannot move file as the target already exists',
@@ -281,7 +288,7 @@ abstract class Node {
     }
 
     // Move folders
-    if (rename($this->path(), $target)) {
+    if (rename($this->path()->toString(), $target)) {
       $this->reset($target);
 
       return true;
@@ -294,7 +301,7 @@ abstract class Node {
    * Return the file name without extension.
    */
   public function name(): string {
-    return pathinfo($this->path(), PATHINFO_FILENAME);
+    return pathinfo($this->path()->toString(), PATHINFO_FILENAME);
   }
 
   /**
@@ -302,7 +309,7 @@ abstract class Node {
    */
   public function owner(): int {
     if ($this->exists()) {
-      return fileowner($this->path());
+      return fileowner($this->path()->toString());
     }
 
     return 0;
@@ -311,7 +318,7 @@ abstract class Node {
   /**
    * Alias for pwd().
    */
-  public function path(): string {
+  public function path(): Path {
     return $this->pwd();
   }
 
@@ -319,11 +326,11 @@ abstract class Node {
    * Return the parent folder as a Folder object.
    */
   public function parent(): ?Folder {
-    if ($this->parent) {
+    if ($this->parent is nonnull) {
       return $this->parent;
     }
 
-    $folder = dirname($this->path());
+    $folder = $this->path()->parent()->toString();
 
     if ($folder !== '.' && $folder !== '/') {
       $this->parent = new Folder($folder);
@@ -337,7 +344,8 @@ abstract class Node {
    */
   public function permissions(): string {
     if ($this->exists()) {
-      return Str\slice(Str\format('%o', fileperms($this->path())), -4);
+      return
+        Str\slice(Str\format('%o', fileperms($this->path()->toString())), -4);
     }
 
     return '';
@@ -346,7 +354,7 @@ abstract class Node {
   /**
    * Return the current path (print working directory).
    */
-  public function pwd(): string {
+  public function pwd(): Path {
     return $this->path;
   }
 
@@ -354,7 +362,7 @@ abstract class Node {
    * Is the file readable.
    */
   public function readable(): bool {
-    return is_readable($this->path());
+    return is_readable($this->path()->toString());
   }
 
   /**
@@ -365,7 +373,10 @@ abstract class Node {
    *
    * @throws ExistingFileException
    */
-  public function rename(string $name, bool $overwrite = true): bool {
+  public async function rename(
+    string $name,
+    bool $overwrite = true,
+  ): Awaitable<bool> {
     if (!$this->exists()) {
       return false;
     }
@@ -388,7 +399,7 @@ abstract class Node {
     // Don't move if the target exists and overwrite is disabled
     if (file_exists($target)) {
       if ($overwrite) {
-        static::destroy($target);
+        await static::destroy($target);
       } else {
         throw new ExistingFileException(
           'Cannot rename file as the target already exists',
@@ -397,7 +408,7 @@ abstract class Node {
     }
 
     // Rename the file within the current folder
-    if (rename($this->path(), $target)) {
+    if (rename($this->path()->toString(), $target)) {
       $this->reset($target);
 
       return true;
@@ -411,7 +422,7 @@ abstract class Node {
    */
   public function reset(string $path = ''): this {
     if ('' !== $path) {
-      $this->path = $path;
+      $this->path = Path::create($path);
     }
 
     clearstatcache();
@@ -422,13 +433,12 @@ abstract class Node {
   /**
    * Return the current file size.
    */
-  abstract public function size(): int;
+  abstract public function size(): Awaitable<int>;
 
   /**
    * Is the file writable.
    */
   public function writable(): bool {
-    return is_writable($this->path());
+    return is_writable($this->path()->toString());
   }
-
 }
