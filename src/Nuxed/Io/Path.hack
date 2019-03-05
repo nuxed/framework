@@ -124,6 +124,20 @@ final class Path {
   }
 
   /**
+   * Converts OS directory separators to the standard forward slash.
+   */
+  public static function standard(
+    string $path,
+    bool $endSlash = false,
+  ): string {
+    $path = Str\replace($path, '\\', '/');
+    if ($endSlash && !Str\ends_with($path, '/')) {
+      $path .= '/';
+    }
+    return $path;
+  }
+
+  /**
    * Determine the relative path between this and another absolute path.
    *
    * @throws InvalidArgumentException
