@@ -70,14 +70,14 @@ final class Path {
   public static function join(
     Container<string> $paths,
     bool $above = true,
-  ): string {
+  ): Path {
     $clean = vec[];
     $parts = vec[];
     $up = 0;
 
     // First pass expands sub-paths
     foreach ($paths as $path) {
-      $path = Str\trim($path, '/');
+      $path = Str\trim(static::standard($path), '/');
 
       if (Str\contains($path, '/')) {
         $clean = Vec\concat($clean, Str\split($path, '/'));
@@ -86,18 +86,21 @@ final class Path {
       }
     }
 
+    // Second pass flattens dot paths
+    $clean = Vec\reverse($clean);
     foreach ($clean as $path) {
       if ($path === '.' || $path === '') {
         continue;
       } elseif ($path === '..') {
         $up++;
-      } elseif ($up) {
+      } elseif ($up > 0) {
         $up--;
       } else {
         $parts[] = $path;
       }
     }
 
+    // Append double dots above root
     if ($above) {
       while ($up) {
         $parts[] = '..';
@@ -105,7 +108,9 @@ final class Path {
       }
     }
 
-    return Str\join($parts, '/');
+    $parts = Vec\reverse($parts);
+
+    return self::create(Str\join($parts, '/'));
   }
 
   /**
