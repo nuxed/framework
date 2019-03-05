@@ -245,16 +245,16 @@ You can pass the lock type as the 1st argument, which must be a value of the [`F
 ```hack
 use type HH\Lib\Experimental\Filesystem\FileLockType;
 
-$type = FileLockType::
+$type = FileLockType::EXCLUSIVE_NON_BLOCKING;
 
 await (using $write = $file->getWriteHandle($mode)) {
-  using ($lock = $file->lock($type)) {
+  using ($lock = $write->lock($type)) {
     // Do something with the write handle.
   }
 }
 
 await (using $read = $file->getReadHandle()) {
-  using ($lock = $file->lock($type)) {
+  using ($lock = $read->lock($type)) {
     // Do something with the read handle.
   }
 }
