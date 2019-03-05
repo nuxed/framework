@@ -3,8 +3,8 @@ namespace Nuxed\Io;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
+use type HH\InvariantException;
 use type Nuxed\Util\StringableTrait;
-use type Vector;
 use type Iterator;
 use type Countable;
 use type IteratorAggregate;
@@ -20,7 +20,11 @@ final class Lines implements Countable, IteratorAggregate<string> {
   }
 
   public function first(): string {
-    return C\firstx($this->lines);
+    try {
+      return C\firstx($this->lines);
+    } catch(InvariantException $e) {
+      throw new Exception\OutOfRangeException('Lines instance is empty.', $e->getCode(), $e);
+    }
   }
 
   /**
