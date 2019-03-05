@@ -181,9 +181,7 @@ final class File extends Node {
    * Prepend data to the beginning of a file.
    */
   public async function prepend(string $data): Awaitable<void> {
-    await using $readHandle = $this->getReadHandle();
-    $content = await $readHandle->readAsync();
-    await $readHandle->closeAsync();
+    $content = await $this->read();
     await $this->write($data.$content);
   }
 
@@ -207,10 +205,13 @@ final class File extends Node {
    * Open a file for reading. If $length is provided, will only read up to that limit.
    */
   public async function read(int $length = -1): Awaitable<string> {
-    await using $handle = $this->getReadHandle();
-    $content = await $handle->readAsync($length);
-    await $handle->closeAsync();
-    return $content;
+    await using ($handle = $this->getReadHandle()) {
+      using (
+        $lock = $handle->lock(Filesystem\FileLockType::SHARED_NON_BLOCKING)
+      ) {
+        return await $handle->readAsync($length);
+      }
+    }
   }
 
   public async function lines(): Awaitable<Lines> {
