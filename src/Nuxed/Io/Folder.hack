@@ -19,7 +19,7 @@ use function unlink;
 use function rmdir;
 use function clearstatcache;
 
-final class Folder extends Node  implements IteratorAggregate<Node> {
+final class Folder extends Node implements IteratorAggregate<Node> {
 
   const ALL = 0;
   const FILES = 1;

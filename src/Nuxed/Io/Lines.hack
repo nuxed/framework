@@ -22,8 +22,12 @@ final class Lines implements Countable, IteratorAggregate<string> {
   public function first(): string {
     try {
       return C\firstx($this->lines);
-    } catch(InvariantException $e) {
-      throw new Exception\OutOfRangeException('Lines instance is empty.', $e->getCode(), $e);
+    } catch (InvariantException $e) {
+      throw new Exception\OutOfRangeException(
+        'Lines instance is empty.',
+        $e->getCode(),
+        $e,
+      );
     }
   }
 
