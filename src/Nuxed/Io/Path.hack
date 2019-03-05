@@ -30,7 +30,8 @@ final class Path {
   }
 
   public static function create(string $path): Path {
-    return new self(new Filesystem\Path(static::normalize($path)));
+    $path = static::standard($path, false);
+    return new self(new Filesystem\Path($path));
   }
 
   public function toString(): string {
