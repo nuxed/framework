@@ -12,7 +12,7 @@ use type IteratorAggregate;
 final class Lines implements Countable, IteratorAggregate<string> {
   use StringableTrait;
 
-  public function __construct(private vec<string> $lines) {
+  public function __construct(private Container<string> $lines) {
   }
 
   public function count(): int {
