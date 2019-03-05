@@ -149,8 +149,8 @@ final class Path {
       );
     }
 
-    $from = Str\split($this->toString(), '/');
-    $to = Str\split($to->toString(), '/');
+    $from = Str\split(static::standard($this->toString(), true), '/');
+    $to = Str\split(static::standard($to->toString(), true), '/');
     $relative = $to;
 
     foreach ($from as $depth => $dir) {
@@ -164,11 +164,7 @@ final class Path {
 
         // Add traversals up to first matching dir
         if ($remaining > 1) {
-          $padLength = (C\count($relative) + $remaining - 1) * -1;
-          $relative = Vec\drop(
-            Vec\concat($relative, Vec\fill($padLength, '..')),
-            $padLength,
-          );
+          $relative = Vec\concat(Vec\fill($remaining - 1, '..'), $relative);
           break;
         } else {
           $relative[0] = './'.$relative[0];
