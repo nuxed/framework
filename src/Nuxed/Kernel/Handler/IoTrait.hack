@@ -11,7 +11,7 @@ trait IoTrait {
     bool $create = false,
     int $mode = 0777,
   ): Io\File {
-    return new Io\File($path, $create, $mode);
+    return new Io\File(Io\Path::create($path), $create, $mode);
   }
 
   protected function folder(
@@ -19,6 +19,6 @@ trait IoTrait {
     bool $create = false,
     int $mode = 0777,
   ): Io\Folder {
-    return new Io\Folder($path, $create, $mode);
+    return new Io\Folder(Io\Path::create($path), $create, $mode);
   }
 }
