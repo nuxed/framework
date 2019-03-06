@@ -7,9 +7,7 @@ use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\Filesystem;
 use type Nuxed\Io\Exception\ExistingFileException;
 use type Nuxed\Io\Exception\InvalidPathException;
-use function is_dir;
 use function filesize;
-use function file_exists;
 use function pathinfo;
 use function touch;
 use function copy;
@@ -81,7 +79,7 @@ final class File extends Node {
    */
   <<__Override>>
   public async function copy(
-    string $target,
+    Path $target,
     OperationType $process = OperationType::OVERWRITE,
     int $mode = 0755,
   ): Awaitable<?File> {
@@ -89,13 +87,13 @@ final class File extends Node {
       return null;
     }
 
-    if (file_exists($target) && $process !== OperationType::OVERWRITE) {
+    if ($target->exists() && $process !== OperationType::OVERWRITE) {
       throw new ExistingFileException(
         'Cannot copy file as the target already exists',
       );
     }
 
-    if (copy($this->path()->toString(), $target)) {
+    if (copy($this->path()->toString(), $target->toString())) {
       $file = new File($target);
       await $file->chmod($mode);
 
@@ -160,10 +158,13 @@ final class File extends Node {
    * @throws InvalidPathException
    */
   <<__Override>>
-  public function reset(string $path = ''): this {
-    if ($path !== '' && file_exists($path) && is_dir($path)) {
+  public function reset(Path $path = Path::create('')): this {
+    if ($path->toString() !== '' && $path->exists() && $path->isDirectory()) {
       throw new InvalidPathException(
-        Str\format('Invalid file path %s, folders are not allowed', $path),
+        Str\format(
+          'Invalid file path %s, folders are not allowed',
+          $path->toString(),
+        ),
       );
     }
 

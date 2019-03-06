@@ -28,7 +28,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   /**
    * Change directory. Alias for reset().
    */
-  public function cd(string $path): this {
+  public function cd(Path $path): this {
     return $this->reset($path);
   }
 
@@ -114,7 +114,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    */
   <<__Override>>
   public async function copy(
-    string $target,
+    Path $target,
     OperationType $process = OperationType::MERGE,
     int $mode = 0755,
   ): Awaitable<?Folder> {
@@ -123,7 +123,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     }
 
     // Delete the target folder if overwrite is true
-    if ($process === OperationType::OVERWRITE && file_exists($target)) {
+    if ($process === OperationType::OVERWRITE && $target->exists()) {
       await static::destroy($target);
     }
 
@@ -210,12 +210,12 @@ final class Folder extends Node implements IteratorAggregate<Node> {
       if (
         $file->isDir() && ($filter === Node::class || $filter === Folder::class)
       ) {
-        $contents[] = new Folder($file->getPathname());
+        $contents[] = new Folder(Path::create($file->getPathname()));
 
       } else if (
         $file->isFile() && ($filter === Node::class || $filter === File::class)
       ) {
-        $contents[] = new File($file->getPathname());
+        $contents[] = new File(Path::create($file->getPathname()));
       }
     }
 
@@ -276,12 +276,12 @@ final class Folder extends Node implements IteratorAggregate<Node> {
       if (
         $file->isDir() && ($filter === Node::class || $filter === Folder::class)
       ) {
-        $contents[] = new Folder($file->getPathname());
+        $contents[] = new Folder(Path::create($file->getPathname()));
 
       } else if (
         $file->isFile() && ($filter === Node::class || $filter === File::class)
       ) {
-        $contents[] = new File($file->getPathname());
+        $contents[] = new File(Path::create($file->getPathname()));
       }
     }
 
@@ -303,11 +303,12 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    */
   <<__Override>>
   public async function move(
-    string $target,
+    Path $target,
     bool $overwrite = true,
   ): Awaitable<bool> {
     if (
-      Path::normalize($target) === Path::normalize($this->path()->toString())
+      Path::normalize($target->toString()) ===
+        Path::normalize($this->path()->toString())
     ) {
       return true; // Don't move to the same location
     }
@@ -321,16 +322,19 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    * @throws InvalidPathException
    */
   <<__Override>>
-  public function reset(string $path = ''): this {
-    if ('' !== $path) {
-      if (file_exists($path) && is_file($path)) {
+  public function reset(Path $path = Path::create('')): this {
+    if ('' !== $path->toString()) {
+      if ($path->exists() && $path->isFile()) {
         throw new InvalidPathException(
-          Str\format('Invalid folder path %s, files are not allowed', $path),
+          Str\format(
+            'Invalid folder path %s, files are not allowed',
+            $path->toString(),
+          ),
         );
       }
 
-      if (!Str\ends_with($path, '/')) {
-        $path .= '/';
+      if (!Str\ends_with($path->toString(), '/')) {
+        $path = Path::create(Path::standard($path->toString(), true));
       }
     }
 

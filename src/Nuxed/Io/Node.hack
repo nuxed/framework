@@ -2,15 +2,14 @@ namespace Nuxed\Io;
 
 use namespace HH\Asio;
 use namespace HH\Lib\Str;
+use namespace HH\Lib\Regex;
 use type Nuxed\Io\Exception\MissingFileException;
 use type Nuxed\Io\Exception\ExistingFileException;
-use function is_dir;
 use function is_writable;
 use function is_readable;
 use function is_executable;
 use function rename;
 use function basename;
-use function preg_replace;
 use function clearstatcache;
 use function fileatime;
 use function filectime;
@@ -18,7 +17,6 @@ use function filegroup;
 use function filemtime;
 use function fileowner;
 use function fileperms;
-use function file_exists;
 use function pathinfo;
 use function chgrp;
 use function chmod;
@@ -39,19 +37,13 @@ abstract class Node {
   protected ?Folder $parent;
 
   /**
-   * Current path.
-   */
-  protected Path $path;
-
-  /**
    * Initialize the file path. If the file doesn't exist, create it.
    */
   public function __construct(
-    string $path,
+    protected Path $path,
     bool $create = false,
     int $mode = 0755,
   ) {
-    $this->path = Path::create($path);
     $this->reset($path);
 
     if ($create) {
@@ -158,7 +150,7 @@ abstract class Node {
    *      skip        - Will not copy the node if the target exists
    */
   abstract public function copy(
-    string $target,
+    Path $target,
     OperationType $process = OperationType::OVERWRITE,
     int $mode = 0755,
   ): Awaitable<?Node>;
@@ -176,8 +168,8 @@ abstract class Node {
   /**
    * Helper method for deleting a file or folder.
    */
-  public static async function destroy(string $path): Awaitable<bool> {
-    if (!file_exists($path)) {
+  public static async function destroy(Path $path): Awaitable<bool> {
+    if (!$path->exists()) {
       return false;
     }
 
@@ -235,14 +227,14 @@ abstract class Node {
   /**
    * Attempt to load a file or folder object at a target location.
    */
-  public static function load(string $path): Node {
-    if (!file_exists($path)) {
+  public static function load(Path $path): Node {
+    if (!$path->exists()) {
       throw new MissingFileException(
-        Str\format('No file or folder found at  %s', $path),
+        Str\format('No file or folder found at  %s', $path->toString()),
       );
     }
 
-    if (is_dir($path)) {
+    if ($path->isDirectory()) {
       return new Folder($path);
     }
 
@@ -269,7 +261,7 @@ abstract class Node {
    * @throws ExistingFileException
    */
   public async function move(
-    string $target,
+    Path $target,
     bool $overwrite = true,
   ): Awaitable<bool> {
     if (!$this->exists()) {
@@ -277,7 +269,7 @@ abstract class Node {
     }
 
     // Don't move if the target exists and overwrite is disabled
-    if (file_exists($target)) {
+    if ($target->exists()) {
       if ($overwrite) {
         await static::destroy($target);
       } else {
@@ -288,7 +280,7 @@ abstract class Node {
     }
 
     // Move folders
-    if (rename($this->path()->toString(), $target)) {
+    if (rename($this->path()->toString(), $target->toString())) {
       $this->reset($target);
 
       return true;
@@ -330,9 +322,9 @@ abstract class Node {
       return $this->parent;
     }
 
-    $folder = $this->path()->parent()->toString();
+    $folder = $this->path()->parent();
 
-    if ($folder !== '.' && $folder !== '/') {
+    if ($folder->toString() !== '.' && $folder->toString() !== '/') {
       $this->parent = new Folder($folder);
     }
 
@@ -382,10 +374,10 @@ abstract class Node {
     }
 
     // Remove unwanted characters
-    $name = preg_replace(
-      '/[^_\-\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]/imu',
-      '-',
+    $name = Regex\replace(
       basename($name),
+      re"/[^_\-\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]/imu",
+      '-',
     );
 
     // Return early if the same name
@@ -394,10 +386,10 @@ abstract class Node {
     }
 
     // Prepend folder
-    $target = $this->dir().$name;
+    $target = Path::create($this->dir()->toString().$name);
 
     // Don't move if the target exists and overwrite is disabled
-    if (file_exists($target)) {
+    if ($target->exists()) {
       if ($overwrite) {
         await static::destroy($target);
       } else {
@@ -408,7 +400,7 @@ abstract class Node {
     }
 
     // Rename the file within the current folder
-    if (rename($this->path()->toString(), $target)) {
+    if (rename($this->path()->toString(), $target->toString())) {
       $this->reset($target);
 
       return true;
@@ -420,9 +412,9 @@ abstract class Node {
   /**
    * Reset the cache and path.
    */
-  public function reset(string $path = ''): this {
+  public function reset(Path $path = Path::create('')): this {
     if ('' !== $path) {
-      $this->path = Path::create($path);
+      $this->path = $path;
     }
 
     clearstatcache();
