@@ -230,7 +230,7 @@ abstract class Node {
   public static function load(Path $path): Node {
     if (!$path->exists()) {
       throw new MissingFileException(
-        Str\format('No file or folder found at  %s', $path->toString()),
+        Str\format('No file or folder found at %s', $path->toString()),
       );
     }
 
