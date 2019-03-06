@@ -39,9 +39,9 @@ final class File extends Node {
 
   public static function temporary(
     string $perfix,
-    ?string $directory = null,
+    Path $directory = Path::create(sys_get_temp_dir()),
   ): File {
-    return new self(tempnam($directory ?? sys_get_temp_dir(), $perfix), true);
+    return new self(tempnam($directory->toString(), $perfix), true);
   }
 
   /**
