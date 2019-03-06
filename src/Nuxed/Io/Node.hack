@@ -413,7 +413,7 @@ abstract class Node {
    * Reset the cache and path.
    */
   public function reset(Path $path = Path::create('')): this {
-    if ('' !== $path) {
+    if ('' !== $path->toString()) {
       $this->path = $path;
     }
 
