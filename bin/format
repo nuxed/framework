@@ -9,19 +9,25 @@ require __DIR__.'/../vendor/autoload.hack';
 async function format(): Awaitable<noreturn> {
   Facebook\AutoloadMap\initialize();
 
-  $source = new Nuxed\Io\Folder(__DIR__ . '/../src/Nuxed');
-  $tests = new Nuxed\Io\Folder(__DIR__ . '/../tests/Nuxed');
+  $source = new Nuxed\Io\Folder(
+    Nuxed\Io\Path::create(__DIR__ . '/../src/Nuxed')
+  );
   $source = await $source->files(true, true);
   foreach ($source as $file) {
     if ($file->path()->extension() === 'hack') {
      exec('hackfmt -i '.$file->path()->toString());
     }
   }
+
+  $tests = new Nuxed\Io\Folder(
+    Nuxed\Io\Path::create(__DIR__ . '/../tests/Nuxed')
+  );
   $tests = await $tests->files(true, true);
   foreach ($tests as $file) {
     if ($file->path()->extension() === 'hack') {
      exec('hackfmt -i '.$file->path()->toString());
     }
   }
+
   exit(0);
 }
