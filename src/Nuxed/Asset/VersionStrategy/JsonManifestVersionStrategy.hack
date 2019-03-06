@@ -18,14 +18,9 @@ use namespace Nuxed\Asset\Exception;
  * You could then ask for the version of "main.js" or "css/styles.css".
  */
 class JsonManifestVersionStrategy implements VersionStrategyInterface {
-  private Io\File $manifest;
   private ?KeyedContainer<string, string> $manifestData;
 
-  /**
-   * @param string $manifestPath Absolute path to the manifest file
-   */
-  public function __construct(string $manifestPath) {
-    $this->manifest = new Io\File($manifestPath, false);
+  public function __construct(private Io\File $manifest) {
   }
 
   /**
