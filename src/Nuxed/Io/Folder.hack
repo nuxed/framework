@@ -179,7 +179,11 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    * Recursively delete all files and folders within this folder.
    */
   public async function flush(): Awaitable<this> {
-    $nodes = await $this->read(false, true);
+    // delete files first.
+    $files = await $this->files(true, true);
+    await Asio\v(Vec\map($files, ($node) ==> $node->delete()));
+    // folders later.
+    $nodes = await $this->read(true, true);
     await Asio\v(Vec\map($nodes, ($node) ==> $node->delete()));
     return $this;
   }
