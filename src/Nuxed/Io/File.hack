@@ -43,7 +43,8 @@ final class File extends Node {
     string $perfix,
     Path $directory = Path::create(sys_get_temp_dir()),
   ): File {
-    return new self(Path::create(tempnam($directory->toString(), $perfix)), true);
+    return
+      new self(Path::create(tempnam($directory->toString(), $perfix)), true);
   }
 
   /**

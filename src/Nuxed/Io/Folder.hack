@@ -172,7 +172,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     }
     await $this->flush();
     $this->reset();
-    return rmdir($this->path()->toString());
+    return @rmdir($this->path()->toString());
   }
 
   /**
@@ -181,7 +181,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   public async function flush(): Awaitable<this> {
     // delete files first.
     $files = await $this->files(true, true);
-    await Asio\v(Vec\map($files, ($node) ==> $node->delete()));
+    await Asio\v(Vec\map($files, ($file) ==> $file->delete()));
     // folders later.
     $nodes = await $this->read(true, true);
     await Asio\v(Vec\map($nodes, ($node) ==> $node->delete()));
