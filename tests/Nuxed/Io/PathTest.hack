@@ -10,6 +10,8 @@ use const __DIR__;
 use const __FILE__;
 
 class PathTest extends HackTest {
+  use IoTestTrait;
+
   public function testCreate(): void {
     expect(Io\Path::create('/foo/bar')->toString())->toBeSame('/foo/bar');
   }
@@ -254,8 +256,11 @@ class PathTest extends HackTest {
       tuple('foo.hack', false),
       tuple('foo/bar.hack', false),
       tuple('/foo/bar/baz.hack', false),
-
-      // TODO: add symlink test ?
+      tuple(static::createSymlink()->path()->toString(), true),
+      tuple(static::createSymlink()->path()->toString(), true),
+      tuple(static::createSymlink()->path()->toString(), true),
+      tuple(static::createSymlink()->path()->toString(), true),
+      tuple(static::createSymlink()->path()->toString(), true),
     ];
   }
 
