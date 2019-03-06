@@ -12,7 +12,9 @@ use function pathinfo;
 use function touch;
 use function copy;
 use function md5_file;
+use function link;
 use function unlink;
+use function symlink;
 use function finfo_close;
 use function finfo_file;
 use function finfo_open;
@@ -235,5 +237,27 @@ final class File extends Node {
     }
 
     return 0;
+  }
+
+  /**
+   * Creates a symbolic link.
+   */
+  public function symlink(Path $link): void {
+    if ($link->exists()) {
+      throw new Exception\InvalidArgumentException('Target already exists.');
+    }
+
+    symlink($this->path()->toString(), $link->toString());
+  }
+
+  /**
+   * Create a hard link.
+   */
+  public function link(Path $link): void {
+    if ($link->exists()) {
+      throw new Exception\InvalidArgumentException('Link already exists.');
+    }
+
+    link($this->path()->toString(), $link->toString());
   }
 }
