@@ -1,7 +1,5 @@
 namespace Nuxed\Io\Exception;
 
-use type RuntimeException;
-
 /**
  * Exception thrown when a file does not exist.
  */

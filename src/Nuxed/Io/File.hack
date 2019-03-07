@@ -6,6 +6,7 @@ use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\Filesystem;
 use type Nuxed\Io\Exception\ExistingFileException;
 use type Nuxed\Io\Exception\InvalidPathException;
+use type Exception;
 use function filesize;
 use function touch;
 use function copy;
@@ -26,14 +27,49 @@ use const PATHINFO_FILENAME;
 final class File extends Node {
   <<__ReturnDisposable>>
   public function getReadHandle(): Filesystem\DisposableFileReadHandle {
-    return Filesystem\open_read_only($this->path()->toString());
+    if (!$this->readable()) {
+      throw new Exception\UnreadableFileException(
+        Str\format('File (%s) is not readable.', $this->path()->toString()),
+      );
+    }
+
+    try {
+      return Filesystem\open_read_only($this->path()->toString());
+    } catch(Exception $e) {
+      throw new Exception\RuntimeException(
+        Str\format(
+          'Error while opening file (%s) for writing.',
+          $this->path()->toString(),
+        ),
+        $e->getCode(),
+        $e,
+      );
+    }
   }
 
   <<__ReturnDisposable>>
   public function getWriteHandle(
     Filesystem\FileWriteMode $mode = Filesystem\FileWriteMode::OPEN_OR_CREATE,
   ): Filesystem\DisposableFileWriteHandle {
-    return Filesystem\open_write_only($this->path()->toString(), $mode);
+    if (!$this->writable()) {
+      throw new Exception\UnreadableFileException(
+        Str\format('File (%s) is not writable.', $this->path()->toString()),
+      );
+    }
+
+    try {
+      return Filesystem\open_write_only($this->path()->toString(), $mode);
+    } catch(Exception $e) {
+      throw new Exception\RuntimeException(
+        Str\format(
+          'Error while opening file (%s) for reading (mode:%s).',
+          $this->path()->toString(),
+          $mode as string,
+        ),
+        $e->getCode(),
+        $e,
+      );
+    }
   }
 
   public static function temporary(
@@ -174,15 +210,37 @@ final class File extends Node {
    * Append data to the end of a file.
    */
   public async function append(string $data): Awaitable<void> {
-    await $this->write($data, Filesystem\FileWriteMode::APPEND);
+    try {
+      await $this->write($data, Filesystem\FileWriteMode::APPEND);
+    } catch (Exception $e) {
+      throw new Exception\WriteErrorException(
+        Str\format(
+          'Erro while appending data to file (%s)',
+          $this->path()->toString(),
+        ),
+        $e->getCode(),
+        $e,
+      );
+    }
   }
 
   /**
    * Prepend data to the beginning of a file.
    */
   public async function prepend(string $data): Awaitable<void> {
-    $content = await $this->read();
-    await $this->write($data.$content);
+    try {
+      $content = await $this->read();
+      await $this->write($data.$content);
+    } catch (Exception $e) {
+      throw new Exception\WriteErrorException(
+        Str\format(
+          'Error while prepending data to file (%s).',
+          $this->path()->toString(),
+        ),
+        $e->getCode(),
+        $e,
+      );
+    }
   }
 
   /**
@@ -192,12 +250,23 @@ final class File extends Node {
     string $data,
     Filesystem\FileWriteMode $mode = Filesystem\FileWriteMode::TRUNCATE,
   ): Awaitable<void> {
-    await using ($file = $this->getWriteHandle($mode)) {
-      using (
-        $lock = $file->lock(Filesystem\FileLockType::EXCLUSIVE_NON_BLOCKING)
-      ) {
-        await $file->writeAsync($data);
+    try {
+      await using ($file = $this->getWriteHandle($mode)) {
+        using (
+          $lock = $file->lock(Filesystem\FileLockType::EXCLUSIVE_NON_BLOCKING)
+        ) {
+          await $file->writeAsync($data);
+        }
       }
+    } catch (Exception $e) {
+      throw new Exception\ReadErrorException(
+        Str\format(
+          'Error while writing to file (%s).',
+          $this->path()->toString(),
+        ),
+        $e->getCode(),
+        $e,
+      );
     }
   }
 
@@ -205,12 +274,23 @@ final class File extends Node {
    * Open a file for reading. If $length is provided, will only read up to that limit.
    */
   public async function read(int $length = -1): Awaitable<string> {
-    await using ($handle = $this->getReadHandle()) {
-      using (
-        $lock = $handle->lock(Filesystem\FileLockType::SHARED_NON_BLOCKING)
-      ) {
-        return await $handle->readAsync($length);
+    try {
+      await using ($handle = $this->getReadHandle()) {
+        using (
+          $lock = $handle->lock(Filesystem\FileLockType::SHARED_NON_BLOCKING)
+        ) {
+          return await $handle->readAsync($length);
+        }
       }
+    } catch (Exception $e) {
+      throw new Exception\ReadErrorException(
+        Str\format(
+          'Error while reading from file (%s).',
+          $this->path()->toString(),
+        ),
+        $e->getCode(),
+        $e,
+      );
     }
   }
 
