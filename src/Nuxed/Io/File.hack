@@ -1,6 +1,5 @@
 namespace Nuxed\Io;
 
-use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
@@ -219,8 +218,9 @@ final class File extends Node {
   }
 
   public async function lines(): Awaitable<Lines> {
-    return $this->read()
-      |> Asio\join($$)
+    $content = await $this->read();
+
+    return $content
       |> Str\replace($$, "\r\n", "\n")
       |> Str\replace($$, "\r", "\n")
       |> Str\split($$, "\n")
