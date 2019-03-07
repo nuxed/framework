@@ -7,7 +7,6 @@ use namespace HH\Lib\Experimental\Filesystem;
 use type Nuxed\Io\Exception\ExistingFileException;
 use type Nuxed\Io\Exception\InvalidPathException;
 use function filesize;
-use function pathinfo;
 use function touch;
 use function copy;
 use function md5_file;
@@ -20,7 +19,6 @@ use function finfo_open;
 use function clearstatcache;
 use function tempnam;
 use function sys_get_temp_dir;
-use const PATHINFO_EXTENSION;
 use const FILEINFO_MIME_TYPE;
 use const PATHINFO_BASENAME;
 use const PATHINFO_FILENAME;
@@ -123,9 +121,8 @@ final class File extends Node {
   /**
    * Return the file extension.
    */
-  public function ext(): string {
-    return
-      Str\lowercase(pathinfo($this->path()->toString(), PATHINFO_EXTENSION));
+  public function extension(): ?string {
+    return $this->path()->extension();
   }
 
   /**
