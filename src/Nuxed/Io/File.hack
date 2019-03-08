@@ -196,15 +196,13 @@ final class File extends Node {
 
   /**
    * Reset the cache and path.
-   *
-   * @throws InvalidPathException
    */
   <<__Override>>
   public function reset(Path $path = Path::create('')): this {
     if ($path->toString() !== '' && $path->exists() && $path->isDirectory()) {
       throw new InvalidPathException(
         Str\format(
-          'Invalid file path %s, folders are not allowed',
+          'Invalid file path %s, folders are not allowed.',
           $path->toString(),
         ),
       );
@@ -222,7 +220,7 @@ final class File extends Node {
     } catch (Exception $e) {
       throw new Exception\WriteErrorException(
         Str\format(
-          'Erro while appending data to file (%s)',
+          'Erro while appending data to file (%s).',
           $this->path()->toString(),
         ),
         $e->getCode(),
