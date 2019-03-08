@@ -5,6 +5,7 @@ use namespace HH\Lib\Str;
 use namespace HH\Lib\Regex;
 use type Nuxed\Io\Exception\MissingFileException;
 use type Nuxed\Io\Exception\ExistingFileException;
+use type Stringish;
 use function is_writable;
 use function is_readable;
 use function is_executable;
@@ -36,15 +37,18 @@ abstract class Node {
    */
   protected ?Folder $parent;
 
+  protected Path $path;
+
   /**
    * Initialize the file path. If the file doesn't exist, create it.
    */
   public function __construct(
-    protected Path $path,
+    Stringish $path,
     bool $create = false,
     int $mode = 0755,
   ) {
-    $this->reset($path);
+    $this->path = Path::create($path);
+    $this->reset($this->path);
 
     if ($create) {
       Asio\join($this->create($mode));
@@ -168,7 +172,8 @@ abstract class Node {
   /**
    * Helper method for deleting a file or folder.
    */
-  public static async function destroy(Path $path): Awaitable<bool> {
+  public static async function destroy(Stringish $path): Awaitable<bool> {
+    $path = Path::create($path);
     if (!$path->exists()) {
       return false;
     }
@@ -227,7 +232,8 @@ abstract class Node {
   /**
    * Attempt to load a file or folder object at a target location.
    */
-  public static function load(Path $path): Node {
+  final public static function load(Stringish $path): Node {
+    $path = Path::create($path);
     if (!$path->exists()) {
       throw new MissingFileException(
         Str\format('No file or folder found at %s', $path->toString()),
