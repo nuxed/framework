@@ -91,7 +91,7 @@ final class File extends Node {
   public async function create(int $mode = 0755): Awaitable<bool> {
     $folder = $this->parent();
 
-    if (!$folder) {
+    if (null === $folder) {
       return false;
     }
 
