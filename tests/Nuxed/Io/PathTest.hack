@@ -329,4 +329,27 @@ class PathTest extends HackTest {
       tuple('foo', vec['foo']),
     ];
   }
+
+  <<DataProvider('provideCompareData')>>
+  public function testCompare(
+    string $path,
+    string $other,
+    int $expected,
+  ): void {
+    $path = Io\Path::create($path);
+    expect($path->compare($other))->toBeSame($expected);
+  }
+
+  public function provideCompareData(): Container<(string, string, int)> {
+    return vec[
+      tuple('', '', 0),
+      // last `/` should be removed
+      tuple('/foo', '/foo/', 0),
+      // same directory path
+      tuple(__DIR__, __DIR__.'/../Io/', 0),
+      tuple('/foo\\bar', '/foo/bar/', 0),
+      tuple(__DIR__, __DIR__.'/..', -1),
+      tuple(__DIR__.'/..', __DIR__, 1),
+    ];
+  }
 }

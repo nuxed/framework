@@ -213,4 +213,20 @@ final class Path implements Stringish {
   public function parts(): Container<string> {
     return $this->path->getParts();
   }
+
+  public function compare(Stringish $other): int {
+    $other = static::standard((string)$other, false);
+    $other = static::normalize($other) ?? $other;
+    if (Str\ends_with($other, '/')) {
+      $other = Str\slice($other, 0, Str\length($other) - 1);
+    }
+
+    $self = static::standard($this->toString(), false);
+    $self = static::normalize($self) ?? $self;
+    if (Str\ends_with($self, '/')) {
+      $self = Str\slice($self, 0, Str\length($self) - 1);
+    }
+
+    return $other <=> $self;
+  }
 }
