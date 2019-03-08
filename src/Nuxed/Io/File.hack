@@ -101,11 +101,12 @@ final class File extends Node {
 
     if (!$this->exists() && $folder->writable()) {
       if (touch($this->path()->toString())) {
+        $ret = true;
         if ($mode) {
-          await $this->chmod($mode);
+          $ret = await $this->chmod($mode);
         }
 
-        return true;
+        return $ret;
       }
     }
 
