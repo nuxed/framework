@@ -72,10 +72,14 @@ final class File extends Node {
     }
   }
 
-  public static function temporary(
+  public static async function temporary(
     string $perfix,
     Path $directory = Path::create(sys_get_temp_dir()),
-  ): File {
+  ): Awaitable<File> {
+    $folder = new Folder($directory, true);
+    if (!$folder->exists()) {
+      await $folder->create();
+    }
     return
       new self(Path::create(tempnam($directory->toString(), $perfix)), true);
   }
