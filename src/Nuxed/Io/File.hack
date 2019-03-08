@@ -122,7 +122,7 @@ final class File extends Node {
   public async function copy(
     Path $target,
     OperationType $process = OperationType::OVERWRITE,
-    int $mode = 0755,
+    ?int $mode = $this->permissions(),
   ): Awaitable<?File> {
     if (!$this->exists()) {
       return null;
@@ -136,6 +136,7 @@ final class File extends Node {
 
     if (copy($this->path()->toString(), $target->toString())) {
       $file = new File($target);
+      $mode = $mode ?? 0755;
       await $file->chmod($mode);
 
       return $file;
@@ -143,6 +144,7 @@ final class File extends Node {
 
     return null;
   }
+
   /**
    * Remove the file if it exists.
    */
