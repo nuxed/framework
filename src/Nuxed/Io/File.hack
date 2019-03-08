@@ -35,10 +35,10 @@ final class File extends Node {
 
     try {
       return Filesystem\open_read_only($this->path()->toString());
-    } catch(Exception $e) {
+    } catch (Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
-          'Error while opening file (%s) for writing.',
+          'Error while opening file (%s) for reading.',
           $this->path()->toString(),
         ),
         $e->getCode(),
@@ -52,17 +52,17 @@ final class File extends Node {
     Filesystem\FileWriteMode $mode = Filesystem\FileWriteMode::OPEN_OR_CREATE,
   ): Filesystem\DisposableFileWriteHandle {
     if (!$this->writable()) {
-      throw new Exception\UnreadableFileException(
+      throw new Exception\UnwritableFileException(
         Str\format('File (%s) is not writable.', $this->path()->toString()),
       );
     }
 
     try {
       return Filesystem\open_write_only($this->path()->toString(), $mode);
-    } catch(Exception $e) {
+    } catch (Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
-          'Error while opening file (%s) for reading (mode:%s).',
+          'Error while opening file (%s) for writing (mode:%s).',
           $this->path()->toString(),
           $mode as string,
         ),
