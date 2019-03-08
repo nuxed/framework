@@ -5,6 +5,7 @@ use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\Filesystem;
 use type Nuxed\Io\Exception\InvalidArgumentException;
+use type Stringish;
 use function realpath;
 use const PATHINFO_BASENAME;
 use const PATHINFO_FILENAME;
@@ -15,7 +16,7 @@ use const DIRECTORY_SEPARATOR;
 /**
  * Provides convenience functions for inflecting notation paths and file system paths.
  */
-final class Path {
+final class Path implements Stringish {
   /**
    * Directory separator.
    */
@@ -29,8 +30,8 @@ final class Path {
   public function __construct(private Filesystem\Path $path) {
   }
 
-  public static function create(string $path): Path {
-    $path = static::standard($path, false);
+  public static function create(Stringish $path): Path {
+    $path = static::standard((string)$path, false);
     return new self(new Filesystem\Path($path));
   }
 
