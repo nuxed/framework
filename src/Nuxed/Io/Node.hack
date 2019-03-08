@@ -334,13 +334,12 @@ abstract class Node {
   /**
    * Return the permissions for the file.
    */
-  public function permissions(): string {
+  public function permissions(): ?int {
     if ($this->exists()) {
-      return
-        Str\slice(Str\format('%o', fileperms($this->path()->toString())), -4);
+      return fileperms($this->path()->toString()) & 0777;
     }
 
-    return '';
+    return null;
   }
 
   /**
