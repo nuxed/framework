@@ -21,13 +21,14 @@ trait IoTestTrait {
 
   protected static function createPath(): Io\Path {
     $path = static::temporaryFolder()->path()->toString().
-      '/'.
       PseudoRandom\string(32, 'qwertyuiopasdfghjklzxcvbnm123456789');
     return Io\Path::create($path);
   }
 
   protected static function createFile(): Io\File {
-    return Io\File::temporary('io_file_', static::temporaryFolder()->path());
+    return Asio\join(
+      Io\File::temporary('io_file_', static::temporaryFolder()->path()),
+    );
   }
 
   protected static function createFolder(): Io\Folder {
