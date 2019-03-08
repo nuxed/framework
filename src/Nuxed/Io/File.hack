@@ -280,7 +280,7 @@ final class File extends Node {
   /**
    * Open a file for reading. If $length is provided, will only read up to that limit.
    */
-  public async function read(int $length = -1): Awaitable<string> {
+  public async function read(?int $length = null): Awaitable<string> {
     try {
       await using ($handle = $this->getReadHandle()) {
         using (
