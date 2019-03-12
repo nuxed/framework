@@ -18,14 +18,11 @@ use function filegroup;
 use function filemtime;
 use function fileowner;
 use function fileperms;
-use function pathinfo;
 use function chgrp;
 use function chmod;
 use function chown;
 use function lchgrp;
 use function lchown;
-use const PATHINFO_BASENAME;
-use const PATHINFO_FILENAME;
 
 /**
  * Shared functionality between file and folder objects.
@@ -40,7 +37,7 @@ abstract class Node {
   protected Path $path;
 
   /**
-   * Initialize the file path. If the file doesn't exist, create it.
+   * Initialize the node path. If the node doesn't exist and `$create` is true, create it.
    */
   public function __construct(
     Stringish $path,
@@ -67,10 +64,10 @@ abstract class Node {
   }
 
   /**
-   * Return the file name with extension.
+   * Return the node name with extension.
    */
   public function basename(): string {
-    return pathinfo($this->path()->toString(), PATHINFO_BASENAME);
+    return $this->path()->basename();
   }
 
   /**
@@ -85,7 +82,7 @@ abstract class Node {
   }
 
   /**
-   * Change the group of the file.
+   * Change the group of the node.
    */
   public async function chgrp(
     int $group,
@@ -107,7 +104,7 @@ abstract class Node {
   }
 
   /**
-   * Change the permissions mode of the file.
+   * Change the permissions mode of the node.
    */
   public async function chmod(
     int $mode,
@@ -123,7 +120,7 @@ abstract class Node {
   }
 
   /**
-   * Change the owner of the file.
+   * Change the owner of the node.
    */
   public async function chown(
     int $user,
@@ -145,7 +142,7 @@ abstract class Node {
   }
 
   /**
-   * Copy the file to a new location and return a new Node object.
+   * Copy the node to a new location and return a new Node object.
    * The functionality of copy will change depending on `$process` and whether the target file exists.
    * This also applies recursively.
    *
@@ -182,12 +179,10 @@ abstract class Node {
   }
 
   /**
-   * Return the parent directory as a string.
-   * Will always end in a trailing slash.
+   * Return the parent directory.
    */
   public function dir(): Path {
-    $dir = $this->path()->parent()->toString().'/';
-    return Path::create($dir);
+    return $this->path()->parent();
   }
 
   /**
@@ -259,10 +254,10 @@ abstract class Node {
   }
 
   /**
-   * Move the file to another folder. If a file exists at the target path,
-   * either delete the file if `$overwrite` is true, or throw an exception.
+   * Move the node to another folder. If a node exists at the target path,
+   * either delete the node if `$overwrite` is true, or throw an exception.
    *
-   * Use `rename()` to rename the file within the current folder.
+   * Use `rename()` to rename the node within the current folder.
    *
    * @throws ExistingFileException
    */
@@ -296,14 +291,14 @@ abstract class Node {
   }
 
   /**
-   * Return the file name without extension.
+   * Return the node name without extension.
    */
   public function name(): string {
-    return pathinfo($this->path()->toString(), PATHINFO_FILENAME);
+    return $this->path()->name();
   }
 
   /**
-   * Return the owner name for the file.
+   * Return the owner name for the node.
    */
   public function owner(): int {
     if ($this->exists()) {
@@ -338,7 +333,7 @@ abstract class Node {
   }
 
   /**
-   * Return the permissions for the file.
+   * Return the permissions for the node.
    */
   public function permissions(): ?int {
     if ($this->exists()) {
@@ -356,17 +351,17 @@ abstract class Node {
   }
 
   /**
-   * Is the file readable.
+   * Is the node readable.
    */
   public function readable(): bool {
     return is_readable($this->path()->toString());
   }
 
   /**
-   * Rename the file within the current folder. If a file exists at the target path,
-   * either delete the file if `$overwrite` is true, or throw an exception.
+   * Rename the node within the current folder. If a node exists at the target path,
+   * either delete the node if `$overwrite` is true, or throw an exception.
    *
-   * Use `move()` to re-locate the file to another folder.
+   * Use `move()` to re-locate the node to another folder.
    *
    * @throws ExistingFileException
    */
@@ -398,9 +393,10 @@ abstract class Node {
       if ($overwrite) {
         await static::destroy($target);
       } else {
-        throw new ExistingFileException(
-          'Cannot rename file as the target already exists',
-        );
+        throw new ExistingFileException(Str\format(
+          'Cannot rename file as the target (%s) already exists.',
+          $target->toString(),
+        ));
       }
     }
 
@@ -428,12 +424,12 @@ abstract class Node {
   }
 
   /**
-   * Return the current file size.
+   * Return the current node size.
    */
   abstract public function size(): Awaitable<int>;
 
   /**
-   * Is the file writable.
+   * Is the node writable.
    */
   public function writable(): bool {
     return is_writable($this->path()->toString());
