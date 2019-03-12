@@ -208,7 +208,7 @@ final class File extends Node {
     if ($path->toString() !== '' && $path->exists() && $path->isDirectory()) {
       throw new InvalidPathException(
         Str\format(
-          'Invalid file path %s, folders are not allowed.',
+          'Invalid file path (%s), folders are not allowed.',
           $path->toString(),
         ),
       );
@@ -226,7 +226,7 @@ final class File extends Node {
     } catch (Exception $e) {
       throw new Exception\WriteErrorException(
         Str\format(
-          'Erro while appending data to file (%s).',
+          'Error while appending data to file (%s).',
           $this->path()->toString(),
         ),
         $e->getCode(),
