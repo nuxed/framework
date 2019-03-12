@@ -47,6 +47,10 @@ final class Path implements Stringish {
    * Return the extension from a file path.
    */
   public function extension(): ?string {
+    if ($this->isDirectory()) {
+      return null;
+    }
+
     return $this->path->getExtension();
   }
 
