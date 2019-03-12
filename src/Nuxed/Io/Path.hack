@@ -149,8 +149,6 @@ final class Path implements Stringish {
 
   /**
    * Determine the relative path between this and another absolute path.
-   *
-   * @throws InvalidArgumentException
    */
   public function relativeTo(Path $to): Path {
     if ($this->isRelative() || $to->isRelative()) {
