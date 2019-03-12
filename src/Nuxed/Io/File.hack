@@ -51,6 +51,13 @@ final class File extends Node {
   public function getWriteHandle(
     Filesystem\FileWriteMode $mode = Filesystem\FileWriteMode::OPEN_OR_CREATE,
   ): Filesystem\DisposableFileWriteHandle {
+    if ($mode === Filesystem\FileWriteMode::MUST_CREATE && $this->exists()) {
+      throw new Exception\ExistingFileException(Str\format(
+        'Cannot re-create file (%s) for writing.',
+        $this->path()->toString(),
+      ));
+    }
+
     $creating = $mode === Filesystem\FileWriteMode::OPEN_OR_CREATE ||
       $mode === Filesystem\FileWriteMode::MUST_CREATE;
     if (!$creating && !$this->exists()) {
