@@ -155,8 +155,8 @@ final class Path implements Stringish {
    */
   public function relativeTo(Path $to): Path {
     if ($this->isRelative() || $to->isRelative()) {
-      throw new InvalidArgumentException(
-        'Cannot determine relative path without two absolute paths',
+      throw new Exception\InvalidPathException(
+        'Cannot determine relative path without two absolute paths.',
       );
     }
 
