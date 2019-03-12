@@ -7,9 +7,8 @@ use namespace HH\Lib\Experimental\Filesystem;
 use type Nuxed\Io\Exception\InvalidArgumentException;
 use type Stringish;
 use function realpath;
-use const PATHINFO_BASENAME;
+use function pathinfo;
 use const PATHINFO_FILENAME;
-use const PATHINFO_EXTENSION;
 use const PATH_SEPARATOR;
 use const DIRECTORY_SEPARATOR;
 
@@ -231,6 +230,13 @@ final class Path implements Stringish {
    */
   public function basename(): string {
     return $this->path->getBaseName();
+  }
+
+  /**
+   * Return the file name without extension.
+   */
+  public function name(): string {
+    return pathinfo($this->toString(), PATHINFO_FILENAME);
   }
 
   public function parts(): Container<string> {
