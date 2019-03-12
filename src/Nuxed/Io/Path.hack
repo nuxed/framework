@@ -183,7 +183,7 @@ final class Path implements Stringish {
       }
     }
 
-    if (!$relative) {
+    if (0 === C\count($relative)) {
       return self::create('./');
     }
 
