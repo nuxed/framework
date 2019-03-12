@@ -51,7 +51,15 @@ final class File extends Node {
   public function getWriteHandle(
     Filesystem\FileWriteMode $mode = Filesystem\FileWriteMode::OPEN_OR_CREATE,
   ): Filesystem\DisposableFileWriteHandle {
-    if (!$this->writable()) {
+    $creating = $mode === Filesystem\FileWriteMode::OPEN_OR_CREATE ||
+      $mode === Filesystem\FileWriteMode::MUST_CREATE;
+    if (!$creating && !$this->exists()) {
+      throw new Exception\MissingFileException(
+        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
+      );
+    }
+
+    if (!$creating && !$this->writable()) {
       throw new Exception\UnwritableFileException(
         Str\format('File (%s) is not writable.', $this->path()->toString()),
       );
