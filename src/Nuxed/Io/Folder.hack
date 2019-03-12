@@ -170,6 +170,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     if (!$this->exists()) {
       return false;
     }
+
     await $this->flush();
     $this->reset();
     return @rmdir($this->path()->toString());
@@ -182,7 +183,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     // delete files first.
     $files = await $this->files(true, true);
     await Asio\v(Vec\map($files, ($file) ==> $file->delete()));
-    // folders later.
+    // delete rest of the nodes.
     $nodes = await $this->read(true, true);
     await Asio\v(Vec\map($nodes, ($node) ==> $node->delete()));
     return $this;
@@ -281,8 +282,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
         $file->isDir() && ($filter === Node::class || $filter === Folder::class)
       ) {
         $contents[] = new Folder(Path::create($file->getPathname()));
-
-      } else if (
+      } elseif (
         $file->isFile() && ($filter === Node::class || $filter === File::class)
       ) {
         $contents[] = new File(Path::create($file->getPathname()));
@@ -292,8 +292,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     if ($sort) {
       $contents = Vec\sort(
         $contents,
-        (Node $a, Node $b) ==>
-          Str\compare($a->path()->toString(), $b->path()->toString()),
+        (Node $a, Node $b) ==> $a->path()->compare($b->path()),
       );
     }
 
