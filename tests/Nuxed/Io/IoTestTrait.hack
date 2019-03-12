@@ -12,7 +12,9 @@ trait IoTestTrait {
   }
 
   public static async function afterLastTestAsync(): Awaitable<void> {
-    await static::temporaryFolder()->delete();
+    $tmp = static::temporaryFolder();
+    await $tmp->chmod(0777, true);
+    await $tmp->delete();
   }
 
   protected static function temporaryFolder(): Io\Folder {
