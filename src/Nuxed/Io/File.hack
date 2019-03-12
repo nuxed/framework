@@ -123,8 +123,6 @@ final class File extends Node {
 
   /**
    * {@inheritdoc}
-   *
-   * @throws \Nuxed\Io\Exception\ExistingFileException
    */
   <<__Override>>
   public async function copy(
@@ -138,7 +136,7 @@ final class File extends Node {
 
     if ($target->exists() && $process !== OperationType::OVERWRITE) {
       throw new ExistingFileException(
-        'Cannot copy file as the target already exists',
+        'Cannot copy file as the target already exists.',
       );
     }
 
