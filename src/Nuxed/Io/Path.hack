@@ -222,7 +222,9 @@ final class Path implements Stringish {
    * Will always end in a trailing slash.
    */
   public function parent(): Path {
-    return new self($this->path->getParent());
+    $parent = $this->path->getParent()->toString();
+    $parent = static::standard($parent, true);
+    return new self(new Filesystem\Path($parent));
   }
 
   /**
