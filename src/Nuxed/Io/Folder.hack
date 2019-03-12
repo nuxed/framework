@@ -12,10 +12,7 @@ use type IteratorAggregate;
 use type FilesystemIterator;
 use type RecursiveIteratorIterator;
 use type RecursiveDirectoryIterator;
-use function file_exists;
 use function mkdir;
-use function is_file;
-use function unlink;
 use function rmdir;
 use function clearstatcache;
 
@@ -33,7 +30,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   }
 
   /**
-   * Change the group of the file.
+   * Change the group of the folder.
    * If $recursive is true, set the group on all children.
    */
   <<__Override>>
@@ -42,11 +39,12 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     bool $recursive = false,
   ): Awaitable<bool> {
     if ($recursive) {
-      $contents = await $this->read();
+      $contents = await $this->read(false, true, Node::class);
       $awaitables = vec[];
-      foreach ($contents as $file) {
-        $awaitables[] = $file->chgrp($group, true);
+      foreach ($contents as $node) {
+        $awaitables[] = $node->chgrp($group, true);
       }
+
       await Asio\v($awaitables);
     }
 
@@ -54,7 +52,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   }
 
   /**
-   * Change the permissions mode of the file.
+   * Change the permissions mode of the folder.
    * If $recursive is true, set the mode on all children.
    */
   <<__Override>>
@@ -63,11 +61,12 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     bool $recursive = false,
   ): Awaitable<bool> {
     if ($recursive) {
-      $contents = await $this->read();
+      $contents = await $this->read(false, true, Node::class);
       $awaitables = vec[];
-      foreach ($contents as $file) {
-        $awaitables[] = $file->chmod($mode, true);
+      foreach ($contents as $node) {
+        $awaitables[] = $node->chmod($mode, true);
       }
+
       await Asio\v($awaitables);
     }
 
@@ -75,7 +74,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   }
 
   /**
-   * Change the owner of the file.
+   * Change the owner of the folder.
    * If $recursive is true, set the owner on all children.
    */
   <<__Override>>
@@ -84,11 +83,12 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     bool $recursive = false,
   ): Awaitable<bool> {
     if ($recursive) {
-      $contents = await $this->read();
+      $contents = await $this->read(false, true, Node::class);
       $awaitables = vec[];
-      foreach ($contents as $file) {
-        $awaitables[] = $file->chown($user, true);
+      foreach ($contents as $node) {
+        $awaitables[] = $node->chown($user, true);
       }
+
       await Asio\v($awaitables);
     }
 
@@ -104,8 +104,8 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     if (!$this->exists()) {
       $ret = (bool)@mkdir($this->path()->toString(), $mode, true);
     }
-    $this->reset();
 
+    $this->reset();
     return $ret;
   }
 
@@ -132,29 +132,31 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     $target = $destination->path();
 
     // Recursively copy over contents to new destination
-    $contents = await $this->read();
+    $contents = await $this->read(true, true, Node::class);
 
     $awaitables = vec[];
-    foreach ($contents as $file) {
-      $to = Str\replace(
-        $file->path()->toString(),
+    foreach ($contents as $node) {
+      $to = Path::create(Str\replace(
+        $node->path()->toString(),
         $this->path()->toString(),
         $target->toString(),
-      );
+      ));
 
       // Skip copy if target exists
-      if ($process === OperationType::SKIP && file_exists($to)) {
+      if ($process === OperationType::SKIP && $to->exists()) {
         continue;
       }
 
+      $destroy = async {};
       // Delete target since File::copy() will throw exception
-      if (
-        $process === OperationType::MERGE && file_exists($to) && is_file($to)
-      ) {
-        @unlink($to);
+      if ($process === OperationType::MERGE && $to->exists() && $to->isFile()) {
+        $destroy = Node::destroy($to);
       }
 
-      $awaitables[] = $file->copy($to, $process, $mode);
+      $awaitables[] = async {
+        await $destroy;
+        await $node->copy($to, $process, $mode);
+      };
     }
 
     await Asio\v($awaitables);
@@ -181,10 +183,10 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    */
   public async function flush(): Awaitable<this> {
     // delete files first.
-    $files = await $this->files(true, true);
+    $files = await $this->files(false, true);
     await Asio\v(Vec\map($files, ($file) ==> $file->delete()));
     // delete rest of the nodes.
-    $nodes = await $this->read(true, true);
+    $nodes = await $this->read(false, true, Node::class);
     await Asio\v(Vec\map($nodes, ($node) ==> $node->delete()));
     return $this;
   }
@@ -258,7 +260,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     bool $recursive = false,
     ?classname<T> $filter = null,
   ): Awaitable<Container<T>> {
-    $filter = $filter ?? Node::class;
+    $filter ??= Node::class;
 
     $contents = vec[];
     if (!$this->exists()) {
@@ -312,10 +314,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     Path $target,
     bool $overwrite = true,
   ): Awaitable<bool> {
-    if (
-      Path::normalize($target->toString()) ===
-        Path::normalize($this->path()->toString())
-    ) {
+    if ($target->compare($this->path()) === 0) {
       return true; // Don't move to the same location
     }
 
@@ -324,8 +323,6 @@ final class Folder extends Node implements IteratorAggregate<Node> {
 
   /**
    * {@inheritdoc}
-   *
-   * @throws InvalidPathException
    */
   <<__Override>>
   public function reset(Path $path = Path::create('')): this {
@@ -353,7 +350,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   <<__Override>>
   public async function size(): Awaitable<int> {
     if ($this->exists()) {
-      $nodes = await $this->read();
+      $nodes = await $this->read(false, true, Node::class);
       return C\count($nodes);
     }
 
