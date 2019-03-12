@@ -193,10 +193,12 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   /**
    * Find all files and folders within the current folder that match a specific pattern.
    */
-  public async function find<T super Node>(
+  public async function find<T as Node>(
     string $pattern,
-    classname<T> $filter = Node::class,
+    ?classname<T> $filter = null,
   ): Awaitable<Container<T>> {
+    $filter ??= Node::class;
+
     $contents = vec[];
 
     if (!$this->exists()) {
@@ -225,6 +227,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
       }
     }
 
+    // UNSAFE
     return $contents;
   }
 
