@@ -66,7 +66,13 @@ final class File extends Node {
       );
     }
 
-    if (!$creating && !$this->writable()) {
+    if (
+      (
+        !$creating ||
+        ($mode === Filesystem\FileWriteMode::OPEN_OR_CREATE && $this->exists())
+      ) &&
+      !$this->writable()
+    ) {
       throw new Exception\UnwritableFileException(
         Str\format('File (%s) is not writable.', $this->path()->toString()),
       );
@@ -277,7 +283,7 @@ final class File extends Node {
         }
       }
     } catch (Exception $e) {
-      throw new Exception\ReadErrorException(
+      throw new Exception\WriteErrorException(
         Str\format(
           'Error while writing to file (%s).',
           $this->path()->toString(),
