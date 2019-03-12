@@ -338,22 +338,56 @@ final class File extends Node {
   /**
    * Creates a symbolic link.
    */
-  public function symlink(Path $link): void {
-    if ($link->exists()) {
-      throw new Exception\InvalidArgumentException('Target already exists.');
+  public function symlink(Path $target): File {
+    if (!$this->exists()) {
+      throw new Exception\MissingFileException(
+        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
-    symlink($this->path()->toString(), $link->toString());
+    if ($target->exists()) {
+      throw new Exception\InvalidPathException(
+        Str\format('Target (%s) already exists.', $target->toString()),
+      );
+    }
+
+    @symlink($this->path()->toString(), $target->toString());
+    if (!$target->exists() || !$target->isSymlink()) {
+      throw new Exception\RuntimeException(Str\format(
+        'Error while creating a symbolic link (%s) for file (%s).',
+        $target->toString(),
+        $this->path()->toString(),
+      ));
+    }
+
+    return new File($target);
   }
 
   /**
    * Create a hard link.
    */
-  public function link(Path $link): void {
-    if ($link->exists()) {
-      throw new Exception\InvalidArgumentException('Link already exists.');
+  public function link(Path $link): File {
+    if (!$this->exists()) {
+      throw new Exception\MissingFileException(
+        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
-    link($this->path()->toString(), $link->toString());
+    if ($link->exists()) {
+      throw new Exception\InvalidPathException(
+        Str\format('Link (%s) already exists.', $link->toString()),
+      );
+    }
+
+    @link($this->path()->toString(), $link->toString());
+    if (!$link->exists()) {
+      throw new Exception\RuntimeException(Str\format(
+        'Error while creating a hard link (%s) for file (%s).',
+        $link->toString(),
+        $this->path()->toString(),
+      ));
+    }
+
+    return new File($link);
   }
 }
