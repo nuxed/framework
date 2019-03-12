@@ -190,26 +190,45 @@ final class Path implements Stringish {
     return self::create(Str\join($relative, '/'));
   }
 
+  /**
+   * Check if the path is a directory.
+   */
   public function isDirectory(): bool {
     return $this->path->isDirectory();
   }
 
+  /**
+   * Check if the path is a file.
+   */
   public function isFile(): bool {
     return $this->path->isFile();
   }
 
+  /**
+   * Check if the path is a symbolic link.
+   */
   public function isSymlink(): bool {
     return $this->path->isSymlink();
   }
 
+  /**
+   * Check if the file exists.
+   */
   public function exists(): bool {
     return $this->path->exists();
   }
 
+  /**
+   * Return the parent directory.
+   * Will always end in a trailing slash.
+   */
   public function parent(): Path {
     return new self($this->path->getParent());
   }
 
+  /**
+   * Return the file name with extension.
+   */
   public function basename(): string {
     return $this->path->getBaseName();
   }
