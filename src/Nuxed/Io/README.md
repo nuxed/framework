@@ -91,12 +91,12 @@ await $folder->rename('new-folder-name', false);
 
 ### Informational
 
-To access a file or folders name use `basename()`, or a file name without an extension use `name()`, or the extension itself use `ext()` (files only).
+To access a file or folders name use `basename()`, or a file name without an extension use `name()`, or the extension itself use `extension()` (files only).
 
 ```hack
-$file->basename(); // image.jpg
-$file->name(); // image
-$file->ext(); // jpg
+$node->basename(); // image.jpg
+$node->name(); // image
+$file->extension(); // jpg
 ```
 
 To access the group, owner, or parent, use `group(): int`, `owner(): int`, and `parent(): ?Folder` respectively. The `parent(): ?Folder` method will return a new `Folder` instance for the folder that the file/folder belongs in. If there is no parent (at the root), `null` will be returned.
@@ -140,7 +140,7 @@ To modify permissions on all files within a folder, set the recursive 2nd argume
 await $folder->chmod(0777, true);
 ```
 
-The `permissions(): string` method will return the literal read-write-execute octal value.
+The `permissions(): int` method will return the literal read-write-execute octal value.
 
 ```hack
 $file->permissions(); // 0777
@@ -158,7 +158,7 @@ The `path(): Path` method will return the current path while `dir(): Path` will 
 
 ```hack
 $path = $file->path();
-$path = $file->dir();
+$parent = $file->dir();
 ```
 
 To check if a path is relative or absolute, use `isRelative(): bool` or `isAbsolute(): bool` methods on the path instance, or use the node proxy.
@@ -178,6 +178,11 @@ if ($file->isRelative()) {
 `Nuxed\Io\File`s provide read, write functionality alongside the utility methods `mimeType()`, which attempts to guess the files type, and `md5()`, which returns an MD5 hash of the file.
 
 ```hack
+use namespace Nuxed\Io;
+
+// ...
+
+$file = Io\Node::load('path/to/index.html') as Io\File;
 $mime = $file->mimeType(); // text/html
 $hash = $file->md5();
 ```
@@ -196,7 +201,7 @@ await using ($handle = $file->getWriteHandle()) {
 
 ### Reading Files Content
 
-The `read()` method will attempt to read the contents of the current file. An optional limit can be passed to return all bytes up until that point.
+The `read(?int): Awaitable<string>` method will attempt to read the contents of the current file. An optional limit can be passed to return all bytes up until that point.
 
 ```hack
 $content = await $file->read();
@@ -207,18 +212,20 @@ This method will lock the file until the contents have been read.
 
 ### Writing To Files
 
-The `write(): Awaitable<void>` method will write content to the current file. The default write [mode](https://github.com/hhvm/hsl-experimental/blob/master/src/filesystem/FileWriteMode.php) is `FileWriteMode::TRUNCATE`, which can be changed using the 2nd argument.
+The `write(): Awaitable<void>` method will write content to the current file. The default [write mode](https://github.com/hhvm/hsl-experimental/blob/master/src/filesystem/FileWriteMode.php) is `FileWriteMode::TRUNCATE`, which can be changed using the 2nd argument.
 
 ```hack
+use namespace Nuxed\Io;
 use type HH\Lib\Experimental\Filesystem\FileWriteMode;
 
-...
+// ...
 
+$file = Io\Node::load('path/to/file.txt') as Io\File;
 await $file->write($content);
-await $file->write($content, FileWriteMode::MUST_CREATE);
+await $file->write($content, FileWriteMode::OPEN_OR_CREATE);
 ```
 
-The previous method will truncate the file before writing to it. To append to the file instead, use `append(): Awaitable<void>`.
+The previous method will truncate the file before writing to it. To append to the file instead, use `append(string): Awaitable<void>`.
 
 ```hack
 await $file->append('foo');
@@ -243,17 +250,25 @@ We've mentioned locking previously, as it automatically occurs during reads and 
 You can pass the lock type as the 1st argument, which must be a value of the [`FileLockType`](https://github.com/hhvm/hsl-experimental/blob/master/src/filesystem/FileLockType.php) enum.
 
 ```hack
+use namespace Nuxed\Io;
 use type HH\Lib\Experimental\Filesystem\FileLockType;
 
-$type = FileLockType::EXCLUSIVE_NON_BLOCKING;
+// ...
 
-await (using $write = $file->getWriteHandle($mode)) {
+$file = Io\Node::load('path/to/file.txt') as Io\File;
+
+await using ($write = $file->getWriteHandle($mode)) {
+  $type = FileLockType::EXCLUSIVE_NON_BLOCKING;
   using ($lock = $write->lock($type)) {
     // Do something with the write handle.
+    //
+    // Note: you cannot use `Io\File::read()`, `Io\File::write()`, `Io\File::append()`,
+    // or `Io\File::prepend()` here, as the file is locked.
   }
 }
 
-await (using $read = $file->getReadHandle()) {
+await using ($read = $file->getReadHandle()) {
+  $type = FileLockType::SHARED_NON_BLOCKING;
   using ($lock = $read->lock($type)) {
     // Do something with the read handle.
   }
