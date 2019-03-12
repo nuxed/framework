@@ -17,6 +17,7 @@ use function mkdir;
 use function is_file;
 use function unlink;
 use function rmdir;
+use function touch;
 use function clearstatcache;
 
 final class Folder extends Node implements IteratorAggregate<Node> {
@@ -355,6 +356,31 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     }
 
     return 0;
+  }
+
+  public async function touch(
+    string $file,
+    int $mode = 0755,
+  ): Awaitable<?File> {
+    if (!$this->exists()) {
+      return null;
+    }
+
+    $path = Path::create(Str\format(
+      '%s%s',
+      Path::normalize($this->path()->toString().'/') as string,
+      $file,
+    ));
+
+    if ($path->exists()) {
+      throw new Exception\ExistingFileException(
+        Str\format('File (%s) already exist.', $path->toString()),
+      );
+    }
+
+    $file = new File($path, false);
+    await $file->create($mode);
+    return $file;
   }
 
   public function getIterator(): Iterator<Node> {
