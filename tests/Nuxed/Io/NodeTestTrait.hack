@@ -8,6 +8,7 @@ use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
 use function microtime;
+use function getenv;
 
 trait NodeTestTrait {
   use IoTestTrait;
@@ -18,7 +19,7 @@ trait NodeTestTrait {
     $time1 = (int)microtime(true);
     expect($node->accessTime())->toBeLessThanOrEqualTo($time1);
 
-    if ($node is Io\File) {
+    if ($node is Io\File && getenv('TEST_LONG_RUN') !== false) {
       await Asio\usleep(10000000);
       await $node->read();
       $time2 = (int)microtime(true);
@@ -39,7 +40,7 @@ trait NodeTestTrait {
     $time1 = (int)microtime(true);
     expect($node->changeTime())->toBeLessThanOrEqualTo($time1);
 
-    if ($node is Io\File) {
+    if ($node is Io\File && getenv('TEST_LONG_RUN') !== false) {
       await Asio\usleep(10000000);
       // change node
       await $node->write('foo');

@@ -185,8 +185,8 @@ class PathTest extends HackTest {
         Io\Path::create('foo/bar')->relativeTo(Io\Path::create('foo/bar/baz')),
     )
       ->toThrow(
-        Io\Exception\InvalidArgumentException::class,
-        'Cannot determine relative path without two absolute paths',
+        Io\Exception\InvalidPathException::class,
+        'Cannot determine relative path without two absolute paths.',
       );
 
     // relative + absolute
@@ -195,8 +195,8 @@ class PathTest extends HackTest {
         Io\Path::create('/foo/bar')->relativeTo(Io\Path::create('foo/bar/baz')),
     )
       ->toThrow(
-        Io\Exception\InvalidArgumentException::class,
-        'Cannot determine relative path without two absolute paths',
+        Io\Exception\InvalidPathException::class,
+        'Cannot determine relative path without two absolute paths.',
       );
 
     // absolute + relative
@@ -205,8 +205,8 @@ class PathTest extends HackTest {
         Io\Path::create('foo/bar')->relativeTo(Io\Path::create('/foo/bar/baz')),
     )
       ->toThrow(
-        Io\Exception\InvalidArgumentException::class,
-        'Cannot determine relative path without two absolute paths',
+        Io\Exception\InvalidPathException::class,
+        'Cannot determine relative path without two absolute paths.',
       );
   }
 
@@ -290,16 +290,16 @@ class PathTest extends HackTest {
 
   public function provideParentData(): Container<(string, string)> {
     return vec[
-      tuple('foo/bar/baz.gif', 'foo/bar'),
-      tuple('foo', '.'),
-      tuple('foo/bar/baz/', 'foo/bar'),
-      tuple('./', '.'),
+      tuple('foo/bar/baz.gif', 'foo/bar/'),
+      tuple('foo', './'),
+      tuple('foo/bar/baz/', 'foo/bar/'),
+      tuple('./', './'),
     ];
   }
 
   <<DataProvider('provideBasenameData')>>
-  public function testBasename(string $path, string $basename): void {
-    expect(Io\Path::create($path)->basename())->toBeSame($basename);
+  public function testBasename(string $path, string $expected): void {
+    expect(Io\Path::create($path)->basename())->toBeSame($expected);
   }
 
   public function provideBasenameData(): Container<(string, string)> {
@@ -311,6 +311,23 @@ class PathTest extends HackTest {
       tuple('foo/bar/baz/', 'baz'),
       tuple('/foo/bar/baz/', 'baz'),
       tuple('./', '.'),
+    ];
+  }
+
+  <<DataProvider('provideNameData')>>
+  public function testName(string $path, string $expected): void {
+    expect(Io\Path::create($path)->name())->toBeSame($expected);
+  }
+
+  public function provideNameData(): Container<(string, string)> {
+    return vec[
+      tuple('foo/bar/baz.gif', 'baz'),
+      tuple('/foo/bar/baz.gif', 'baz'),
+      tuple('foo/bar/baz', 'baz'),
+      tuple('/foo/bar/baz', 'baz'),
+      tuple('foo/bar/baz/', 'baz'),
+      tuple('/foo/bar/baz/', 'baz'),
+      tuple('./', ''),
     ];
   }
 
@@ -348,8 +365,8 @@ class PathTest extends HackTest {
       // same directory path
       tuple(__DIR__, __DIR__.'/../Io/', 0),
       tuple('/foo\\bar', '/foo/bar/', 0),
-      tuple(__DIR__, __DIR__.'/..', -1),
-      tuple(__DIR__.'/..', __DIR__, 1),
+      tuple(__DIR__, __DIR__.'/..', 3),
+      tuple(__DIR__.'/..', __DIR__, -3),
     ];
   }
 }
