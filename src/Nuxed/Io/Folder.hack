@@ -17,7 +17,6 @@ use function mkdir;
 use function is_file;
 use function unlink;
 use function rmdir;
-use function touch;
 use function clearstatcache;
 
 final class Folder extends Node implements IteratorAggregate<Node> {
