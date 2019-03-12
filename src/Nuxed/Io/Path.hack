@@ -258,6 +258,6 @@ final class Path implements Stringish {
       $self = Str\slice($self, 0, Str\length($self) - 1);
     }
 
-    return $other <=> $self;
+    return Str\compare($self, $other);
   }
 }
