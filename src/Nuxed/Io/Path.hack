@@ -4,7 +4,6 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\Filesystem;
-use type Nuxed\Io\Exception\InvalidArgumentException;
 use type Stringish;
 use function realpath;
 use function pathinfo;
