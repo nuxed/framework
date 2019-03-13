@@ -253,8 +253,8 @@ trait NodeTestTrait {
   }
 
   protected function markAsSkippedIfRoot(): void {
-    if (getenv('USER') === 'root') {
-      static::markTestSkipped('Skipped test for root.');
+    if (!getenv('USER') || 'root' === getenv('USER')) {
+      static::markTestSkipped('Skipped test for superuser.');
     }
   }
 }

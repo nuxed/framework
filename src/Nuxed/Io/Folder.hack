@@ -147,7 +147,8 @@ final class Folder extends Node implements IteratorAggregate<Node> {
         continue;
       }
 
-      $destroy = async {};
+      $destroy = async {
+      };
       // Delete target since File::copy() will throw exception
       if ($process === OperationType::MERGE && $to->exists() && $to->isFile()) {
         $destroy = Node::destroy($to);
