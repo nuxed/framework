@@ -12,7 +12,43 @@ use function getenv;
 
 trait NodeTestTrait {
   use IoTestTrait;
+
   require extends HackTest;
+
+  <<DataProvider('provideNodes')>>
+  public async function testChmod(Io\Node $node): Awaitable<void> {
+    $permissions = $node->permissions() ?? 0755;
+
+    $ret = await $node->chmod(0111, true);
+    expect($ret)->toBeTrue();
+    expect($node->permissions())->toBeSame(0111);
+
+    $ret = await $node->chmod(0222, true);
+    expect($ret)->toBeTrue();
+    expect($node->permissions())->toBeSame(0222);
+
+    $ret = await $node->chmod(0333, true);
+    expect($ret)->toBeTrue();
+    expect($node->permissions())->toBeSame(0333);
+
+    $ret = await $node->chmod(0444, true);
+    expect($ret)->toBeTrue();
+    expect($node->permissions())->toBeSame(0444);
+
+    $ret = await $node->chmod(0555, true);
+    expect($ret)->toBeTrue();
+    expect($node->permissions())->toBeSame(0555);
+
+    $ret = await $node->chmod(0666, true);
+    expect($ret)->toBeTrue();
+    expect($node->permissions())->toBeSame(0666);
+
+    $ret = await $node->chmod(0777, true);
+    expect($ret)->toBeTrue();
+    expect($node->permissions())->toBeSame(0777);
+
+    await $node->chmod($permissions, true);
+  }
 
   <<DataProvider('provideNodes')>>
   public async function testAccessTime(Io\Node $node): Awaitable<void> {
@@ -118,6 +154,8 @@ trait NodeTestTrait {
 
   <<DataProvider('provideNodes')>>
   public async function testWritable(Io\Node $node): Awaitable<void> {
+    $this->markAsSkippedIfRoot();
+
     $mode = $node->permissions() ?? 0755;
 
     // write only
@@ -134,6 +172,8 @@ trait NodeTestTrait {
 
   <<DataProvider('provideNodes')>>
   public async function testReadable(Io\Node $node): Awaitable<void> {
+    $this->markAsSkippedIfRoot();
+
     $mode = $node->permissions() ?? 0755;
 
     // read only
@@ -150,6 +190,8 @@ trait NodeTestTrait {
 
   <<DataProvider('provideNodes')>>
   public async function testExecutable(Io\Node $node): Awaitable<void> {
+    $this->markAsSkippedIfRoot();
+
     $mode = $node->permissions() ?? 0755;
 
     // execute only
@@ -208,5 +250,11 @@ trait NodeTestTrait {
     }
 
     return $ret;
+  }
+
+  protected function markAsSkippedIfRoot(): void {
+    if (getenv('USER') === 'root') {
+      static::markTestSkipped('Skipped test for root.');
+    }
   }
 }

@@ -48,6 +48,8 @@ class FileTest extends HackTest {
 
   public async function testGetReadHandleThrowsForUnreadableFiles(
   ): Awaitable<void> {
+    $this->markAsSkippedIfRoot();
+
     $file = static::createFile();
     await $file->chmod(0000);
     expect(async () ==> {
@@ -57,6 +59,8 @@ class FileTest extends HackTest {
 
   public async function testGetWriteHandleThrowsForUnwritableFiles(
   ): Awaitable<void> {
+    $this->markAsSkippedIfRoot();
+
     $file = static::createFile();
     // execute only
     await $file->chmod(0111);
@@ -321,6 +325,8 @@ class FileTest extends HackTest {
   }
 
   public function testAppendThrowsIfFileIsNotWritable(): void {
+    $this->markAsSkippedIfRoot();
+
     expect(async () ==> {
       $file = static::createFile();
       // read only
@@ -343,6 +349,8 @@ class FileTest extends HackTest {
   }
 
   public function testPrependThrowsIfFileIsNotWritable(): void {
+    $this->markAsSkippedIfRoot();
+
     expect(async () ==> {
       $file = static::createFile();
       // read only
@@ -355,6 +363,8 @@ class FileTest extends HackTest {
   }
 
   public function testPrependThrowsIfFileIsNotReadable(): void {
+    $this->markAsSkippedIfRoot();
+
     expect(async () ==> {
       $file = static::createFile();
       // execute only
