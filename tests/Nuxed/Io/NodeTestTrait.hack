@@ -118,6 +118,8 @@ trait NodeTestTrait {
 
   <<DataProvider('provideNodes')>>
   public async function testWritable(Io\Node $node): Awaitable<void> {
+    $mode = $node->permissions() ?? 0755;
+
     // write only
     await $node->chmod(0222);
     expect($node->writable())->toBeTrue();
@@ -125,10 +127,15 @@ trait NodeTestTrait {
     // execute + read only
     await $node->chmod(0555);
     expect($node->writable())->toBeFalse();
+
+    // reset
+    await $node->chmod($mode, true);
   }
 
   <<DataProvider('provideNodes')>>
   public async function testReadable(Io\Node $node): Awaitable<void> {
+    $mode = $node->permissions() ?? 0755;
+
     // read only
     await $node->chmod(0444);
     expect($node->readable())->toBeTrue();
@@ -136,10 +143,15 @@ trait NodeTestTrait {
     // execute + write only
     await $node->chmod(0333);
     expect($node->readable())->toBeFalse();
+
+    // reset
+    await $node->chmod($mode, true);
   }
 
   <<DataProvider('provideNodes')>>
   public async function testExecutable(Io\Node $node): Awaitable<void> {
+    $mode = $node->permissions() ?? 0755;
+
     // execute only
     await $node->chmod(0111);
     expect($node->executable())->toBeTrue();
@@ -147,6 +159,9 @@ trait NodeTestTrait {
     // read + write only
     await $node->chmod(0666);
     expect($node->executable())->toBeFalse();
+
+    // reset
+    await $node->chmod($mode, true);
   }
 
   // Data providers

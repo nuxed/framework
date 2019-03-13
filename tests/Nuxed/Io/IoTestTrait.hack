@@ -13,7 +13,6 @@ trait IoTestTrait {
 
   public static async function afterLastTestAsync(): Awaitable<void> {
     $tmp = static::temporaryFolder();
-    await $tmp->chmod(0777, true);
     await $tmp->delete();
   }
 
