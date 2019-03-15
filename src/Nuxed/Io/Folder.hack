@@ -7,6 +7,7 @@ use namespace HH\Lib\Vec;
 use type Nuxed\Io\Exception\InvalidPathException;
 use type Iterator;
 use type Exception;
+use type SplFileInfo;
 use type GlobIterator;
 use type IteratorAggregate;
 use type FilesystemIterator;
@@ -264,21 +265,26 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     }
 
     try {
-      $flags = FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS;
+      $directory = $this->path()->toString();
+      $flags = FilesystemIterator::SKIP_DOTS |
+        FilesystemIterator::UNIX_PATHS |
+        FilesystemIterator::NEW_CURRENT_AND_KEY;
 
       if ($recursive) {
         $iterator = new RecursiveIteratorIterator(
-          new RecursiveDirectoryIterator($this->path(), $flags),
+          new RecursiveDirectoryIterator($directory, $flags),
           RecursiveIteratorIterator::CHILD_FIRST,
         );
       } else {
-        $iterator = new FilesystemIterator($this->path(), $flags);
+        $iterator = new FilesystemIterator($directory, $flags);
       }
     } catch (Exception $e) {
       return $contents;
     }
 
-    foreach ($iterator as $file) {
+    $iterator->rewind();
+    while ($iterator->valid()) {
+      $file = $iterator->current() as SplFileInfo;
       if (
         $file->isDir() && ($filter === Node::class || $filter === Folder::class)
       ) {
@@ -288,6 +294,8 @@ final class Folder extends Node implements IteratorAggregate<Node> {
       ) {
         $contents[] = new File(Path::create($file->getPathname()));
       }
+
+      $iterator->next();
     }
 
     if ($sort) {
@@ -322,14 +330,14 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    */
   <<__Override>>
   public function reset(Path $path = $this->path()): this {
-      if ($path->exists() && $path->isFile()) {
-        throw new InvalidPathException(
-          Str\format(
+    if ($path->exists() && $path->isFile()) {
+      throw new InvalidPathException(
+        Str\format(
           'Invalid folder path (%s), files are not allowed',
-            $path->toString(),
-          ),
-        );
-      }
+          $path->toString(),
+        ),
+      );
+    }
 
     return parent::reset($path);
   }
