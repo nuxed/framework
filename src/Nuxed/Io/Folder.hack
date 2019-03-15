@@ -326,21 +326,15 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    * {@inheritdoc}
    */
   <<__Override>>
-  public function reset(Path $path = Path::create('')): this {
-    if ('' !== $path->toString()) {
+  public function reset(Path $path = $this->path()): this {
       if ($path->exists() && $path->isFile()) {
         throw new InvalidPathException(
           Str\format(
-            'Invalid folder path %s, files are not allowed',
+          'Invalid folder path (%s), files are not allowed',
             $path->toString(),
           ),
         );
       }
-
-      if (!Str\ends_with($path->toString(), '/')) {
-        $path = Path::create(Path::standard($path->toString(), true));
-      }
-    }
 
     return parent::reset($path);
   }
@@ -366,11 +360,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
       return null;
     }
 
-    $path = Path::create(Str\format(
-      '%s%s',
-      Path::normalize($this->path()->toString().'/') as string,
-      $file,
-    ));
+    $path = Path::create(Str\format('%s/%s', $this->path()->toString(), $file));
 
     if ($path->exists()) {
       throw new Exception\ExistingFileException(

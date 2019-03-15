@@ -44,7 +44,8 @@ abstract class Node {
     bool $create = false,
     int $mode = 0755,
   ) {
-    $this->path = Path::create($path);
+    $this->path = $this->normalizePath(Path::create($path));
+
     $this->reset($this->path);
 
     if ($create) {
@@ -413,11 +414,8 @@ abstract class Node {
   /**
    * Reset the cache and path.
    */
-  public function reset(Path $path = Path::create('')): this {
-    if ('' !== $path->toString()) {
-      $this->path = $path;
-    }
-
+  public function reset(Path $path = $this->path): this {
+    $this->path = $this->normalizePath($path);
     clearstatcache();
 
     return $this;
@@ -433,5 +431,16 @@ abstract class Node {
    */
   public function writable(): bool {
     return is_writable($this->path()->toString());
+  }
+
+  /**
+   * Return the path normalized if it exists.
+   */
+  private function normalizePath(Path $path): Path {
+    if ($path->exists()) {
+      return Path::create(Path::normalize($path->toString()) as string);
+    }
+
+    return $path;
   }
 }

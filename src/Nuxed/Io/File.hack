@@ -216,8 +216,8 @@ final class File extends Node {
    * Reset the cache and path.
    */
   <<__Override>>
-  public function reset(Path $path = Path::create('')): this {
-    if ($path->toString() !== '' && $path->exists() && $path->isDirectory()) {
+  public function reset(Path $path = $this->path()): this {
+    if ($path->exists() && $path->isDirectory()) {
       throw new InvalidPathException(
         Str\format(
           'Invalid file path (%s), folders are not allowed.',
