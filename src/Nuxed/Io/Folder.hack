@@ -132,7 +132,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     $target = $destination->path();
 
     // Recursively copy over contents to new destination
-    $contents = await $this->read(true, true, Node::class);
+    $contents = await $this->read(false, true, Node::class);
 
     $awaitables = vec[];
     foreach ($contents as $node) {
