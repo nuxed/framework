@@ -134,7 +134,7 @@ trait NodeTestTrait {
   ): Awaitable<void> {
     expect(async () ==> {
       await $node->rename($another->basename(), false);
-    })->toThrow(Io\Exception\ExistingFileException::class, 'already exists');
+    })->toThrow(Io\Exception\ExistingNodeException::class, 'already exists');
   }
 
   <<DataProvider('provideNodes')>>

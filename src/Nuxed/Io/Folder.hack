@@ -366,7 +366,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     $path = Path::create(Str\format('%s/%s', $this->path()->toString(), $file));
 
     if ($path->exists()) {
-      throw new Exception\ExistingFileException(
+      throw new Exception\ExistingNodeException(
         Str\format('File (%s) already exist.', $path->toString()),
       );
     }

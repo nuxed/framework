@@ -1,9 +1,9 @@
 namespace Nuxed\Io\Exception;
 
 /**
- * Exception thrown when a target file destination already exists.
+ * Exception thrown when a target node destination already exists.
  */
-class ExistingFileException
+class ExistingNodeException
   extends RuntimeException
   implements ExceptionInterface {
 }

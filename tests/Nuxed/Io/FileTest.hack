@@ -154,7 +154,7 @@ class FileTest extends HackTest {
       $file = static::createFile();
       $target = static::createFile()->path();
       await $file->copy($target, Io\OperationType::SKIP);
-    })->toThrow(Io\Exception\ExistingFileException::class);
+    })->toThrow(Io\Exception\ExistingNodeException::class);
   }
 
   public async function testCopyReturnsNullWhenOperationFails(

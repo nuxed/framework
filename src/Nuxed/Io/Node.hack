@@ -3,8 +3,6 @@ namespace Nuxed\Io;
 use namespace HH\Asio;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Regex;
-use type Nuxed\Io\Exception\MissingFileException;
-use type Nuxed\Io\Exception\ExistingFileException;
 use type Stringish;
 use function is_writable;
 use function is_readable;
@@ -275,7 +273,7 @@ abstract class Node {
       if ($overwrite) {
         await static::destroy($target);
       } else {
-        throw new ExistingFileException(
+        throw new Exception\ExistingNodeException(
           'Cannot move file as the target already exists',
         );
       }
@@ -394,7 +392,7 @@ abstract class Node {
       if ($overwrite) {
         await static::destroy($target);
       } else {
-        throw new ExistingFileException(Str\format(
+        throw new Exception\ExistingNodeException(Str\format(
           'Cannot rename file as the target (%s) already exists.',
           $target->toString(),
         ));

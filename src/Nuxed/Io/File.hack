@@ -4,8 +4,6 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\Filesystem;
-use type Nuxed\Io\Exception\ExistingFileException;
-use type Nuxed\Io\Exception\InvalidPathException;
 use type Exception;
 use function filesize;
 use function touch;
@@ -52,7 +50,7 @@ final class File extends Node {
     Filesystem\FileWriteMode $mode = Filesystem\FileWriteMode::OPEN_OR_CREATE,
   ): Filesystem\DisposableFileWriteHandle {
     if ($mode === Filesystem\FileWriteMode::MUST_CREATE && $this->exists()) {
-      throw new Exception\ExistingFileException(Str\format(
+      throw new Exception\ExistingNodeException(Str\format(
         'Cannot re-create file (%s) for writing.',
         $this->path()->toString(),
       ));
@@ -148,7 +146,7 @@ final class File extends Node {
     }
 
     if ($target->exists() && $process !== OperationType::OVERWRITE) {
-      throw new ExistingFileException(
+      throw new Exception\ExistingNodeException(
         'Cannot copy file as the target already exists.',
       );
     }
@@ -218,7 +216,7 @@ final class File extends Node {
   <<__Override>>
   public function reset(Path $path = $this->path()): this {
     if ($path->exists() && $path->isDirectory()) {
-      throw new InvalidPathException(
+      throw new Exception\InvalidPathException(
         Str\format(
           'Invalid file path (%s), folders are not allowed.',
           $path->toString(),
