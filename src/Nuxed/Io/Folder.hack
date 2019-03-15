@@ -17,11 +17,6 @@ use function rmdir;
 use function clearstatcache;
 
 final class Folder extends Node implements IteratorAggregate<Node> {
-
-  const ALL = 0;
-  const FILES = 1;
-  const FOLDERS = 2;
-
   /**
    * Change directory. Alias for reset().
    */
