@@ -344,7 +344,7 @@ final class File extends Node {
   /**
    * Creates a symbolic link.
    */
-  public function symlink(Path $target): File {
+  public async function symlink(Path $target): Awaitable<File> {
     if (!$this->exists()) {
       throw new Exception\MissingFileException(
         Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
@@ -372,7 +372,7 @@ final class File extends Node {
   /**
    * Create a hard link.
    */
-  public function link(Path $link): File {
+  public async function link(Path $link): Awaitable<File> {
     if (!$this->exists()) {
       throw new Exception\MissingFileException(
         Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),

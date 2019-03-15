@@ -39,7 +39,6 @@ trait IoTestTrait {
   protected static function createSymlink(): Io\File {
     $file = static::createFile();
     $symlink = static::createPath();
-    $file->symlink($symlink);
-    return new Io\File($symlink);
+    return Asio\join($file->symlink($symlink));
   }
 }

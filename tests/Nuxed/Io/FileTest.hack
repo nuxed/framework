@@ -461,8 +461,11 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideLinkData')>>
-  public function testLink(Io\File $file, Io\Path $path): void {
-    $link = $file->link($path);
+  public async function testLink(
+    Io\File $file,
+    Io\Path $path,
+  ): Awaitable<void> {
+    $link = await $file->link($path);
     expect($path->exists())->toBeTrue();
     expect($link->path()->toString())->toBeSame($path->toString());
   }
@@ -475,22 +478,25 @@ class FileTest extends HackTest {
   }
 
   public function testLinkThrowsIfLinkExists(): void {
-    expect(() ==> {
+    expect(async () ==> {
       $file = static::createFile();
-      $file->link(static::createFile()->path());
+      await $file->link(static::createFile()->path());
     })->toThrow(Io\Exception\InvalidPathException::class, 'already exists.');
   }
 
   public function testLinkThrowsIfFileIsMissing(): void {
-    expect(() ==> {
+    expect(async () ==> {
       $file = new Io\File(static::createPath(), false);
-      $file->link(static::createPath());
+      await $file->link(static::createPath());
     })->toThrow(Io\Exception\MissingFileException::class, 'doesn\'t exist');
   }
 
   <<DataProvider('provideSymlinkData')>>
-  public function testSymlink(Io\File $file, Io\Path $path): void {
-    $link = $file->symlink($path);
+  public async function testSymlink(
+    Io\File $file,
+    Io\Path $path,
+  ): Awaitable<void> {
+    $link = await $file->symlink($path);
     expect($link->path()->isSymlink())->toBeTrue();
     expect($link->path()->toString())->toBeSame($path->toString());
   }
@@ -503,16 +509,16 @@ class FileTest extends HackTest {
   }
 
   public function testSymlinkThrowsIfLinkExists(): void {
-    expect(() ==> {
+    expect(async () ==> {
       $file = static::createFile();
-      $file->symlink(static::createFile()->path());
+      await $file->symlink(static::createFile()->path());
     })->toThrow(Io\Exception\InvalidPathException::class, 'already exists.');
   }
 
   public function testSymlinkThrowsIfFileIsMissing(): void {
-    expect(() ==> {
+    expect(async () ==> {
       $file = new Io\File(static::createPath(), false);
-      $file->symlink(static::createPath());
+      await $file->symlink(static::createPath());
     })->toThrow(Io\Exception\MissingFileException::class, 'doesn\'t exist');
   }
 
