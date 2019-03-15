@@ -22,6 +22,7 @@ trait IoTestTrait {
 
   protected static function createPath(): Io\Path {
     $path = static::temporaryFolder()->path()->toString().
+      '/'.
       PseudoRandom\string(32, 'qwertyuiopasdfghjklzxcvbnm123456789');
     return Io\Path::create($path);
   }
