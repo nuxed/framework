@@ -231,7 +231,7 @@ abstract class Node {
   final public static function load(Stringish $path): Node {
     $path = Path::create($path);
     if (!$path->exists()) {
-      throw new MissingFileException(
+      throw new Exception\MissingNodeException(
         Str\format('No file or folder found at %s', $path->toString()),
       );
     }

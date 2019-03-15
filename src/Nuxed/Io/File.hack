@@ -61,7 +61,7 @@ final class File extends Node {
     $creating = $mode === Filesystem\FileWriteMode::OPEN_OR_CREATE ||
       $mode === Filesystem\FileWriteMode::MUST_CREATE;
     if (!$creating && !$this->exists()) {
-      throw new Exception\MissingFileException(
+      throw new Exception\MissingNodeException(
         Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
       );
     }
@@ -345,7 +345,7 @@ final class File extends Node {
    */
   public async function symlink(Path $target): Awaitable<File> {
     if (!$this->exists()) {
-      throw new Exception\MissingFileException(
+      throw new Exception\MissingNodeException(
         Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
       );
     }
@@ -373,7 +373,7 @@ final class File extends Node {
    */
   public async function link(Path $link): Awaitable<File> {
     if (!$this->exists()) {
-      throw new Exception\MissingFileException(
+      throw new Exception\MissingNodeException(
         Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
       );
     }

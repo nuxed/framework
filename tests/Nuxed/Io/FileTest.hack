@@ -488,7 +488,7 @@ class FileTest extends HackTest {
     expect(async () ==> {
       $file = new Io\File(static::createPath(), false);
       await $file->link(static::createPath());
-    })->toThrow(Io\Exception\MissingFileException::class, 'doesn\'t exist');
+    })->toThrow(Io\Exception\MissingNodeException::class, 'doesn\'t exist');
   }
 
   <<DataProvider('provideSymlinkData')>>
@@ -519,7 +519,7 @@ class FileTest extends HackTest {
     expect(async () ==> {
       $file = new Io\File(static::createPath(), false);
       await $file->symlink(static::createPath());
-    })->toThrow(Io\Exception\MissingFileException::class, 'doesn\'t exist');
+    })->toThrow(Io\Exception\MissingNodeException::class, 'doesn\'t exist');
   }
 
   public function provideNodes(): Container<(Io\Node)> {

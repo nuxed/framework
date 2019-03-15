@@ -40,7 +40,7 @@ class NodeTest extends HackTest {
   public function testLoadThrowsForNonExistingPath(): void {
     expect(() ==> Io\Node::load(Io\Path::create('missing')))
       ->toThrow(
-        Io\Exception\MissingFileException::class,
+        Io\Exception\MissingNodeException::class,
         'No file or folder found at missing',
       );
   }
