@@ -170,7 +170,7 @@ abstract class Node {
     Path $target,
     OperationType $process = OperationType::OVERWRITE,
     int $mode = 0755,
-  ): Awaitable<?Node>;
+  ): Awaitable<Node>;
 
   /**
    * Create the node.
