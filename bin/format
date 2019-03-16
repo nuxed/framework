@@ -2,32 +2,35 @@
 <?hh // strict
 
 use namespace HH\Asio;
+use namespace HH\Lib\Str;
+use namespace HH\Lib\Vec;
 
 require __DIR__.'/../vendor/autoload.hack';
 
 <<__EntryPoint>>
-async function format(): Awaitable<noreturn> {
+async function main(): Awaitable<noreturn> {
   Facebook\AutoloadMap\initialize();
 
-  $source = new Nuxed\Io\Folder(
-    Nuxed\Io\Path::create(__DIR__ . '/../src/Nuxed')
-  );
-  $source = await $source->files(true, true);
-  foreach ($source as $file) {
-    if ($file->path()->extension() === 'hack') {
-     exec('hackfmt -i '.$file->path()->toString());
-    }
-  }
+  $source = new Nuxed\Io\Folder(__DIR__.'/../src/Nuxed')
+    |> $$->files(false, true);
+  $source = await $source;
+  $wh = Vec\map($source, ($file) ==> format($file));
 
-  $tests = new Nuxed\Io\Folder(
-    Nuxed\Io\Path::create(__DIR__ . '/../tests/Nuxed')
-  );
-  $tests = await $tests->files(true, true);
-  foreach ($tests as $file) {
-    if ($file->path()->extension() === 'hack') {
-     exec('hackfmt -i '.$file->path()->toString());
-    }
-  }
+  $tests = new Nuxed\Io\Folder(__DIR__.'/../tests/Nuxed')
+    |> $$->files(false, true);
+  $tests = await $tests;
+  $wh = Vec\concat($wh, Vec\map($tests, ($file) ==> format($file)));
+
+  await Asio\v($wh);
 
   exit(0);
+}
+
+/**
+ * exec() blocks the thread so this is not actually async.
+ */
+async function format(Nuxed\Io\File $file): Awaitable<void> {
+  if ($file->extension() === 'hack') {
+    exec(Str\format('bash -c "hackfmt -i %s /dev/null 2>&1 &"', $file->path()->toString()));
+  }
 }
