@@ -185,10 +185,6 @@ final class File extends Node {
       );
     }
 
-    if (Str\contains($this->path()->toString(), 'FileTest.hack')) {
-      throw new Exception\RuntimeException('f');
-    }
-
     $deleted = unlink($this->path()->toString());
     $this->reset();
     return $deleted;
