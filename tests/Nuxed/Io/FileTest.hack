@@ -19,8 +19,8 @@ class FileTest extends HackTest {
 
   public function provideLoadData(): Container<(Io\Path)> {
     return vec[
-      tuple(Io\Path::create(__FILE__)),
-      tuple(Io\Path::create(__DIR__.'/PathTest.hack')),
+      tuple(static::createFile()->path()),
+      tuple(static::createFile()->path()),
       tuple(static::createFile()->path()),
       tuple(static::createSymlink()->path()),
     ];
@@ -130,22 +130,24 @@ class FileTest extends HackTest {
     expect($path->exists())->toBeFalse();
     $file = new Io\File($path, false);
     $ret = await $file->create();
+    expect($ret)->toBeTrue();
     expect($dir->exists())->toBeTrue();
     expect($path->exists())->toBeTrue();
   }
 
-  public async function testCreateFailsIfFileAlreadyExist(): Awaitable<void> {
-    $file = static::createFile();
-    $ret = await $file->create();
-    expect($ret)->toBeFalse();
+  public function testCreateThrowsIfFileAlreadyExist(): void {
+    expect(async () ==> {
+      $file = static::createFile();
+      await $file->create();
+    })->toThrow(Io\Exception\ExistingNodeException::class);
   }
 
-  public async function testCopyReturnsNullIfFileDoesntExist(
-  ): Awaitable<void> {
-    $file = static::createFile();
-    await $file->delete();
-    $ret = await $file->copy(static::createPath());
-    expect($ret)->toBeNull();
+  public function testCopyThrowsIfFileDoesntExist(): void {
+    expect(async () ==> {
+      $file = static::createFile();
+      await $file->delete();
+      await $file->copy(static::createPath());
+    })->toThrow(Io\Exception\MissingNodeException::class);
   }
 
   public async function testCopyThrowsIfTargetExistWithSkipOperation(
@@ -157,22 +159,21 @@ class FileTest extends HackTest {
     })->toThrow(Io\Exception\ExistingNodeException::class);
   }
 
-  public async function testCopyReturnsNullWhenOperationFails(
-  ): Awaitable<void> {
-    $file = static::createFile();
-    $path = Io\Path::create('/foo/bar/baz.tmp');
-    $ret = await $file->copy($path);
-    expect($ret)->toBeNull();
+  public function testCopyThrowsWhenOperationFails(): void {
+    expect(async () ==> {
+      $file = static::createFile();
+      $path = Io\Path::create('/foo/bar/baz.tmp');
+      await $file->copy($path);
+    })->toThrow(Io\Exception\RuntimeException::class);
   }
 
-  public async function testCopySetsTargetPermissionsToSamePermissionsOfTheFile(
+  public async function testCopySetsTargetPermissionsTo0755ByDefault(
   ): Awaitable<void> {
     $file = static::createFile();
-    await $file->chmod(0766);
     $path = static::createPath();
     $copy = await $file->copy($path);
     expect($copy)->toBeInstanceOf(Io\File::class);
-    expect($copy->permissions())->toBeSame(0766);
+    expect($copy->permissions())->toBeSame(0755);
   }
 
   public async function testCopyWithPermissions(): Awaitable<void> {
@@ -188,11 +189,12 @@ class FileTest extends HackTest {
     expect($ret)->toBeTrue();
   }
 
-  public async function testDeleteReturnsFalseIfFileDoesntExists(
-  ): Awaitable<void> {
-    $file = new Io\File(static::createPath(), $createFile = false);
-    $ret = await $file->delete();
-    expect($ret)->toBeFalse();
+  public function testDeleteThrowsIfFileDoesntExists(): void {
+    expect(async () ==> {
+      $a = new Io\File(static::createPath())
+        |> $$->delete();
+      await $a;
+    })->toThrow(Io\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideExtensionData')>>
@@ -213,11 +215,10 @@ class FileTest extends HackTest {
   public function provideExtensionData(): Container<(Io\Path, ?string)> {
     return vec[
       tuple(Io\Path::create(''), null),
-      tuple(Io\Path::create(__FILE__), 'hack'),
       tuple(Io\Path::create('path/to/hhvm-4-main.hack'), 'hack'),
       tuple(Io\Path::create('path/to/hhvm-3-main.hh'), 'hh'),
       tuple(Io\Path::create('config.yml'), 'yml'),
-      tuple(Io\Path::create(__DIR__.'/../../.gitignore'), 'gitignore'),
+      tuple(Io\Path::create('.gitignore'), 'gitignore'),
       tuple(Io\Path::create('example.foo.bar'), 'bar'),
     ];
   }
@@ -250,9 +251,11 @@ class FileTest extends HackTest {
     expect(\bin2hex($hash))->toBeSame('c934dc050854790967503f84a39742c1');
   }
 
-  public function testMd5ReturnsEmptyStringIfFileDoesntExists(): void {
-    $file = new Io\File('/foo/bar', false);
-    expect($file->md5())->toBeEmpty();
+  public function testMd5ThrowsFileDoesntExists(): void {
+    expect(() ==> {
+      new Io\File('/foo/bar', false)
+      |> $$->md5();
+    })->toThrow(Io\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideMimeTypeData')>>
@@ -276,9 +279,11 @@ class FileTest extends HackTest {
     ];
   }
 
-  public function testMimeTypeReturnsEmptyStringIfFileDoesntExists(): void {
-    $file = new Io\File(__DIR__.'/foo.hack', false);
-    expect($file->mimeType())->toBeEmpty();
+  public function testMimeTypeThrowsIfFileDoesntExists(): void {
+    expect(() ==> {
+      new Io\File(static::createPath(), false)
+      |> $$->mimeType();
+    })->toThrow(Io\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideResetData')>>
@@ -289,8 +294,9 @@ class FileTest extends HackTest {
   public function provideResetData(): Container<(Io\File, Io\Path)> {
     return vec[
       tuple(static::createFile(), static::createPath()),
-      tuple(Io\Node::load(__FILE__) as Io\File, static::createPath()),
-      tuple(Io\Node::load(__FILE__) as Io\File, Io\Path::create(__FILE__)),
+      tuple(static::createFile(), static::createPath()),
+      tuple(static::createFile(), static::createPath()),
+      tuple(static::createFile(), static::createPath()),
     ];
   }
 
@@ -304,7 +310,7 @@ class FileTest extends HackTest {
 
   public function testResetThrowsIfProvidedPathIsAFolder(): void {
     expect(() ==> {
-      $path = Io\Path::create(__DIR__);
+      $path = static::createFolder()->path();
       $file = static::createFile();
       $file->reset($path);
     })->toThrow(
@@ -473,7 +479,9 @@ class FileTest extends HackTest {
   public function provideLinkData(): Container<(Io\File, Io\Path)> {
     return vec[
       tuple(static::createFile(), static::createPath()),
-      tuple(Io\Node::load(__FILE__) as Io\File, static::createPath()),
+      tuple(static::createFile(), static::createPath()),
+      tuple(static::createFile(), static::createPath()),
+      tuple(static::createFile(), static::createPath()),
     ];
   }
 
@@ -504,7 +512,8 @@ class FileTest extends HackTest {
   public function provideSymlinkData(): Container<(Io\File, Io\Path)> {
     return vec[
       tuple(static::createFile(), static::createPath()),
-      tuple(Io\Node::load(__FILE__) as Io\File, static::createPath()),
+      tuple(static::createFile(), static::createPath()),
+      tuple(static::createFile(), static::createPath()),
     ];
   }
 

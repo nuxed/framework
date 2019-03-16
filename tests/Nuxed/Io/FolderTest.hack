@@ -20,12 +20,13 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testCreateRetrunsFalseIfFolderExists(
+  public function testCreateRetrunsFalseIfFolderExists(
     Io\Folder $folder,
-  ): Awaitable<void> {
-    expect($folder->exists())->toBeTrue();
-    $ret = await $folder->create(0755);
-    expect($ret)->toBeFalse();
+  ): void {
+    expect(async () ==> {
+      expect($folder->exists())->toBeTrue();
+      await $folder->create();
+    })->toThrow(Io\Exception\ExistingNodeException::class);
   }
 
   <<DataProvider('provideNodes')>>
@@ -78,18 +79,12 @@ class FolderTest extends HackTest {
     $targetSize = await $target->size();
     expect($targetSize)->toBeSame(1);
     $copy = await $folder->copy($target->path(), Io\OperationType::OVERWRITE);
-    expect($copy?->exists())->toBeTrue();
+    expect($copy->exists())->toBeTrue();
     $copy as Io\Folder;
     list($folderSize, $copySize) =
       await Tuple\from_async($folder->size(), $copy->size());
     expect($copySize)->toNotBeSame($targetSize);
     expect($copySize)->toBeSame($folderSize);
-
-  }
-
-  public async function testCopyThrowsWithSkipOperationIfTargetExist(
-    Io\Folder $folder,
-  ): Awaitable<void> {
 
   }
 

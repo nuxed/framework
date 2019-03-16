@@ -15,7 +15,6 @@ use type RecursiveIteratorIterator;
 use type RecursiveDirectoryIterator;
 use function mkdir;
 use function rmdir;
-use function clearstatcache;
 
 final class Folder extends Node implements IteratorAggregate<Node> {
   /**
@@ -96,11 +95,14 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    */
   <<__Override>>
   public async function create(int $mode = 0755): Awaitable<bool> {
-    $ret = false;
-    if (!$this->exists()) {
-      $ret = (bool)@mkdir($this->path()->toString(), $mode, true);
+    if ($this->exists()) {
+      throw new Exception\ExistingNodeException(Str\format(
+        'Folder (%s) already exists.',
+        $this->path()->toString()
+      ));
     }
 
+    $ret = @mkdir($this->path()->toString(), $mode, true) as bool;
     $this->reset();
     return $ret;
   }
@@ -113,9 +115,11 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     Path $target,
     OperationType $process = OperationType::MERGE,
     int $mode = 0755,
-  ): Awaitable<?Folder> {
+  ): Awaitable<Folder> {
     if (!$this->exists()) {
-      return null;
+      throw new Exception\MissingNodeException(
+        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
     // Delete the target folder if overwrite is true
@@ -157,7 +161,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     }
 
     await Asio\v($awaitables);
-    clearstatcache();
+    $this->reset();
     return $destination;
   }
 
@@ -171,8 +175,9 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     }
 
     await $this->flush();
+    $deleted = @rmdir($this->path()->toString()) as bool;
     $this->reset();
-    return @rmdir($this->path()->toString());
+    return $deleted;
   }
 
   /**
@@ -181,10 +186,19 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   public async function flush(): Awaitable<this> {
     // delete files first.
     $files = await $this->files(false, true);
-    await Asio\v(Vec\map($files, ($file) ==> $file->delete()));
+    await Asio\v(Vec\map($files, async ($file) ==> {
+      if ($file->exists()) {
+        return await $file->delete();
+      }
+    }));
+
     // delete rest of the nodes.
     $nodes = await $this->read(false, true, Node::class);
-    await Asio\v(Vec\map($nodes, ($node) ==> $node->delete()));
+    await Asio\v(Vec\map($nodes, async ($node) ==> {
+      if ($node->exists()) {
+        return await $node->delete();
+      }
+    }));
     return $this;
   }
 
@@ -347,20 +361,21 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    */
   <<__Override>>
   public async function size(): Awaitable<int> {
-    if ($this->exists()) {
-      $nodes = await $this->read(false, true, Node::class);
-      return C\count($nodes);
+    if (!$this->exists()) {
+      throw new Exception\MissingNodeException(
+        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
-    return 0;
+    $nodes = await $this->read(false, true, Node::class);
+    return C\count($nodes);
   }
 
-  public async function touch(
-    string $file,
-    int $mode = 0755,
-  ): Awaitable<?File> {
+  public async function touch(string $file, int $mode = 0755): Awaitable<File> {
     if (!$this->exists()) {
-      return null;
+      throw new Exception\MissingNodeException(
+        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
     $path = Path::create(Str\format('%s/%s', $this->path()->toString(), $file));

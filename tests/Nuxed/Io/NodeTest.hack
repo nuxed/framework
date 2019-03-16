@@ -41,7 +41,7 @@ class NodeTest extends HackTest {
     expect(() ==> Io\Node::load(Io\Path::create('missing')))
       ->toThrow(
         Io\Exception\MissingNodeException::class,
-        'No file or folder found at missing',
+        'Node (missing) doesn\'t exist.',
       );
   }
 
@@ -61,8 +61,9 @@ class NodeTest extends HackTest {
     ];
   }
 
-  public function testDestoryReturnsFalseForNonExistingPath(): void {
-    $result = Asio\join(Io\Node::destroy(static::createPath()));
-    expect($result)->toBeFalse();
+  public function testDestoryThrowsForMissinPath(): void {
+    expect(async () ==> {
+      await Io\Node::destroy(static::createPath());
+    })->toThrow(Io\Exception\MissingNodeException::class);
   }
 }

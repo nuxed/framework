@@ -15,7 +15,6 @@ use function symlink;
 use function finfo_close;
 use function finfo_file;
 use function finfo_open;
-use function clearstatcache;
 use function tempnam;
 use function sys_get_temp_dir;
 use const FILEINFO_MIME_TYPE;
@@ -108,6 +107,13 @@ final class File extends Node {
    */
   <<__Override>>
   public async function create(int $mode = 0755): Awaitable<bool> {
+    if ($this->exists()) {
+      throw new Exception\ExistingNodeException(Str\format(
+        'File (%s) already exists.',
+        $this->path()->toString(),
+      ));
+    }
+
     $folder = $this->parent();
 
     if (null === $folder) {
@@ -118,17 +124,20 @@ final class File extends Node {
       await $folder->create();
     }
 
-    if (!$this->exists() && $folder->writable()) {
-      if (touch($this->path()->toString())) {
-        $ret = true;
-        if ($mode) {
-          $ret = await $this->chmod($mode);
-        }
-
-        return $ret;
+    if ($folder->writable()) {
+      $created = touch($this->path()->toString()) as bool;
+      if ($created) {
+        await $this->chmod($mode);
       }
+
+      return $created;
+    } else {
+      throw new Exception\UnwritableNodeException(Str\format(
+        'Parent Folder (%s) is not writable.',
+        $folder->path()->toString(),
+      ));
     }
- 
+
     return false;
   }
 
@@ -140,9 +149,11 @@ final class File extends Node {
     Path $target,
     OperationType $process = OperationType::OVERWRITE,
     int $mode = 0755,
-  ): Awaitable<?File> {
+  ): Awaitable<File> {
     if (!$this->exists()) {
-      return null;
+      throw new Exception\MissingNodeException(
+        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
     if ($target->exists() && $process !== OperationType::OVERWRITE) {
@@ -158,23 +169,29 @@ final class File extends Node {
       return $file;
     }
 
-    return null;
+    throw new Exception\RuntimeException(
+      'An error occurred while performing the copy operation.',
+    );
   }
 
   /**
-   * Remove the file if it exists.
+   * Remove the file.
    */
   <<__Override>>
   public async function delete(): Awaitable<bool> {
-    if ($this->exists()) {
+    if (!$this->exists()) {
+      throw new Exception\MissingNodeException(
+        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
+      );
+    }
+
+    if (Str\contains($this->path()->toString(), 'FileTest.hack')) {
+      throw new Exception\RuntimeException('f');
+    }
+
+    $deleted = unlink($this->path()->toString());
     $this->reset();
-
-    $ret = unlink($this->path()->toString());
-    clearstatcache();
-    return $ret;
-  }
-
-    return false;
+    return $deleted;
   }
 
   /**
@@ -188,11 +205,13 @@ final class File extends Node {
    * Return an MD5 checksum of the file.
    */
   public function md5(bool $raw = false): string {
-    if ($this->exists()) {
-      return md5_file($this->path()->toString(), $raw);
+    if (!$this->exists()) {
+      throw new Exception\MissingNodeException(
+        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
-    return '';
+    return md5_file($this->path()->toString(), $raw) as string;
   }
 
   /**
@@ -200,14 +219,16 @@ final class File extends Node {
    */
   public function mimeType(): string {
     if (!$this->exists()) {
-      return '';
+      throw new Exception\MissingNodeException(
+        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
     $info = finfo_open(FILEINFO_MIME_TYPE);
     $type = finfo_file($info, $this->path());
     finfo_close($info);
 
-    return $type;
+    return $type as string;
   }
 
   /**
@@ -331,11 +352,14 @@ final class File extends Node {
    */
   <<__Override>>
   public async function size(): Awaitable<int> {
-    if ($this->exists()) {
-      return filesize($this->path()->toString());
+    if (!$this->exists()) {
+      throw new Exception\MissingNodeException(
+        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
-    return 0;
+
+    return filesize($this->path()->toString()) as int;
   }
 
   /**

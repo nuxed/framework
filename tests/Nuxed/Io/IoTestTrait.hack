@@ -8,12 +8,17 @@ use type Facebook\HackTest\HackTest;
 trait IoTestTrait {
   require extends HackTest;
   public static async function beforeFirstTestAsync(): Awaitable<void> {
-    await static::temporaryFolder()->create();
+    $tmp = static::temporaryFolder();
+    if (!$tmp->exists()) {
+      await $tmp->create();
+    }
   }
 
   public static async function afterLastTestAsync(): Awaitable<void> {
     $tmp = static::temporaryFolder();
-    await $tmp->delete();
+    if ($tmp->exists()) {
+      await $tmp->delete();
+    }
   }
 
   protected static function temporaryFolder(): Io\Folder {

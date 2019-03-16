@@ -65,10 +65,9 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testAccessTimeReturnsZeroIfFileIsMissing(
-    Io\Node $node,
-  ): void {
-    expect($node->accessTime())->toBeSame(0);
+  public function testAccessTimeThrowsIfFileIsMissing(Io\Node $node): void {
+    expect(() ==> $node->accessTime())
+      ->toThrow(Io\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideNodes')>>
@@ -87,10 +86,9 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testChangeTimeReturnsZeroIfFileIsMissing(
-    Io\Node $node,
-  ): void {
-    expect($node->changeTime())->toBeSame(0);
+  public function testChangeTimeThrowsFileIsMissing(Io\Node $node): void {
+    expect(() ==> $node->changeTime())
+      ->toThrow(Io\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideNodes')>>
@@ -120,11 +118,11 @@ trait NodeTestTrait {
 
 
   <<DataProvider('provideMissingNodes')>>
-  public async function testRenameReturnsFlaseIfFileIsMissing(
+  public async function testRenameThrowsFileIsMissing(
     Io\Node $missing,
   ): Awaitable<void> {
-    $res = await $missing->rename('foo');
-    expect($res)->toBeFalse();
+    expect(() ==> $missing->rename('foo'))
+      ->toThrow(Io\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideExistingNodesPair')>>
