@@ -2,8 +2,8 @@ namespace Nuxed\Io\Exception;
 
 /**
  * Exception throw when trying to read or retrieve
- * a read handle of an unreadable file.
+ * a read handle of an unreadable node.
  */
-class UnreadableFileException
+class UnreadableNodeException
   extends RuntimeException
   implements ExceptionInterface {}

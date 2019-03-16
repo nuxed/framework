@@ -26,7 +26,7 @@ final class File extends Node {
   <<__ReturnDisposable>>
   public function getReadHandle(): Filesystem\DisposableFileReadHandle {
     if (!$this->readable()) {
-      throw new Exception\UnreadableFileException(
+      throw new Exception\UnreadableNodeException(
         Str\format('File (%s) is not readable.', $this->path()->toString()),
       );
     }
@@ -71,7 +71,7 @@ final class File extends Node {
       ) &&
       !$this->writable()
     ) {
-      throw new Exception\UnwritableFileException(
+      throw new Exception\UnwritableNodeException(
         Str\format('File (%s) is not writable.', $this->path()->toString()),
       );
     }
@@ -128,7 +128,7 @@ final class File extends Node {
         return $ret;
       }
     }
-
+ 
     return false;
   }
 
@@ -167,12 +167,12 @@ final class File extends Node {
   <<__Override>>
   public async function delete(): Awaitable<bool> {
     if ($this->exists()) {
-      $this->reset();
+    $this->reset();
 
-      $ret = unlink($this->path()->toString());
-      clearstatcache();
-      return $ret;
-    }
+    $ret = unlink($this->path()->toString());
+    clearstatcache();
+    return $ret;
+  }
 
     return false;
   }

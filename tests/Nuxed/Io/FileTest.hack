@@ -54,7 +54,7 @@ class FileTest extends HackTest {
     await $file->chmod(0000);
     expect(async () ==> {
       await using $handle = $file->getReadHandle();
-    })->toThrow(Io\Exception\UnreadableFileException::class);
+    })->toThrow(Io\Exception\UnreadableNodeException::class);
   }
 
   public async function testGetWriteHandleThrowsForUnwritableFiles(
@@ -66,7 +66,7 @@ class FileTest extends HackTest {
     await $file->chmod(0111);
     expect(async () ==> {
       await using $handle = $file->getWriteHandle();
-    })->toThrow(Io\Exception\UnwritableFileException::class);
+    })->toThrow(Io\Exception\UnwritableNodeException::class);
   }
 
   public async function testGetReadHandle(): Awaitable<void> {
@@ -172,14 +172,14 @@ class FileTest extends HackTest {
     $path = static::createPath();
     $copy = await $file->copy($path);
     expect($copy)->toBeInstanceOf(Io\File::class);
-    expect($copy?->permissions())->toBeSame(0766);
+    expect($copy->permissions())->toBeSame(0766);
   }
 
   public async function testCopyWithPermissions(): Awaitable<void> {
     $file = static::createFile();
     $path = static::createPath();
     $copy = await $file->copy($path, Io\OperationType::SKIP, 0733);
-    expect($copy?->permissions())->toBeSame(0733);
+    expect($copy->permissions())->toBeSame(0733);
   }
 
   public async function testDelete(): Awaitable<void> {

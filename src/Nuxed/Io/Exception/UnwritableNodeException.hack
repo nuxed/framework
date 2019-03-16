@@ -2,8 +2,8 @@ namespace Nuxed\Io\Exception;
 
 /**
  * Exception throw when trying to write or retrieve
- * a write handle of an unwritable file.
+ * a write handle of an unwritable node.
  */
-class UnwritableFileException
+class UnwritableNodeException
   extends RuntimeException
   implements ExceptionInterface {}
