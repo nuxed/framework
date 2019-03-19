@@ -93,10 +93,9 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   <<__Override>>
   public async function create(int $mode = 0755): Awaitable<bool> {
     if ($this->exists()) {
-      throw new Exception\ExistingNodeException(Str\format(
-        'Folder (%s) already exists.',
-        $this->path()->toString()
-      ));
+      throw new Exception\ExistingNodeException(
+        Str\format('Folder (%s) already exists.', $this->path()->toString()),
+      );
     }
 
     $ret = @mkdir($this->path()->toString(), $mode, true) as bool;
@@ -168,10 +167,9 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   <<__Override>>
   public async function delete(): Awaitable<bool> {
     if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        'Folder (%s) doesn\'t exist.',
-        $this->path()->toString(),
-      ));
+      throw new Exception\MissingNodeException(
+        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
     await $this->flush();
@@ -291,25 +289,17 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     ?classname<T> $filter = null,
   ): Awaitable<Container<T>> {
     if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        'Folder (%s) doesn\'t exist.',
-        $this->path()->toString(),
-      ));
+      throw new Exception\MissingNodeException(
+        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
+      );
     }
 
     if (!$this->readable()) {
-      throw new Exception\UnreadableNodeException(Str\format(
-        'Folder (%s) is unreadable.',
-        $this->path()->toString()
-      ));
+      throw new Exception\UnreadableNodeException(
+        Str\format('Folder (%s) is unreadable.', $this->path()->toString()),
+      );
     }
 
-    /**
-     * @link https://github.com/facebook/hhvm/issues/8090
-     */
-    $filter ??= Node::class;
-
-    $contents = vec[];
     try {
       $directory = $this->path()->toString();
       $flags = FilesystemIterator::SKIP_DOTS |
@@ -321,13 +311,18 @@ final class Folder extends Node implements IteratorAggregate<Node> {
       throw new Exception\ReadErrorException(
         Str\format(
           'Error while reading from folder (%s).',
-          $this->path()->toString()
+          $this->path()->toString(),
         ),
         $e->getCode(),
         $e,
       );
     }
 
+    /**
+     * @link https://github.com/facebook/hhvm/issues/8090
+     */
+    $filter ??= Node::class;
+    $contents = vec[];
     $awaitables = vec[];
       foreach ($iterator as $node) {
         if (

@@ -108,10 +108,9 @@ final class File extends Node {
   <<__Override>>
   public async function create(int $mode = 0755): Awaitable<bool> {
     if ($this->exists()) {
-      throw new Exception\ExistingNodeException(Str\format(
-        'File (%s) already exists.',
-        $this->path()->toString(),
-      ));
+      throw new Exception\ExistingNodeException(
+        Str\format('File (%s) already exists.', $this->path()->toString()),
+      );
     }
 
     $folder = $this->parent();

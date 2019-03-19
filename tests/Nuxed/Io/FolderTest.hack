@@ -42,9 +42,7 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testCopyThrowsIfFolderDoesntExists(
-    Io\Folder $missing
-  ): void {
+  public function testCopyThrowsIfFolderDoesntExists(Io\Folder $missing): void {
     expect(async () ==> {
       await $missing->copy(static::createPath());
     })->toThrow(Io\Exception\MissingNodeException::class);
@@ -84,7 +82,7 @@ class FolderTest extends HackTest {
   <<DataProvider('provideExistingNodesPair')>>
   public async function testCopyOverwrite(
     Io\Folder $folder,
-    Io\Folder $target
+    Io\Folder $target,
   ): Awaitable<void> {
     await $target->touch('foo.txt');
     $targetSize = await $target->size();
@@ -116,7 +114,7 @@ class FolderTest extends HackTest {
     expect($targetSize)->toBeSame(1);
 
     $copy = await $folder->copy($target->path(), Io\OperationType::SKIP);
-    
+
     list($folderSize, $copySize) =
       await Tuple\from_async($folder->size(), $copy->size());
     expect($copySize)->toNotBeSame($targetSize);
@@ -133,7 +131,7 @@ class FolderTest extends HackTest {
   ): Awaitable<void> {
     await Asio\v(vec[
       $folder->flush(),
-      $target->flush()
+      $target->flush(),
     ]);
     $foo = await $folder->touch('foo.txt');
     await $foo->write('foo');
@@ -161,9 +159,7 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testDelete(
-    Io\Folder $folder
-  ): Awaitable<void> {
+  public async function testDelete(Io\Folder $folder): Awaitable<void> {
     expect($folder->exists())->toBeTrue();
     $ret = await $folder->delete();
     expect($ret)->toBeTrue();
@@ -171,9 +167,7 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testDeleteThrowsIfFolderDoesntExist(
-    Io\Folder $folder
-  ): void {
+  public function testDeleteThrowsIfFolderDoesntExist(Io\Folder $folder): void {
     expect(async () ==> {
       expect($folder->exists())->toBeFalse();
       await $folder->delete();

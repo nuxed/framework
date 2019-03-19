@@ -48,7 +48,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideNodes')>>
   public async function testGetReadHandleThrowsForUnreadableFiles(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     $this->markAsSkippedIfRoot();
 
@@ -60,7 +60,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideNodes')>>
   public async function testGetWriteHandleThrowsForUnwritableFiles(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     $this->markAsSkippedIfRoot();
 
@@ -72,9 +72,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testGetReadHandle(
-    Io\File $file
-  ): Awaitable<void> {
+  public async function testGetReadHandle(Io\File $file): Awaitable<void> {
     await $file->write('foo');
     await using ($handle = $file->getReadHandle()) {
       $content = await $handle->readAsync();
@@ -83,9 +81,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testGetWriteHandle(
-    Io\File $file
-  ): Awaitable<void> {
+  public async function testGetWriteHandle(Io\File $file): Awaitable<void> {
     await using ($handle = $file->getWriteHandle()) {
       await $handle->writeAsync('foo');
     }
@@ -142,18 +138,14 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testCreateThrowsIfFileAlreadyExist(
-    Io\File $file
-  ): void {
+  public function testCreateThrowsIfFileAlreadyExist(Io\File $file): void {
     expect(async () ==> {
       await $file->create();
     })->toThrow(Io\Exception\ExistingNodeException::class);
   }
 
   <<DataProvider('provideNodes')>>
-  public function testCopyThrowsIfFileDoesntExist(
-    Io\File $file
-  ): void {
+  public function testCopyThrowsIfFileDoesntExist(Io\File $file): void {
     expect(async () ==> {
       await $file->delete();
       await $file->copy(static::createPath());
@@ -162,7 +154,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideNodes')>>
   public async function testCopyThrowsIfTargetExistWithSkipOperation(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     expect(async () ==> {
       $target = static::createFile()->path();
@@ -171,9 +163,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testCopyThrowsWhenOperationFails(
-    Io\File $file
-  ): void {
+  public function testCopyThrowsWhenOperationFails(Io\File $file): void {
     expect(async () ==> {
       $path = Io\Path::create('/foo/bar/baz.tmp');
       await $file->copy($path);
@@ -182,7 +172,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideNodes')>>
   public async function testCopySetsTargetPermissionsTo0755ByDefault(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     $path = static::createPath();
     $copy = await $file->copy($path);
@@ -192,7 +182,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideNodes')>>
   public async function testCopyWithPermissions(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     $path = static::createPath();
     $copy = await $file->copy($path, Io\OperationType::SKIP, 0733);
@@ -200,17 +190,13 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testDelete(
-    Io\File $file
-  ): Awaitable<void> {
+  public async function testDelete(Io\File $file): Awaitable<void> {
     $ret = await $file->delete();
     expect($ret)->toBeTrue();
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testDeleteThrowsIfFileDoesntExists(
-    Io\File $file
-  ): void {
+  public function testDeleteThrowsIfFileDoesntExists(Io\File $file): void {
     expect(async () ==> {
       await $file->delete();
     })->toThrow(Io\Exception\MissingNodeException::class);
@@ -271,9 +257,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testMd5ThrowsFileDoesntExists(
-    Io\File $file
-  ): void {
+  public function testMd5ThrowsFileDoesntExists(Io\File $file): void {
     expect(() ==> {
       $file->md5();
     })->toThrow(Io\Exception\MissingNodeException::class);
@@ -323,7 +307,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideNodes')>>
   public function testResetWithDefaultArgumentWillJustClearStateWithoutChangingPath(
-    Io\File $file
+    Io\File $file,
   ): void {
     $path = $file->path()->toString();
     expect($file->reset()->path()->toString())->toBeSame($path);
@@ -331,9 +315,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testResetThrowsIfProvidedPathIsAFolder(
-    Io\File $file
-  ): void {
+  public function testResetThrowsIfProvidedPathIsAFolder(Io\File $file): void {
     expect(() ==> {
       $path = static::createFolder()->path();
       $file->reset($path);
@@ -344,9 +326,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testAppend(
-    Io\File $file
-  ): Awaitable<void> {
+  public async function testAppend(Io\File $file): Awaitable<void> {
     await $file->append('a');
     $content = await $file->read();
     expect($content)->toBeSame('a');
@@ -356,9 +336,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testAppendThrowsIfFileIsNotWritable(
-    Io\File $file
-  ): void {
+  public function testAppendThrowsIfFileIsNotWritable(Io\File $file): void {
     $this->markAsSkippedIfRoot();
 
     expect(async () ==> {
@@ -372,9 +350,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testPrepend(
-    Io\File $file
-  ): Awaitable<void> {
+  public async function testPrepend(Io\File $file): Awaitable<void> {
     await $file->prepend('a');
     $content = await $file->read();
     expect($content)->toBeSame('a');
@@ -384,9 +360,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testPrependThrowsIfFileIsNotWritable(
-    Io\File $file
-  ): void {
+  public function testPrependThrowsIfFileIsNotWritable(Io\File $file): void {
     $this->markAsSkippedIfRoot();
 
     expect(async () ==> {
@@ -400,9 +374,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testPrependThrowsIfFileIsNotReadable(
-    Io\File $file
-  ): void {
+  public function testPrependThrowsIfFileIsNotReadable(Io\File $file): void {
     $this->markAsSkippedIfRoot();
 
     expect(async () ==> {
@@ -416,9 +388,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testWrite(
-    Io\File $file
-  ): Awaitable<void> {
+  public async function testWrite(Io\File $file): Awaitable<void> {
     await $file->write('foo');
     $content = await $file->read();
     expect($content)->toBeSame('foo');
@@ -426,7 +396,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideNodes')>>
   public async function testWriteWithOpenOrCreateMode(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     await $file->write('foo', Filesystem\FileWriteMode::OPEN_OR_CREATE);
     $content = await $file->read();
@@ -439,7 +409,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideNodes')>>
   public async function testWriteWithAppendMode(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     await $file->write('foo', Filesystem\FileWriteMode::APPEND);
     $content = await $file->read();
@@ -451,7 +421,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideMissingNodes')>>
   public async function testWriteWithMustCreateMode(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     expect($file->exists())->toBeFalse();
     await $file->write('foo', Filesystem\FileWriteMode::MUST_CREATE);
@@ -465,9 +435,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testRead(
-    Io\File $file
-  ): Awaitable<void> {
+  public async function testRead(Io\File $file): Awaitable<void> {
     await $file->write('foobar');
 
     $content = await $file->read();
@@ -488,9 +456,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testLines(
-    Io\File $file
-  ): Awaitable<void> {
+  public async function testLines(Io\File $file): Awaitable<void> {
     await $file->write('foo'."\n");
     await $file->append('bar'."\n");
     $lines = await $file->lines();
@@ -501,7 +467,7 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideNodes')>>
   public async function testLinesRemovesLastEmptyLine(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     await $file->write('foo'."\n");
     await $file->append('bar'."\n");
@@ -534,7 +500,7 @@ class FileTest extends HackTest {
   <<DataProvider('provideExistingNodesPair')>>
   public function testLinkThrowsIfLinkExists(
     Io\File $file,
-    Io\File $target
+    Io\File $target,
   ): void {
     expect(async () ==> {
       await $file->link($target->path());
@@ -542,9 +508,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testLinkThrowsIfFileIsMissing(
-    Io\File $file
-  ): void {
+  public function testLinkThrowsIfFileIsMissing(Io\File $file): void {
     expect(async () ==> {
       await $file->link(static::createPath());
     })->toThrow(Io\Exception\MissingNodeException::class, 'doesn\'t exist');
@@ -579,9 +543,7 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testSymlinkThrowsIfFileIsMissing(
-    Io\File $file
-  ): void {
+  public function testSymlinkThrowsIfFileIsMissing(Io\File $file): void {
     expect(async () ==> {
       await $file->symlink(static::createPath());
     })->toThrow(Io\Exception\MissingNodeException::class, 'doesn\'t exist');
