@@ -171,7 +171,10 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   <<__Override>>
   public async function delete(): Awaitable<bool> {
     if (!$this->exists()) {
-      return false;
+      throw new Exception\MissingNodeException(Str\format(
+        'Folder (%s) doesn\'t exist.',
+        $this->path()->toString(),
+      ));
     }
 
     await $this->flush();
@@ -271,13 +274,19 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     bool $recursive = false,
     ?classname<T> $filter = null,
   ): Awaitable<Container<T>> {
+    if (!$this->exists()) {
+      throw new Exception\MissingNodeException(Str\format(
+        'Folder (%s) doesn\'t exist.',
+        $this->path()->toString(),
+      ));
+    }
+
+    /**
+     * @link https://github.com/facebook/hhvm/issues/8090
+     */
     $filter ??= Node::class;
 
     $contents = vec[];
-    if (!$this->exists()) {
-      return $contents;
-    }
-
     try {
       $directory = $this->path()->toString();
       $flags = FilesystemIterator::SKIP_DOTS |
@@ -293,20 +302,27 @@ final class Folder extends Node implements IteratorAggregate<Node> {
         $iterator = new FilesystemIterator($directory, $flags);
       }
     } catch (Exception $e) {
-      return $contents;
+      throw new Exception\ReadErrorException(
+        Str\format(
+          'Error while reading from folder (%s).',
+          $this->path()->toString()
+        ),
+        $e->getCode(),
+        $e,
+      );
     }
 
     $iterator->rewind();
     while ($iterator->valid()) {
-      $file = $iterator->current() as SplFileInfo;
+      $node = $iterator->current() as SplFileInfo;
       if (
-        $file->isDir() && ($filter === Node::class || $filter === Folder::class)
+        $node->isDir() && ($filter === Node::class || $filter === Folder::class)
       ) {
-        $contents[] = new Folder(Path::create($file->getPathname()));
+        $contents[] = new Folder(Path::create($node->getPathname()));
       } elseif (
-        $file->isFile() && ($filter === Node::class || $filter === File::class)
+        $node->isFile() && ($filter === Node::class || $filter === File::class)
       ) {
-        $contents[] = new File(Path::create($file->getPathname()));
+        $contents[] = new File(Path::create($node->getPathname()));
       }
 
       $iterator->next();
