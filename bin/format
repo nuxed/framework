@@ -31,6 +31,9 @@ async function main(): Awaitable<noreturn> {
  */
 async function format(Nuxed\Io\File $file): Awaitable<void> {
   if ($file->extension() === 'hack') {
-    exec(Str\format('bash -c "hackfmt -i %s /dev/null 2>&1 &"', $file->path()->toString()));
+    exec(Str\format(
+      'bash -c "hackfmt -i %s /dev/null 2>&1 &"',
+      $file->path()->toString(),
+    ));
   }
 }
