@@ -137,8 +137,6 @@ final class File extends Node {
         $folder->path()->toString(),
       ));
     }
-
-    return false;
   }
 
   /**
