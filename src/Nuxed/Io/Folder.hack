@@ -7,12 +7,9 @@ use namespace HH\Lib\Vec;
 use type Nuxed\Io\Exception\InvalidPathException;
 use type Iterator;
 use type Exception;
-use type SplFileInfo;
 use type GlobIterator;
 use type IteratorAggregate;
 use type FilesystemIterator;
-use type RecursiveIteratorIterator;
-use type RecursiveDirectoryIterator;
 use function mkdir;
 use function rmdir;
 
@@ -56,7 +53,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     bool $recursive = false,
   ): Awaitable<bool> {
     if ($recursive) {
-      $contents = await $this->read(false, true, Node::class);
+      $contents = await $this->read(false, false, Node::class);
       $awaitables = vec[];
       foreach ($contents as $node) {
         $awaitables[] = $node->chmod($mode, true);
@@ -281,6 +278,13 @@ final class Folder extends Node implements IteratorAggregate<Node> {
       ));
     }
 
+    if (!$this->readable()) {
+      throw new Exception\UnreadableNodeException(Str\format(
+        'Folder (%s) is unreadable.',
+        $this->path()->toString()
+      ));
+    }
+
     /**
      * @link https://github.com/facebook/hhvm/issues/8090
      */
@@ -293,14 +297,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
         FilesystemIterator::UNIX_PATHS |
         FilesystemIterator::NEW_CURRENT_AND_KEY;
 
-      if ($recursive) {
-        $iterator = new RecursiveIteratorIterator(
-          new RecursiveDirectoryIterator($directory, $flags),
-          RecursiveIteratorIterator::CHILD_FIRST,
-        );
-      } else {
         $iterator = new FilesystemIterator($directory, $flags);
-      }
     } catch (Exception $e) {
       throw new Exception\ReadErrorException(
         Str\format(
@@ -312,21 +309,26 @@ final class Folder extends Node implements IteratorAggregate<Node> {
       );
     }
 
-    $iterator->rewind();
-    while ($iterator->valid()) {
-      $node = $iterator->current() as SplFileInfo;
-      if (
-        $node->isDir() && ($filter === Node::class || $filter === Folder::class)
-      ) {
-        $contents[] = new Folder(Path::create($node->getPathname()));
-      } elseif (
-        $node->isFile() && ($filter === Node::class || $filter === File::class)
-      ) {
-        $contents[] = new File(Path::create($node->getPathname()));
+    $awaitables = vec[];
+      foreach ($iterator as $node) {
+        if (
+          $node->isDir() && ($filter === Node::class || $filter === Folder::class)
+        ) {
+          $contents[] = new Folder(Path::create($node->getPathname()));
+        } elseif (
+          $node->isFile() && ($filter === Node::class || $filter === File::class)
+        ) {
+          $contents[] = new File(Path::create($node->getPathname()));
+        }
+
+        if ($node->isDir() && $recursive) {
+          $folder = new Folder($node->getPathname());
+          $awaitables[] = $folder->read(false, true, $filter);
+        }
       }
 
-      $iterator->next();
-    }
+    $inner = await Asio\v($awaitables);
+    $contents = Vec\concat($contents, ...$inner);
 
     if ($sort) {
       $contents = Vec\sort(
