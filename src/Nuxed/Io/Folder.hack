@@ -209,23 +209,42 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     string $pattern,
     ?classname<T> $filter = null,
   ): Awaitable<Container<T>> {
-    $filter ??= Node::class;
-
-    $contents = vec[];
-
     if (!$this->exists()) {
-      return $contents;
+      throw new Exception\MissingNodeException(
+        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
+      );
+    }
+
+    if (!$this->readable()) {
+      throw new Exception\UnreadableNodeException(
+        Str\format('Folder (%s) is unreadable.', $this->path()->toString()),
+      );
     }
 
     try {
-      $iterator = new GlobIterator(
-        $this->path().$pattern,
-        FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS,
-      );
+      $directory = $this->path()->toString();
+      $flags = FilesystemIterator::SKIP_DOTS |
+        FilesystemIterator::UNIX_PATHS |
+        FilesystemIterator::NEW_CURRENT_AND_KEY;
+      $iterator =
+        new GlobIterator(Path::standard($directory, true).$pattern, $flags);
     } catch (Exception $e) {
-      return $contents;
+      throw new Exception\ReadErrorException(
+        Str\format(
+          'Error while reading from folder (%s).',
+          $this->path()->toString(),
+        ),
+        $e->getCode(),
+        $e,
+      );
     }
 
+
+    /**
+     * @link https://github.com/facebook/hhvm/issues/8090
+     */
+    $filter ??= Node::class;
+    $contents = vec[];
     foreach ($iterator as $file) {
       if (
         $file->isDir() && ($filter === Node::class || $filter === Folder::class)
