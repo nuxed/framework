@@ -17,37 +17,37 @@ trait NodeTestTrait {
 
   <<DataProvider('provideNodes')>>
   public async function testChmod(Io\Node $node): Awaitable<void> {
-    $permissions = $node->permissions() ?? 0755;
+    try {
+      $ret = await $node->chmod(0111);
+      expect($ret)->toBeTrue();
+      expect($node->permissions())->toBeSame(0111);
 
-    $ret = await $node->chmod(0111, true);
-    expect($ret)->toBeTrue();
-    expect($node->permissions())->toBeSame(0111);
+      $ret = await $node->chmod(0222);
+      expect($ret)->toBeTrue();
+      expect($node->permissions())->toBeSame(0222);
 
-    $ret = await $node->chmod(0222, true);
-    expect($ret)->toBeTrue();
-    expect($node->permissions())->toBeSame(0222);
+      $ret = await $node->chmod(0333);
+      expect($ret)->toBeTrue();
+      expect($node->permissions())->toBeSame(0333);
 
-    $ret = await $node->chmod(0333, true);
-    expect($ret)->toBeTrue();
-    expect($node->permissions())->toBeSame(0333);
+      $ret = await $node->chmod(0444);
+      expect($ret)->toBeTrue();
+      expect($node->permissions())->toBeSame(0444);
 
-    $ret = await $node->chmod(0444, true);
-    expect($ret)->toBeTrue();
-    expect($node->permissions())->toBeSame(0444);
+      $ret = await $node->chmod(0555);
+      expect($ret)->toBeTrue();
+      expect($node->permissions())->toBeSame(0555);
 
-    $ret = await $node->chmod(0555, true);
-    expect($ret)->toBeTrue();
-    expect($node->permissions())->toBeSame(0555);
+      $ret = await $node->chmod(0666);
+      expect($ret)->toBeTrue();
+      expect($node->permissions())->toBeSame(0666);
 
-    $ret = await $node->chmod(0666, true);
-    expect($ret)->toBeTrue();
-    expect($node->permissions())->toBeSame(0666);
-
-    $ret = await $node->chmod(0777, true);
-    expect($ret)->toBeTrue();
-    expect($node->permissions())->toBeSame(0777);
-
-    await $node->chmod($permissions, true);
+      $ret = await $node->chmod(0777);
+      expect($ret)->toBeTrue();
+      expect($node->permissions())->toBeSame(0777);
+    } finally {
+      await $node->chmod(0777);
+    }
   }
 
   <<DataProvider('provideNodes')>>
@@ -153,9 +153,6 @@ trait NodeTestTrait {
   <<DataProvider('provideNodes')>>
   public async function testWritable(Io\Node $node): Awaitable<void> {
     $this->markAsSkippedIfRoot();
-
-    $mode = $node->permissions() ?? 0755;
-
     // write only
     await $node->chmod(0222);
     expect($node->writable())->toBeTrue();
@@ -165,15 +162,12 @@ trait NodeTestTrait {
     expect($node->writable())->toBeFalse();
 
     // reset
-    await $node->chmod($mode, true);
+    await $node->chmod(0777);
   }
 
   <<DataProvider('provideNodes')>>
   public async function testReadable(Io\Node $node): Awaitable<void> {
     $this->markAsSkippedIfRoot();
-
-    $mode = $node->permissions() ?? 0755;
-
     // read only
     await $node->chmod(0444);
     expect($node->readable())->toBeTrue();
@@ -183,15 +177,12 @@ trait NodeTestTrait {
     expect($node->readable())->toBeFalse();
 
     // reset
-    await $node->chmod($mode, true);
+    await $node->chmod(0777);
   }
 
   <<DataProvider('provideNodes')>>
   public async function testExecutable(Io\Node $node): Awaitable<void> {
     $this->markAsSkippedIfRoot();
-
-    $mode = $node->permissions() ?? 0755;
-
     // execute only
     await $node->chmod(0111);
     expect($node->executable())->toBeTrue();
@@ -201,7 +192,7 @@ trait NodeTestTrait {
     expect($node->executable())->toBeFalse();
 
     // reset
-    await $node->chmod($mode, true);
+    await $node->chmod(0777);
   }
 
   // Data providers
