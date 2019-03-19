@@ -41,6 +41,15 @@ class FolderTest extends HackTest {
     expect($copy->permissions())->toBeSame(0711);
   }
 
+  <<DataProvider('provideMissingNodes')>>
+  public function testCopyThrowsIfFolderDoesntExists(
+    Io\Folder $missing
+  ): void {
+    expect(async () ==> {
+      await $missing->copy(static::createPath());
+    })->toThrow(Io\Exception\MissingNodeException::class);
+  }
+
   <<DataProvider('provideNodes')>>
   public async function testCopyWithContent(
     Io\Folder $folder,
@@ -72,9 +81,11 @@ class FolderTest extends HackTest {
     ]);
   }
 
-  <<DataProvider('provideNodes')>>
-  public async function testCopyOverwrite(Io\Folder $folder): Awaitable<void> {
-    $target = static::createFolder();
+  <<DataProvider('provideExistingNodesPair')>>
+  public async function testCopyOverwrite(
+    Io\Folder $folder,
+    Io\Folder $target
+  ): Awaitable<void> {
     await $target->touch('foo.txt');
     $targetSize = await $target->size();
     expect($targetSize)->toBeSame(1);
@@ -85,7 +96,88 @@ class FolderTest extends HackTest {
       await Tuple\from_async($folder->size(), $copy->size());
     expect($copySize)->toNotBeSame($targetSize);
     expect($copySize)->toBeSame($folderSize);
+  }
 
+  <<DataProvider('provideExistingNodesPair')>>
+  public async function testCopySkip(
+    Io\Folder $folder,
+    Io\Folder $target,
+  ): Awaitable<void> {
+    $foo = await $folder->touch('foo.txt');
+    await $foo->write('foo');
+    $bar = await $folder->touch('bar.txt');
+    await $bar->write('bar');
+    $baz = await $target->touch('foo.txt');
+    await $baz->write('baz');
+
+    list($folderSize, $targetSize) =
+      await Tuple\from_async($folder->size(), $target->size());
+    expect($folderSize)->toBeSame(2);
+    expect($targetSize)->toBeSame(1);
+
+    $copy = await $folder->copy($target->path(), Io\OperationType::SKIP);
+    
+    list($folderSize, $copySize) =
+      await Tuple\from_async($folder->size(), $copy->size());
+    expect($copySize)->toNotBeSame($targetSize);
+    expect($copySize)->toBeSame($folderSize);
+
+    $content = await $baz->read();
+    expect($content)->toBeSame('baz');
+  }
+
+  <<DataProvider('provideExistingNodesPair')>>
+  public async function testCopyMerge(
+    Io\Folder $folder,
+    Io\Folder $target,
+  ): Awaitable<void> {
+    await Asio\v(vec[
+      $folder->flush(),
+      $target->flush()
+    ]);
+    $foo = await $folder->touch('foo.txt');
+    await $foo->write('foo');
+    $bar = await $folder->touch('bar.txt');
+    await $bar->write('bar');
+    await $target->touch('hip.txt');
+    await $target->touch('hop.txt');
+    $baz = await $target->touch('foo.txt');
+    await $baz->write('baz');
+
+    list($folderSize, $targetSize) =
+      await Tuple\from_async($folder->size(), $target->size());
+    expect($folderSize)->toBeSame(2);
+    expect($targetSize)->toBeSame(3);
+
+    $copy = await $folder->copy($target->path(), Io\OperationType::MERGE);
+
+    list($folderSize, $copySize) =
+      await Tuple\from_async($folder->size(), $copy->size());
+    expect($copySize)->toNotBeSame($targetSize);
+    expect($copySize)->toBeSame(4);
+
+    $content = await $baz->read();
+    expect($content)->toBeSame('foo');
+  }
+
+  <<DataProvider('provideNodes')>>
+  public async function testDelete(
+    Io\Folder $folder
+  ): Awaitable<void> {
+    expect($folder->exists())->toBeTrue();
+    $ret = await $folder->delete();
+    expect($ret)->toBeTrue();
+    expect($folder->exists())->toBeFalse();
+  }
+
+  <<DataProvider('provideMissingNodes')>>
+  public function testDeleteThrowsIfFolderDoesntExist(
+    Io\Folder $folder
+  ): void {
+    expect(async () ==> {
+      expect($folder->exists())->toBeFalse();
+      await $folder->delete();
+    })->toThrow(Io\Exception\MissingNodeException::class);
   }
 
   public function provideNodes(): Container<(Io\Node)> {
