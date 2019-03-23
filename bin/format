@@ -1,23 +1,56 @@
 #!/usr/bin/env hhvm
 <?hh // strict
 
+use namespace HH\Asio;
+use namespace HH\Lib\C;
+use namespace HH\Lib\Str;
+use namespace HH\Lib\Vec;
+use namespace HH\Lib\Experimental\IO;
+use namespace Nuxed\Io;
+
 require __DIR__.'/../vendor/autoload.hack';
 
 <<__EntryPoint>>
-async function format(): Awaitable<noreturn> {
+async function main(): Awaitable<noreturn> {
   Facebook\AutoloadMap\initialize();
-
-  $source = new Nuxed\Io\Folder(__DIR__ . '/../src/Nuxed');
-  $tests = new Nuxed\Io\Folder(__DIR__ . '/../tests/Nuxed');
-  foreach ($source->files(true, true) as $file) {
-    if ($file->ext() === 'hack') {
-     exec('hackfmt -i '.$file->path());
-    }
-  }
-  foreach ($tests->files(true, true) as $file) {
-    if ($file->ext() === 'hack') {
-     exec('hackfmt -i '.$file->path());
-    }
-  }
+  $stdout = IO\request_output();
+  $files = await Asio\v(
+    vec[
+      new Io\Folder(__DIR__.'/../src/Nuxed'),
+      new Io\Folder(__DIR__.'/../tests/Nuxed'),
+    ]
+      |> Vec\map($$, ($node) ==> $node->files(false, true)),
+  );
+  await Vec\concat(...$files)
+    |> Vec\map($$, ($file) ==> format($file, $stdout, false))
+    |> Asio\v(
+      Vec\concat($$, vec[format(Io\Node::load(__FILE__), $stdout, true)]),
+    );
+  await $stdout->writeAsync("\n");
   exit(0);
+}
+
+/**
+ * exec() blocks, so this is not actually async.
+ */
+async function format(
+  Nuxed\Io\File $file,
+  IO\WriteHandle $stdout,
+  bool $ignoreExtension = false,
+): Awaitable<void> {
+  if ($ignoreExtension || 'hack' === $file->extension()) {
+    $command = Str\format(
+      'bash -c "hackfmt -i %s >> /dev/null 2>&1 &"',
+      $file->path()->toString(),
+    );
+
+    await Asio\v(vec[
+      async {
+        exec($command);
+      },
+      $stdout->writeAsync('.'),
+    ]);
+  } else {
+    await $stdout->writeAsync('S');
+  }
 }

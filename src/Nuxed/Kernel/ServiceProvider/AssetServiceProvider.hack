@@ -1,6 +1,7 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace HH\Lib\Str;
+use namespace Nuxed\Io;
 use namespace Nuxed\Asset;
 use type Nuxed\Container\Container as ServiceContainer;
 use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
@@ -41,8 +42,9 @@ class AssetServiceProvider extends AbstractServiceProvider {
         () ==> {
           $manifest = $config['manifest'] ?? null;
           if ($manifest is nonnull) {
-            return
-              new Asset\VersionStrategy\JsonManifestVersionStrategy($manifest);
+            return new Asset\VersionStrategy\JsonManifestVersionStrategy(
+              new Io\File(Io\Path::create($manifest)),
+            );
           }
           $version = $config['version'] ?? null;
           if ($version is nonnull) {

@@ -3,21 +3,18 @@ namespace Nuxed\Io;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
-use type Nuxed\Io\Exception\InvalidArgumentException;
-use function preg_match;
-use function pathinfo;
+use namespace HH\Lib\Experimental\Filesystem;
+use type Stringish;
 use function realpath;
-use const PATHINFO_BASENAME;
+use function pathinfo;
 use const PATHINFO_FILENAME;
-use const PATHINFO_EXTENSION;
 use const PATH_SEPARATOR;
 use const DIRECTORY_SEPARATOR;
 
 /**
  * Provides convenience functions for inflecting notation paths and file system paths.
  */
-final abstract class Path {
-
+final class Path implements Stringish {
   /**
    * Directory separator.
    */
@@ -28,29 +25,53 @@ final abstract class Path {
    */
   const string DELIMITER = PATH_SEPARATOR;
 
+  public function __construct(private Filesystem\Path $path) {
+  }
+
+  public static function create(Stringish $path): Path {
+    if ($path is Path) {
+      return $path;
+    }
+
+    if ($path is Filesystem\Path) {
+      return new self($path);
+    }
+
+    $path = static::standard((string)$path, false);
+    return new self(new Filesystem\Path($path));
+  }
+
+  public function toString(): string {
+    return $this->path->toString();
+  }
+
+  public function __toString(): string {
+    return $this->toString();
+  }
+
   /**
    * Return the extension from a file path.
    */
-  public static function extension(string $path): string {
-    return Str\lowercase(pathinfo($path, PATHINFO_EXTENSION));
+  public function extension(): ?string {
+    if ($this->isFolder()) {
+      return null;
+    }
+
+    return $this->path->getExtension();
   }
 
   /**
    * Verify a path is absolute by checking the first path part.
    */
-  public static function isAbsolute(string $path): bool {
-    return (
-      Str\starts_with($path, '/') ||
-      Str\starts_with($path, '\\') ||
-      preg_match('/^[a-zA-Z0-9]+:/', $path)
-    );
+  public function isAbsolute(): bool {
+    return $this->path->isAbsolute();
   }
 
   /**
    * Verify a path is relative.
    */
-  public static function isRelative(string $path): bool {
-    return !static::isAbsolute($path);
+  public function isRelative(): bool {
+    return $this->path->isRelative();
   }
 
   /**
@@ -61,14 +82,14 @@ final abstract class Path {
   public static function join(
     Container<string> $paths,
     bool $above = true,
-  ): string {
+  ): Path {
     $clean = vec[];
     $parts = vec[];
     $up = 0;
 
     // First pass expands sub-paths
     foreach ($paths as $path) {
-      $path = Str\trim($path, '/');
+      $path = Str\trim(static::standard($path), '/');
 
       if (Str\contains($path, '/')) {
         $clean = Vec\concat($clean, Str\split($path, '/'));
@@ -77,18 +98,21 @@ final abstract class Path {
       }
     }
 
+    // Second pass flattens dot paths
+    $clean = Vec\reverse($clean);
     foreach ($clean as $path) {
       if ($path === '.' || $path === '') {
         continue;
       } elseif ($path === '..') {
         $up++;
-      } elseif ($up) {
+      } elseif ($up > 0) {
         $up--;
       } else {
         $parts[] = $path;
       }
     }
 
+    // Append double dots above root
     if ($above) {
       while ($up) {
         $parts[] = '..';
@@ -96,31 +120,52 @@ final abstract class Path {
       }
     }
 
-    return Str\join($parts, '/');
+    $parts = Vec\reverse($parts);
+
+    return self::create(Str\join($parts, '/'));
   }
 
   /**
    * Normalize a string by resolving "." and "..". When multiple slashes are found, they're replaced by a single one;
    * when the path contains a trailing slash, it is preserved. On Windows backslashes are used.
+   *
+   * if the path couldn't be normalized, null will be returned.
    */
-  public static function normalize(string $path): string {
-    return realpath($path);
+  public static function normalize(string $path): ?string {
+    $normalized = realpath($path);
+    if ($normalized is string) {
+      return $normalized;
+    }
+
+    return null;
   }
 
   /**
-   * Determine the relative path between two absolute paths.
-   *
-   * @throws InvalidArgumentException
+   * Converts OS directory separators to the standard forward slash.
    */
-  public static function relativeTo(string $from, string $to): string {
-    if (static::isRelative($from) || static::isRelative($to)) {
-      throw new InvalidArgumentException(
-        'Cannot determine relative path without two absolute paths',
+  public static function standard(
+    string $path,
+    bool $endSlash = false,
+  ): string {
+    $path = Str\replace($path, '\\', '/');
+    if ($endSlash && !Str\ends_with($path, '/')) {
+      $path .= '/';
+    }
+    return $path;
+  }
+
+  /**
+   * Determine the relative path between this and another absolute path.
+   */
+  public function relativeTo(Path $to): Path {
+    if ($this->isRelative() || $to->isRelative()) {
+      throw new Exception\InvalidPathException(
+        'Cannot determine relative path without two absolute paths.',
       );
     }
 
-    $from = Str\split(static::normalize($from), '/');
-    $to = Str\split(static::normalize($to), '/');
+    $from = Str\split(static::standard($this->toString(), true), '/');
+    $to = Str\split(static::standard($to->toString(), true), '/');
     $relative = $to;
 
     foreach ($from as $depth => $dir) {
@@ -134,11 +179,7 @@ final abstract class Path {
 
         // Add traversals up to first matching dir
         if ($remaining > 1) {
-          $padLength = (C\count($relative) + $remaining - 1) * -1;
-          $relative = Vec\drop(
-            Vec\concat($relative, Vec\fill($padLength, '..')),
-            $padLength,
-          );
+          $relative = Vec\concat(Vec\fill($remaining - 1, '..'), $relative);
           break;
         } else {
           $relative[0] = './'.$relative[0];
@@ -146,21 +187,82 @@ final abstract class Path {
       }
     }
 
-    if (!$relative) {
-      return './';
+    if (0 === C\count($relative)) {
+      return self::create('./');
     }
 
-    return Str\join($relative, '/');
+    return self::create(Str\join($relative, '/'));
   }
 
   /**
-   * Strip off the extension if it exists.
+   * Check if the path is a directory.
    */
-  public static function stripExt(string $path): string {
-    if (Str\contains($path, '.')) {
-      $path = Str\slice($path, 0, Str\search($path, '.'));
+  public function isFolder(): bool {
+    return $this->path->isDirectory();
+  }
+
+  /**
+   * Check if the path is a file.
+   */
+  public function isFile(): bool {
+    return $this->path->isFile();
+  }
+
+  /**
+   * Check if the path is a symbolic link.
+   */
+  public function isSymlink(): bool {
+    return $this->path->isSymlink();
+  }
+
+  /**
+   * Check if the file exists.
+   */
+  public function exists(): bool {
+    return $this->path->exists();
+  }
+
+  /**
+   * Return the parent directory.
+   * Will always end in a trailing slash.
+   */
+  public function parent(): Path {
+    $parent = $this->path->getParent()->toString();
+    $parent = static::standard($parent, true);
+    return new self(new Filesystem\Path($parent));
+  }
+
+  /**
+   * Return the file name with extension.
+   */
+  public function basename(): string {
+    return $this->path->getBaseName();
+  }
+
+  /**
+   * Return the file name without extension.
+   */
+  public function name(): string {
+    return pathinfo($this->toString(), PATHINFO_FILENAME);
+  }
+
+  public function parts(): Container<string> {
+    return $this->path->getParts();
+  }
+
+  public function compare(Stringish $other): int {
+    $other = static::standard((string)$other, false);
+    $other = static::normalize($other) ?? $other;
+    if (Str\ends_with($other, '/')) {
+      $other = Str\slice($other, 0, Str\length($other) - 1);
     }
 
-    return $path;
+    $self = static::standard($this->toString(), false);
+    $self = static::normalize($self) ?? $self;
+    if (Str\ends_with($self, '/')) {
+      $self = Str\slice($self, 0, Str\length($self) - 1);
+    }
+
+    return Str\compare($self, $other);
   }
 }

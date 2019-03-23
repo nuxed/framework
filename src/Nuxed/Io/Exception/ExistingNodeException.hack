@@ -1,9 +1,9 @@
 namespace Nuxed\Io\Exception;
 
 /**
- * Exception thrown when a reading a files fails.
+ * Exception thrown when a target node destination already exists.
  */
-class ReadErrorException
+class ExistingNodeException
   extends RuntimeException
   implements ExceptionInterface {
 }
