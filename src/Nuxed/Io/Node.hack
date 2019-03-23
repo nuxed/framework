@@ -52,37 +52,23 @@ abstract class Node {
    * Return the last access time.
    */
   public function accessTime(): int {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
-    return fileatime($this->path()->toString()) as int;
+    $this->isAvailable();
+    return fileatime($this->path->toString()) as int;
   }
 
   /**
    * Return the node name with extension.
    */
   public function basename(): string {
-    return $this->path()->basename();
+    return $this->path->basename();
   }
 
   /**
    * Return the last inode change time.
    */
   public function changeTime(): int {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
-    return filectime($this->path()->toString()) as int;
+    $this->isAvailable();
+    return filectime($this->path->toString()) as int;
   }
 
   /**
@@ -92,23 +78,13 @@ abstract class Node {
     int $group,
     bool $_recursive = false,
   ): Awaitable<bool> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
-    $path = $this->path();
-
+    $this->isAvailable();
     $this->reset();
-
-    if ($path->isSymlink()) {
-      return lchgrp($path->toString(), $group) as bool;
+    if ($this->path->isSymlink()) {
+      return lchgrp($this->path->toString(), $group) as bool;
     }
 
-    return chgrp($path->toString(), $group) as bool;
+    return chgrp($this->path->toString(), $group) as bool;
   }
 
   /**
@@ -118,17 +94,9 @@ abstract class Node {
     int $mode,
     bool $_recursive = false,
   ): Awaitable<bool> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
+    $this->isAvailable();
     $this->reset();
-
-    return chmod($this->path()->toString(), $mode) as bool;
+    return chmod($this->path->toString(), $mode) as bool;
   }
 
   /**
@@ -138,23 +106,13 @@ abstract class Node {
     int $user,
     bool $_recursive = false,
   ): Awaitable<bool> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
-    $path = $this->path();
-
+    $this->isAvailable();
     $this->reset();
-
-    if ($path->isSymlink()) {
-      return lchown($path->toString(), $user) as bool;
+    if ($this->path->isSymlink()) {
+      return lchown($this->path->toString(), $user) as bool;
     }
 
-    return chown($path->toString(), $user) as bool;
+    return chown($this->path->toString(), $user) as bool;
   }
 
   /**
@@ -178,7 +136,7 @@ abstract class Node {
   abstract public function create(int $mode = 0755): Awaitable<bool>;
 
   /**
-   * Remove the node if it exists.
+   * Remove the node.
    */
   abstract public function delete(): Awaitable<bool>;
 
@@ -200,50 +158,43 @@ abstract class Node {
    * Return the parent directory.
    */
   public function dir(): Path {
-    return $this->path()->parent();
+    return $this->path->parent();
   }
 
   /**
    * Is the file executable.
    */
   public function executable(): bool {
-    return is_executable($this->path()->toString()) as bool;
+    return is_executable($this->path->toString()) as bool;
   }
 
   /**
    * Check if the file exists.
    */
   public function exists(): bool {
-    return $this->path()->exists();
+    return $this->path->exists();
   }
 
   /**
    * Return the group name for the file.
    */
   public function group(): int {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
-    return filegroup($this->path()->toString()) as int;
+    $this->isAvailable();
+    return filegroup($this->path->toString()) as int;
   }
 
   /**
    * Return true if the current path is absolute.
    */
   public function isAbsolute(): bool {
-    return $this->path()->isAbsolute();
+    return $this->path->isAbsolute();
   }
 
   /**
    * Return true if the current path is relative.
    */
   public function isRelative(): bool {
-    return $this->path()->isRelative();
+    return $this->path->isRelative();
   }
 
   /**
@@ -257,7 +208,7 @@ abstract class Node {
       );
     }
 
-    if ($path->isDirectory()) {
+    if ($path->isFolder()) {
       return new Folder($path);
     }
 
@@ -268,15 +219,8 @@ abstract class Node {
    * Return the last modified time.
    */
   public function modifyTime(): int {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
-    return filemtime($this->path()->toString()) as int;
+    $this->isAvailable();
+    return filemtime($this->path->toString()) as int;
   }
 
   /**
@@ -291,14 +235,7 @@ abstract class Node {
     Path $target,
     bool $overwrite = true,
   ): Awaitable<bool> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
+    $this->isAvailable();
     // Don't move if the target exists and overwrite is disabled
     if ($target->exists()) {
       if ($overwrite) {
@@ -307,14 +244,14 @@ abstract class Node {
         throw new Exception\ExistingNodeException(Str\format(
           'Cannot move %s (%s) as the target (%s) already exists.',
           $this is Folder ? 'folder' : 'file',
-          $this->path()->toString(),
+          $this->path->toString(),
           $target->toString(),
         ));
       }
     }
 
     // Move node
-    $moved = rename($this->path()->toString(), $target->toString()) as bool;
+    $moved = rename($this->path->toString(), $target->toString()) as bool;
     if ($moved) {
       $this->reset($target);
     }
@@ -326,22 +263,15 @@ abstract class Node {
    * Return the node name without extension.
    */
   public function name(): string {
-    return $this->path()->name();
+    return $this->path->name();
   }
 
   /**
    * Return the owner name for the node.
    */
   public function owner(): int {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
-    return fileowner($this->path()->toString()) as int;
+    $this->isAvailable();
+    return fileowner($this->path->toString()) as int;
   }
 
   /**
@@ -359,7 +289,7 @@ abstract class Node {
       return $this->parent;
     }
 
-    $folder = $this->path()->parent();
+    $folder = $this->path->parent();
 
     if ($folder->toString() !== '.' && $folder->toString() !== '/') {
       $this->parent = new Folder($folder);
@@ -372,15 +302,8 @@ abstract class Node {
    * Return the permissions for the node.
    */
   public function permissions(): int {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
-    return fileperms($this->path()->toString()) & 0777;
+    $this->isAvailable();
+    return fileperms($this->path->toString()) & 0777;
   }
 
   /**
@@ -394,7 +317,7 @@ abstract class Node {
    * Is the node readable.
    */
   public function readable(): bool {
-    return is_readable($this->path()->toString());
+    return is_readable($this->path->toString());
   }
 
   /**
@@ -409,14 +332,7 @@ abstract class Node {
     string $name,
     bool $overwrite = true,
   ): Awaitable<bool> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(Str\format(
-        '%s (%s) doesn\'t exist.',
-        $this is Folder ? 'Folder' : 'File',
-        $this->path()->toString(),
-      ));
-    }
-
+    $this->isAvailable();
     // Remove unwanted characters
     $name = Regex\replace(
       Path::create($name)->basename(),
@@ -445,7 +361,7 @@ abstract class Node {
     }
 
     // Rename the file within the current folder
-    if (rename($this->path()->toString(), $target->toString())) {
+    if (rename($this->path->toString(), $target->toString())) {
       $this->reset($target);
 
       return true;
@@ -473,7 +389,7 @@ abstract class Node {
    * Is the node writable.
    */
   public function writable(): bool {
-    return is_writable($this->path()->toString());
+    return is_writable($this->path->toString());
   }
 
   /**
@@ -485,5 +401,41 @@ abstract class Node {
     }
 
     return $path;
+  }
+
+  final protected function isAvailable(): void {
+    if (!$this->exists()) {
+      throw new Exception\MissingNodeException(
+        Str\format(
+          '%s (%s) doesn\'t exist.',
+          $this is File ? 'File' : 'Folder',
+          $this->path->toString(),
+        ),
+      );
+    }
+  }
+
+  final protected function isReadable(): void {
+    if (!$this->readable()) {
+      throw new Exception\UnreadableNodeException(
+        Str\format(
+          '%s (%s) is not readable.',
+          $this is File ? 'File' : 'Folder',
+          $this->path->toString(),
+        ),
+      );
+    }
+  }
+
+  final protected function isWritable(): void {
+    if (!$this->writable()) {
+      throw new Exception\UnwritableNodeException(
+        Str\format(
+          '%s (%s) is not writable.',
+          $this is File ? 'File' : 'Folder',
+          $this->path->toString(),
+        ),
+      );
+    }
   }
 }

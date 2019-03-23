@@ -195,6 +195,52 @@ trait NodeTestTrait {
     await $node->chmod(0777);
   }
 
+  <<DataProvider('provideNodes')>>
+  public async function testChown(Io\Node $node): Awaitable<void> {
+    $this->markAsSkippedIfNotRoot();
+    $ret = await $node->chown(666, false);
+    expect($ret)->toBeTrue();
+    expect($node->owner())->toBeSame(666);
+  }
+
+  <<DataProvider('provideMissingNodes')>>
+  public function testChownThrowsIfNodeDoesntExist(Io\Node $node): void {
+    expect(() ==> $node->chown(666))
+      ->toThrow(Io\Exception\MissingNodeException::class);
+  }
+
+  <<DataProvider('provideNodes')>>
+  public async function testChgrp(Io\Node $node): Awaitable<void> {
+    $this->markAsSkippedIfNotRoot();
+    $ret = await $node->chgrp(666, false);
+    expect($ret)->toBeTrue();
+    expect($node->group())->toBeSame(666);
+  }
+
+  <<DataProvider('provideMissingNodes')>>
+  public function testChgrpThrowsIfNodeDoesntExist(Io\Node $node): void {
+    expect(() ==> $node->chgrp(666))
+      ->toThrow(Io\Exception\MissingNodeException::class);
+  }
+
+  <<DataProvider('provideMissingNodes')>>
+  public function testGroupThrowsIfNodeDoesntExist(Io\Node $node): void {
+    expect(() ==> $node->group())
+      ->toThrow(Io\Exception\MissingNodeException::class);
+  }
+
+  <<DataProvider('provideMissingNodes')>>
+  public function testOwnerThrowsIfNodeDoesntExist(Io\Node $node): void {
+    expect(() ==> $node->owner())
+      ->toThrow(Io\Exception\MissingNodeException::class);
+  }
+
+  <<DataProvider('provideMissingNodes')>>
+  public function testPermissionsThrowsIfNodeDoesntExist(Io\Node $node): void {
+    expect(() ==> $node->permissions())
+      ->toThrow(Io\Exception\MissingNodeException::class);
+  }
+
   // Data providers
 
   abstract public function provideNodes(): Container<(Io\Node)>;
@@ -243,7 +289,14 @@ trait NodeTestTrait {
 
   protected function markAsSkippedIfRoot(): void {
     if (!getenv('USER') || 'root' === getenv('USER')) {
-      static::markTestSkipped('Skipped test for superuser.');
+      static::markTestSkipped('Test cannot be executad by a superuser.');
     }
+  }
+
+  protected function markAsSkippedIfNotRoot(): void {
+    if (!getenv('USER') || 'root' === getenv('USER')) {
+      return;
+    }
+    static::markTestSkipped('Test can only be executed by a superuser.');
   }
 }

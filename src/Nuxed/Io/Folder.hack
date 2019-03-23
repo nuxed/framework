@@ -5,15 +5,14 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
 use type Nuxed\Io\Exception\InvalidPathException;
-use type Iterator;
 use type Exception;
 use type GlobIterator;
-use type IteratorAggregate;
+use type DirectoryIterator;
 use type FilesystemIterator;
 use function mkdir;
 use function rmdir;
 
-final class Folder extends Node implements IteratorAggregate<Node> {
+final class Folder extends Node {
   /**
    * Change directory. Alias for reset().
    */
@@ -30,17 +29,13 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     int $group,
     bool $recursive = false,
   ): Awaitable<bool> {
-    if ($recursive) {
-      $contents = await $this->read(false, true, Node::class);
-      $awaitables = vec[];
-      foreach ($contents as $node) {
-        $awaitables[] = $node->chgrp($group, true);
-      }
-
-      await Asio\v($awaitables);
+    $this->isAvailable();
+    $ret = await parent::chgrp($group);
+    if (!$recursive || false === $ret) {
+      return $ret;
     }
 
-    return await parent::chgrp($group);
+    return await $this->chop(($node) ==> $node->chgrp($group, true));
   }
 
   /**
@@ -52,17 +47,13 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     int $mode,
     bool $recursive = false,
   ): Awaitable<bool> {
-    if ($recursive) {
-      $contents = await $this->read(false, false, Node::class);
-      $awaitables = vec[];
-      foreach ($contents as $node) {
-        $awaitables[] = $node->chmod($mode, true);
-      }
-
-      await Asio\v($awaitables);
+    $this->isAvailable();
+    $ret = await parent::chmod($mode);
+    if (!$recursive || false === $ret) {
+      return $ret;
     }
 
-    return await parent::chmod($mode);
+    return await $this->chop(($node) ==> $node->chmod($mode, true));
   }
 
   /**
@@ -74,17 +65,31 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     int $user,
     bool $recursive = false,
   ): Awaitable<bool> {
-    if ($recursive) {
-      $contents = await $this->read(false, true, Node::class);
-      $awaitables = vec[];
-      foreach ($contents as $node) {
-        $awaitables[] = $node->chown($user, true);
-      }
-
-      await Asio\v($awaitables);
+    $this->isAvailable();
+    $ret = await parent::chown($user);
+    if (!$recursive || false === $ret) {
+      return $ret;
     }
 
-    return await parent::chown($user);
+    return await $this->chop(($node) ==> $node->chown($user, true));
+  }
+
+  private async function chop(
+    (function(Node): Awaitable<bool>) $op,
+  ): Awaitable<bool> {
+    $iterator = new DirectoryIterator($this->path->toString());
+    $awaitables = vec[];
+    foreach ($iterator as $node) {
+      if ($node->isDot()) {
+        continue;
+      }
+
+      $node = Node::load($node->getPathname());
+      $awaitables[] = $op($node);
+    }
+
+    $ret = await Asio\v($awaitables);
+    return C\reduce($ret, ($a, $b) ==> $a && $b, true);
   }
 
   /**
@@ -94,11 +99,11 @@ final class Folder extends Node implements IteratorAggregate<Node> {
   public async function create(int $mode = 0755): Awaitable<bool> {
     if ($this->exists()) {
       throw new Exception\ExistingNodeException(
-        Str\format('Folder (%s) already exists.', $this->path()->toString()),
+        Str\format('Folder (%s) already exists.', $this->path->toString()),
       );
     }
 
-    $ret = @mkdir($this->path()->toString(), $mode, true) as bool;
+    $ret = @mkdir($this->path->toString(), $mode, true) as bool;
     $this->reset();
     return $ret;
   }
@@ -112,12 +117,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     OperationType $process = OperationType::MERGE,
     int $mode = 0755,
   ): Awaitable<Folder> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
+    $this->isAvailable();
     // Delete the target folder if overwrite is true
     if ($process === OperationType::OVERWRITE && $target->exists()) {
       await static::destroy($target);
@@ -128,13 +128,13 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     $target = $destination->path();
 
     // Recursively copy over contents to new destination
-    $contents = await $this->read(false, true, Node::class);
+    $contents = await $this->list(false, true, Node::class);
 
     $awaitables = vec[];
     foreach ($contents as $node) {
       $to = Path::create(Str\replace(
         $node->path()->toString(),
-        $this->path()->toString(),
+        $this->path->toString(),
         $target->toString(),
       ));
 
@@ -166,14 +166,9 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    */
   <<__Override>>
   public async function delete(): Awaitable<bool> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
+    $this->isAvailable();
     await $this->flush();
-    $deleted = @rmdir($this->path()->toString()) as bool;
+    $deleted = @rmdir($this->path->toString()) as bool;
     $this->reset();
     return $deleted;
   }
@@ -182,6 +177,9 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    * Recursively delete all files and folders within this folder.
    */
   public async function flush(): Awaitable<this> {
+    $this->isAvailable();
+    $this->isReadable();
+
     // delete files first.
     $files = await $this->files(false, true);
     await Asio\v(Vec\map($files, async ($file) ==> {
@@ -191,7 +189,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     }));
 
     // delete rest of the nodes.
-    $nodes = await $this->read(false, true, Node::class);
+    $nodes = await $this->list(false, true, Node::class);
     await Asio\v(Vec\map($nodes, async ($node) ==> {
       if ($node->exists()) {
         return await $node->delete();
@@ -207,20 +205,11 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     string $pattern,
     ?classname<T> $filter = null,
   ): Awaitable<Container<T>> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
-    if (!$this->readable()) {
-      throw new Exception\UnreadableNodeException(
-        Str\format('Folder (%s) is unreadable.', $this->path()->toString()),
-      );
-    }
+    $this->isAvailable();
+    $this->isReadable();
 
     try {
-      $directory = $this->path()->toString();
+      $directory = $this->path->toString();
       $flags = FilesystemIterator::SKIP_DOTS |
         FilesystemIterator::UNIX_PATHS |
         FilesystemIterator::NEW_CURRENT_AND_KEY;
@@ -230,13 +219,12 @@ final class Folder extends Node implements IteratorAggregate<Node> {
       throw new Exception\ReadErrorException(
         Str\format(
           'Error while reading from folder (%s).',
-          $this->path()->toString(),
+          $this->path->toString(),
         ),
         $e->getCode(),
         $e,
       );
     }
-
 
     /**
      * @link https://github.com/facebook/hhvm/issues/8090
@@ -267,7 +255,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     bool $sort = false,
     bool $recursive = false,
   ): Awaitable<Container<File>> {
-    return $this->read($sort, $recursive, File::class);
+    return $this->list($sort, $recursive, File::class);
   }
 
   /**
@@ -277,41 +265,32 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     bool $sort = false,
     bool $recursive = false,
   ): Awaitable<Container<Folder>> {
-    return $this->read($sort, $recursive, Folder::class);
+    return $this->list($sort, $recursive, Folder::class);
   }
 
   /**
    * Scan the folder and return a list of File and Folder objects.
    */
-  public async function read<T as Node>(
+  public async function list<T as Node>(
     bool $sort = false,
     bool $recursive = false,
     ?classname<T> $filter = null,
   ): Awaitable<Container<T>> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
-    if (!$this->readable()) {
-      throw new Exception\UnreadableNodeException(
-        Str\format('Folder (%s) is unreadable.', $this->path()->toString()),
-      );
-    }
+    $this->isAvailable();
+    $this->isReadable();
 
     try {
-      $directory = $this->path()->toString();
+      $directory = $this->path->toString();
       $flags = FilesystemIterator::SKIP_DOTS |
         FilesystemIterator::UNIX_PATHS |
         FilesystemIterator::NEW_CURRENT_AND_KEY;
 
-        $iterator = new FilesystemIterator($directory, $flags);
+      $iterator = new FilesystemIterator($directory, $flags);
     } catch (Exception $e) {
       throw new Exception\ReadErrorException(
         Str\format(
           'Error while reading from folder (%s).',
-          $this->path()->toString(),
+          $this->path->toString(),
         ),
         $e->getCode(),
         $e,
@@ -324,22 +303,22 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     $filter ??= Node::class;
     $contents = vec[];
     $awaitables = vec[];
-      foreach ($iterator as $node) {
-        if (
-          $node->isDir() && ($filter === Node::class || $filter === Folder::class)
-        ) {
-          $contents[] = new Folder(Path::create($node->getPathname()));
-        } elseif (
-          $node->isFile() && ($filter === Node::class || $filter === File::class)
-        ) {
-          $contents[] = new File(Path::create($node->getPathname()));
-        }
-
-        if ($node->isDir() && $recursive) {
-          $folder = new Folder($node->getPathname());
-          $awaitables[] = $folder->read(false, true, $filter);
-        }
+    foreach ($iterator as $node) {
+      if (
+        $node->isDir() && ($filter === Node::class || $filter === Folder::class)
+      ) {
+        $contents[] = new Folder(Path::create($node->getPathname()));
+      } elseif (
+        $node->isFile() && ($filter === Node::class || $filter === File::class)
+      ) {
+        $contents[] = new File(Path::create($node->getPathname()));
       }
+
+      if ($node->isDir() && $recursive) {
+        $folder = new Folder($node->getPathname());
+        $awaitables[] = $folder->list(false, true, $filter);
+      }
+    }
 
     $inner = await Asio\v($awaitables);
     $contents = Vec\concat($contents, ...$inner);
@@ -364,7 +343,8 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     Path $target,
     bool $overwrite = true,
   ): Awaitable<bool> {
-    if ($target->compare($this->path()) === 0) {
+    $this->isAvailable();
+    if ($target->compare($this->path) === 0) {
       return true; // Don't move to the same location
     }
 
@@ -375,7 +355,7 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    * {@inheritdoc}
    */
   <<__Override>>
-  public function reset(Path $path = $this->path()): this {
+  public function reset(Path $path = $this->path): this {
     if ($path->exists() && $path->isFile()) {
       throw new InvalidPathException(
         Str\format(
@@ -393,25 +373,21 @@ final class Folder extends Node implements IteratorAggregate<Node> {
    */
   <<__Override>>
   public async function size(): Awaitable<int> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
-    $nodes = await $this->read(false, true, Node::class);
+    $this->isAvailable();
+    $nodes = await $this->list(false, true, Node::class);
     return C\count($nodes);
   }
 
+  /**
+   * Create a file with the given name inside the current directory.
+   *
+   * @param int $mode file mode.
+   */
   public async function touch(string $file, int $mode = 0755): Awaitable<File> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('Folder (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
+    $this->isAvailable();
+    $this->isWritable();
 
-    $path = Path::create(Str\format('%s/%s', $this->path()->toString(), $file));
-
+    $path = Path::create(Str\format('%s/%s', $this->path->toString(), $file));
     if ($path->exists()) {
       throw new Exception\ExistingNodeException(
         Str\format('File (%s) already exist.', $path->toString()),
@@ -423,8 +399,70 @@ final class Folder extends Node implements IteratorAggregate<Node> {
     return $file;
   }
 
-  public function getIterator(): Iterator<Node> {
-    $nodes = new Vector(Asio\join($this->read(true, true)));
-    return $nodes->getIterator();
+  /**
+   * Create a folder with the given name insde the current directory.
+   *
+   * @param int $mode folder mode.
+   */
+  public async function mkdir(
+    string $folder,
+    int $mode = 0755,
+  ): Awaitable<Folder> {
+    $this->isAvailable();
+    $this->isWritable();
+
+    $path = Path::create(Str\format('%s/%s', $this->path->toString(), $folder));
+    if ($path->exists()) {
+      throw new Exception\ExistingNodeException(
+        Str\format('Folder (%s) already exist.', $path->toString()),
+      );
+    }
+
+    $folder = new Folder($path, false);
+    await $folder->create($mode);
+    return $folder;
+  }
+
+  /**
+   * Remove a node insde the current folder.
+   */
+  public async function remove(string $node): Awaitable<bool> {
+    $node = await $this->read($node, Node::class);
+    return await $node->delete();
+  }
+
+  /**
+   * Return true if a child node with the given name exists.
+   */
+  public function contains(string $node): bool {
+    return Path::create(Str\format('%s/%s', $this->path->toString(), $node))
+      ->exists();
+  }
+
+  /**
+   * Read a node from the current directory.
+   */
+  public async function read<T as Node>(
+    string $name,
+    ?classname<T> $filter = null,
+  ): Awaitable<T> {
+    $this->isAvailable();
+    $path = Path::create(Str\format('%s/%s', $this->path->toString(), $name));
+    $node = Node::load($path);
+    $filter ??= Node::class;
+    if (
+      ($filter === File::class && $node is Folder) ||
+      ($filter === Folder::class && $node is File)
+    ) {
+      throw new Exception\InvalidPathException(Str\format(
+        'Invalid %s path (%s), %s are not allowed.',
+        Str\lowercase($filter),
+        $path->toString(),
+        $node is Folder ? 'folders' : 'files',
+      ));
+    }
+
+    // UNSAFE
+    return $node;
   }
 }

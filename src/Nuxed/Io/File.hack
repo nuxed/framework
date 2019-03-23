@@ -24,19 +24,16 @@ use const PATHINFO_FILENAME;
 final class File extends Node {
   <<__ReturnDisposable>>
   public function getReadHandle(): Filesystem\DisposableFileReadHandle {
-    if (!$this->readable()) {
-      throw new Exception\UnreadableNodeException(
-        Str\format('File (%s) is not readable.', $this->path()->toString()),
-      );
-    }
+    $this->isAvailable();
+    $this->isReadable();
 
     try {
-      return Filesystem\open_read_only($this->path()->toString());
+      return Filesystem\open_read_only($this->path->toString());
     } catch (Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
           'Error while opening file (%s) for reading.',
-          $this->path()->toString(),
+          $this->path->toString(),
         ),
         $e->getCode(),
         $e,
@@ -51,7 +48,7 @@ final class File extends Node {
     if ($mode === Filesystem\FileWriteMode::MUST_CREATE && $this->exists()) {
       throw new Exception\ExistingNodeException(Str\format(
         'Cannot re-create file (%s) for writing.',
-        $this->path()->toString(),
+        $this->path->toString(),
       ));
     }
 
@@ -59,7 +56,7 @@ final class File extends Node {
       $mode === Filesystem\FileWriteMode::MUST_CREATE;
     if (!$creating && !$this->exists()) {
       throw new Exception\MissingNodeException(
-        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
+        Str\format('File (%s) doesn\'t exist.', $this->path->toString()),
       );
     }
 
@@ -71,17 +68,17 @@ final class File extends Node {
       !$this->writable()
     ) {
       throw new Exception\UnwritableNodeException(
-        Str\format('File (%s) is not writable.', $this->path()->toString()),
+        Str\format('File (%s) is not writable.', $this->path->toString()),
       );
     }
 
     try {
-      return Filesystem\open_write_only($this->path()->toString(), $mode);
+      return Filesystem\open_write_only($this->path->toString(), $mode);
     } catch (Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
           'Error while opening file (%s) for writing (mode:%s).',
-          $this->path()->toString(),
+          $this->path->toString(),
           $mode as string,
         ),
         $e->getCode(),
@@ -109,7 +106,7 @@ final class File extends Node {
   public async function create(int $mode = 0755): Awaitable<bool> {
     if ($this->exists()) {
       throw new Exception\ExistingNodeException(
-        Str\format('File (%s) already exists.', $this->path()->toString()),
+        Str\format('File (%s) already exists.', $this->path->toString()),
       );
     }
 
@@ -124,7 +121,7 @@ final class File extends Node {
     }
 
     if ($folder->writable()) {
-      $created = touch($this->path()->toString()) as bool;
+      $created = touch($this->path->toString()) as bool;
       if ($created) {
         await $this->chmod($mode);
       }
@@ -147,19 +144,14 @@ final class File extends Node {
     OperationType $process = OperationType::OVERWRITE,
     int $mode = 0755,
   ): Awaitable<File> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
+    $this->isAvailable();
     if ($target->exists() && $process !== OperationType::OVERWRITE) {
       throw new Exception\ExistingNodeException(
         'Cannot copy file as the target already exists.',
       );
     }
 
-    if (copy($this->path()->toString(), $target->toString())) {
+    if (copy($this->path->toString(), $target->toString())) {
       $file = new File($target);
       await $file->chmod($mode);
 
@@ -176,13 +168,8 @@ final class File extends Node {
    */
   <<__Override>>
   public async function delete(): Awaitable<bool> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
-    $deleted = unlink($this->path()->toString());
+    $this->isAvailable();
+    $deleted = unlink($this->path->toString());
     $this->reset();
     return $deleted;
   }
@@ -191,36 +178,26 @@ final class File extends Node {
    * Return the file extension.
    */
   public function extension(): ?string {
-    return $this->path()->extension();
+    return $this->path->extension();
   }
 
   /**
    * Return an MD5 checksum of the file.
    */
   public function md5(bool $raw = false): string {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
-    return md5_file($this->path()->toString(), $raw) as string;
+    $this->isAvailable();
+    $this->isReadable();
+    return md5_file($this->path->toString(), $raw) as string;
   }
 
   /**
    * Return the mime type for the file.
    */
   public function mimeType(): string {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
+    $this->isAvailable();
     $info = finfo_open(FILEINFO_MIME_TYPE);
-    $type = finfo_file($info, $this->path());
+    $type = finfo_file($info, $this->path);
     finfo_close($info);
-
     return $type as string;
   }
 
@@ -228,8 +205,8 @@ final class File extends Node {
    * Reset the cache and path.
    */
   <<__Override>>
-  public function reset(Path $path = $this->path()): this {
-    if ($path->exists() && $path->isDirectory()) {
+  public function reset(Path $path = $this->path): this {
+    if ($path->exists() && $path->isFolder()) {
       throw new Exception\InvalidPathException(
         Str\format(
           'Invalid file path (%s), folders are not allowed.',
@@ -251,7 +228,7 @@ final class File extends Node {
       throw new Exception\WriteErrorException(
         Str\format(
           'Error while appending data to file (%s).',
-          $this->path()->toString(),
+          $this->path->toString(),
         ),
         $e->getCode(),
         $e,
@@ -270,7 +247,7 @@ final class File extends Node {
       throw new Exception\WriteErrorException(
         Str\format(
           'Error while prepending data to file (%s).',
-          $this->path()->toString(),
+          $this->path->toString(),
         ),
         $e->getCode(),
         $e,
@@ -297,7 +274,7 @@ final class File extends Node {
       throw new Exception\WriteErrorException(
         Str\format(
           'Error while writing to file (%s).',
-          $this->path()->toString(),
+          $this->path->toString(),
         ),
         $e->getCode(),
         $e,
@@ -321,7 +298,7 @@ final class File extends Node {
       throw new Exception\ReadErrorException(
         Str\format(
           'Error while reading from file (%s).',
-          $this->path()->toString(),
+          $this->path->toString(),
         ),
         $e->getCode(),
         $e,
@@ -345,38 +322,27 @@ final class File extends Node {
    */
   <<__Override>>
   public async function size(): Awaitable<int> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
-
-    return filesize($this->path()->toString()) as int;
+    $this->isAvailable();
+    return filesize($this->path->toString()) as int;
   }
 
   /**
    * Creates a symbolic link.
    */
   public async function symlink(Path $target): Awaitable<File> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
+    $this->isAvailable();
     if ($target->exists()) {
       throw new Exception\InvalidPathException(
         Str\format('Target (%s) already exists.', $target->toString()),
       );
     }
 
-    @symlink($this->path()->toString(), $target->toString());
+    @symlink($this->path->toString(), $target->toString());
     if (!$target->exists() || !$target->isSymlink()) {
       throw new Exception\RuntimeException(Str\format(
         'Error while creating a symbolic link (%s) for file (%s).',
         $target->toString(),
-        $this->path()->toString(),
+        $this->path->toString(),
       ));
     }
 
@@ -387,24 +353,19 @@ final class File extends Node {
    * Create a hard link.
    */
   public async function link(Path $link): Awaitable<File> {
-    if (!$this->exists()) {
-      throw new Exception\MissingNodeException(
-        Str\format('File (%s) doesn\'t exist.', $this->path()->toString()),
-      );
-    }
-
+    $this->isAvailable();
     if ($link->exists()) {
       throw new Exception\InvalidPathException(
         Str\format('Link (%s) already exists.', $link->toString()),
       );
     }
 
-    @link($this->path()->toString(), $link->toString());
+    @link($this->path->toString(), $link->toString());
     if (!$link->exists()) {
       throw new Exception\RuntimeException(Str\format(
         'Error while creating a hard link (%s) for file (%s).',
         $link->toString(),
-        $this->path()->toString(),
+        $this->path->toString(),
       ));
     }
 

@@ -1,6 +1,7 @@
 namespace Nuxed\Test\Io;
 
 use namespace Nuxed\Io;
+use namespace HH\Lib\Experimental\Filesystem;
 use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
@@ -14,6 +15,8 @@ class PathTest extends HackTest {
 
   public function testCreate(): void {
     expect(Io\Path::create('/foo/bar')->toString())->toBeSame('/foo/bar');
+    $path = Io\Path::create('/foo/bar');
+    expect(Io\Path::create($path))->toBeSame($path);
   }
 
   <<DataProvider('provideToStringAndMagicToStringData')>>
@@ -212,7 +215,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideIsDirectoryData')>>
   public function testIsDirectory(string $path, bool $expected): void {
-    expect(Io\Path::create($path)->isDirectory())->toBeSame($expected);
+    expect(Io\Path::create($path)->isFolder())->toBeSame($expected);
   }
 
   public function provideIsDirectoryData(): Container<(string, bool)> {

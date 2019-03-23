@@ -29,6 +29,14 @@ final class Path implements Stringish {
   }
 
   public static function create(Stringish $path): Path {
+    if ($path is Path) {
+      return $path;
+    }
+
+    if ($path is Filesystem\Path) {
+      return new self($path);
+    }
+
     $path = static::standard((string)$path, false);
     return new self(new Filesystem\Path($path));
   }
@@ -45,7 +53,7 @@ final class Path implements Stringish {
    * Return the extension from a file path.
    */
   public function extension(): ?string {
-    if ($this->isDirectory()) {
+    if ($this->isFolder()) {
       return null;
     }
 
@@ -189,7 +197,7 @@ final class Path implements Stringish {
   /**
    * Check if the path is a directory.
    */
-  public function isDirectory(): bool {
+  public function isFolder(): bool {
     return $this->path->isDirectory();
   }
 

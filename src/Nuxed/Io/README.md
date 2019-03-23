@@ -288,10 +288,10 @@ $files = await $folder->files(); // Container<File>
 $folders = await $folder->folders(); // Container<Folder>
 ```
 
-To gather a list of both files and folders, use `read()`, which accepts the same arguments.
+To gather a list of both files and folders, use `list()`, which accepts the same arguments.
 
 ```hack
-$nodes = await $folder->read(); // Container<Node>
+$nodes = await $folder->list(); // Container<Node>
 ```
 
 ### Finding
