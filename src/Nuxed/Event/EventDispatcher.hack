@@ -42,6 +42,11 @@ class EventDispatcher implements EventDispatcherInterface {
   public async function dispatch<TEvent as EventInterface>(
     TEvent $event,
   ): Awaitable<TEvent> {
+    if ($event is StoppableEventInterface && $event->isPropagationStopped()) {
+      // event is already stopped.
+      return $event;
+    }
+
     $name = get_class($event);
     $listeners = $this->listeners[$name] ?? vec[];
 
