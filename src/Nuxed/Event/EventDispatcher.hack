@@ -50,25 +50,17 @@ class EventDispatcher implements EventDispatcherInterface {
     $name = get_class($event);
     $listeners = $this->listeners[$name] ?? vec[];
 
-    $stopped = false;
-    $wrappers = await Asio\vmw($listeners, ($listener) ==> {
-      if ($stopped) {
-        return async {
-        };
+    $stopped = new _Private\Ref(false);
+    await Asio\vm($listeners, async ($listener) ==> {
+      if ($stopped->value) {
+        return;
       }
 
-      $awaitable = $listener($event);
+      await $listener($event);
       if ($event is StoppableEventInterface && $event->isPropagationStopped()) {
-        $stopped = true;
+        $stopped->value = true;
       }
-      return $awaitable;
     });
-
-    foreach ($wrappers as $wrapper) {
-      if ($wrapper->isFailed()) {
-        throw $wrapper->getException();
-      }
-    }
 
     return $event;
   }
