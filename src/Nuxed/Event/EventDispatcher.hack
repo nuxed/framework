@@ -75,7 +75,8 @@ final class EventDispatcher implements EventDispatcherInterface {
       };
 
       $operation->value['last'] = $queue;
-      return $queue;
+      // don't return actual queue.
+      return async {};
     });
 
     await $operation->value['last'];
