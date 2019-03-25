@@ -1,6 +1,5 @@
 namespace Nuxed\Event;
 
-use namespace HH\Asio;
 use type Nuxed\Contract\Event\EventSubscriberInterface;
 use type Nuxed\Contract\Event\EventDispatcherInterface;
 use type Nuxed\Contract\Event\EventInterface;
@@ -49,37 +48,29 @@ final class EventDispatcher implements EventDispatcherInterface {
 
     $name = get_class($event);
     $listeners = $this->listeners[$name] ?? vec[];
+    $stopped = false;
+    $lastOperation = async {
+    };
 
-    $stopped = new _Private\Ref(false);
-    $operation = new _Private\Ref(shape(
-      'last' => async {
-      },
-    ));
-    await Asio\vm($listeners, ($listener) ==> {
-      if ($stopped->value) {
-        return async {
-        };
+    foreach ($listeners as $listener) {
+      if ($stopped) {
+        break;
       }
 
-      $last = $operation->value['last'];
-      $queue = async {
-        await $last;
+      $lastOperation = async {
+        await $lastOperation;
         if (
           $event is StoppableEventInterface && $event->isPropagationStopped()
         ) {
-          $stopped->value = true;
+          $stopped = true;
           return;
         }
 
         return await $listener($event);
       };
+    }
 
-      $operation->value['last'] = $queue;
-      // don't return actual queue.
-      return async {};
-    });
-
-    await $operation->value['last'];
+    await $lastOperation;
     return $event;
   }
 
