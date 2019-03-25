@@ -6,14 +6,14 @@ use type Nuxed\Contract\Http\Message\ResponseInterface;
 
 final class CallableRequestHandlerDecorator implements RequestHandlerInterface {
   public function __construct(
-    private (function(ServerRequestInterface): ResponseInterface) $callback,
+    private (function(ServerRequestInterface): Awaitable<ResponseInterface>)
+      $callback,
   ) {}
 
-  public async function handle(
+  public function handle(
     ServerRequestInterface $request,
   ): Awaitable<ResponseInterface> {
     $fun = $this->callback;
-
     return $fun($request);
   }
 }
