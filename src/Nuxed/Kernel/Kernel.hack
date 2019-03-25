@@ -18,7 +18,6 @@ use type Nuxed\Contract\Event\EventListener;
 use type Nuxed\Contract\Event\EventInterface;
 use type Nuxed\Container\Container as C;
 use type Nuxed\Container\ReflectionContainer;
-use type Nuxed\Http\Server\MiddlewareFactory;
 use type Nuxed\Http\Message\ServerRequest;
 
 final class Kernel implements KernelInterface {
@@ -29,7 +28,6 @@ final class Kernel implements KernelInterface {
     private MiddlewarePipeInterface $pipe,
     private EmitterInterface $emitter,
     private EventDispatcherInterface $events,
-    private MiddlewareFactory $middleware,
     private RouteCollectorInterface $collector,
   ) {}
 
@@ -49,7 +47,6 @@ final class Kernel implements KernelInterface {
       $container->get(EmitterInterface::class) as EmitterInterface,
       $container->get(EventDispatcherInterface::class) as
         EventDispatcherInterface,
-      $container->get(MiddlewareFactory::class) as MiddlewareFactory,
       $container->get(RouteCollectorInterface::class) as
         RouteCollectorInterface,
     );
@@ -60,8 +57,8 @@ final class Kernel implements KernelInterface {
 
   public function use(Extension\ExtensionInterface $extension): void {
     $extension->setContainer($this->container);
-    $extension->route($this, $this->middleware);
-    $extension->pipe($this, $this->middleware);
+    $extension->route($this);
+    $extension->pipe($this);
     $extension->subscribe($this->events);
   }
 
