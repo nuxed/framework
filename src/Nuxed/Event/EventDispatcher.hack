@@ -9,11 +9,13 @@ use type Nuxed\Contract\Event\EventListener;
 use type SplPriorityQueue;
 use function get_class;
 
-class EventDispatcher implements EventDispatcherInterface {
+final class EventDispatcher implements EventDispatcherInterface {
   private dict<
     classname<EventInterface>,
     SplPriorityQueue<EventListener<EventInterface>>,
   > $listeners = dict[];
+
+  private ?Awaitable<void> $lastOperation;
 
   /**
    * Register an event listener with the dispatcher.
@@ -51,17 +53,17 @@ class EventDispatcher implements EventDispatcherInterface {
     $listeners = $this->listeners[$name] ?? vec[];
 
     $stopped = new _Private\Ref(false);
-    await Asio\vm($listeners, async ($listener) ==> {
+    await Asio\vm($listeners, ($listener) ==> {
       if ($stopped->value) {
-        return;
+        return async {
+        };
       }
 
-      await $listener($event);
-      if ($event is StoppableEventInterface && $event->isPropagationStopped()) {
-        $stopped->value = true;
-      }
+      $queue = $this->queue($event, $listener, $stopped);
+      return $queue;
     });
 
+    await $this->lastOperation;
     return $event;
   }
 
@@ -70,5 +72,24 @@ class EventDispatcher implements EventDispatcherInterface {
    */
   public function forget(classname<EventInterface> $event): void {
     unset($this->listeners[$event]);
+  }
+
+  private function queue<TEvent as EventInterface>(
+    TEvent $event,
+    (function(TEvent): Awaitable<void>) $next,
+    _Private\Ref<bool> $stopped,
+  ): Awaitable<void> {
+    $last = $this->lastOperation;
+    $queue = async {
+      await $last;
+      if ($event is StoppableEventInterface && $event->isPropagationStopped()) {
+        $stopped->value = true;
+        return;
+      }
+
+      return await $next($event);
+    };
+    $this->lastOperation = $queue;
+    return $queue;
   }
 }

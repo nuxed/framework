@@ -40,8 +40,7 @@ class EventDispatcherTest extends HackTest {
     expect($event->value)->toBeSame('ba');
   }
 
-  public async function testDispatcherDoesntWaitIfListenersSleeps(
-  ): Awaitable<void> {
+  public async function testDispatcherOrder(): Awaitable<void> {
     $events = new Event\EventDispatcher();
     $events->on(
       SillyEvent::class,
@@ -66,16 +65,7 @@ class EventDispatcherTest extends HackTest {
       2,
     );
     $event = await $events->dispatch(new SillyEvent());
-    // 2: b + c
-    //   -> b sleeps
-    //   -> c is appended
-    // -> end
-    // 1: a
-    //   -> a is appended
-    // -> end
-    //   -> b wakes up
-    //   -> b is appended
-    expect($event->value)->toBeSame('cab');
+    expect($event->value)->toBeSame('bca');
   }
 
   public async function testForget(): Awaitable<void> {
@@ -110,7 +100,7 @@ class EventDispatcherTest extends HackTest {
       $event->value = 'called';
     });
     $event = await $events->dispatch(new StoppableSillyEvent());
-    expect($event->value)->toBeSame('called');
+    expect($event->value)->toBeSame('');
   }
 
   public async function testListenersAreNotCalledIfEventIsAlreadyStopped(
