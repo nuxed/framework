@@ -1,4 +1,4 @@
-namespace Nuxed\Http\Server\__Private;
+namespace Nuxed\Http\Server\_Private;
 
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
