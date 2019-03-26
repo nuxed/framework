@@ -6,9 +6,7 @@ use type Nuxed\Contract\Http\Server\MiddlewareInterface;
 use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
 
 /**
- * Decorate callable middleware as PSR-15 middleware.
- *
- * Decorates middleware with the following signature:
+ * Decorates callable with the following signature:
  *
  * <code>
  * function (
@@ -17,10 +15,10 @@ use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
  * ): ResponseInterface
  * </code>
  *
- * such that it will operate as PSR-15 middleware.
+ * such that it will operate as a middleware.
  *
  * Neither the arguments nor the return value need be typehinted; however, if
- * the signature is incompatible, a PHP Error will likely be thrown.
+ * the signature is incompatible, an Exception will likely be thrown.
  */
 final class CallableMiddlewareDecorator implements MiddlewareInterface {
   public function __construct(
