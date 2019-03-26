@@ -16,12 +16,8 @@ class MiddlewarePipeTest extends HackTest {
 
   public function testHandleThrowsIfItReachsTheEndOfThePipe(): void {
     $pipe = new Server\MiddlewarePipe();
-    $pipe->pipe(
-      Server\cm(($req, $next) ==> $next->handle($req))
-    );
-    $pipe->pipe(
-      Server\cm(($req, $next) ==> $next->handle($req))
-    );
+    $pipe->pipe(Server\cm(($req, $next) ==> $next->handle($req)));
+    $pipe->pipe(Server\cm(($req, $next) ==> $next->handle($req)));
     expect(() ==> $pipe->handle($this->request()))
       ->toThrow(Server\Exception\EmptyPipelineException::class);
   }
@@ -30,8 +26,9 @@ class MiddlewarePipeTest extends HackTest {
     $middleware = new Server\MiddlewarePipe();
     $middleware->pipe(
       Server\hm(Server\ch(
-        async ($request) ==> $this->response($request->getAttribute('foo') as string)
-      ))
+        async ($request) ==>
+          $this->response($request->getAttribute('foo') as string),
+      )),
     );
     $request = $this->request()->withAttribute('foo', 'bar');
     $response = await $middleware->handle($request);
@@ -41,36 +38,49 @@ class MiddlewarePipeTest extends HackTest {
   public async function testProcess(): Awaitable<void> {
     $pipe = new Server\MiddlewarePipe();
     $pipe->pipe(
-      Server\cm(($req, $next) ==>
-        $next->handle($req->withAttribute('test', 'a'))),
-      1000
+      Server\cm(
+        ($req, $next) ==> $next->handle($req->withAttribute('test', 'a')),
+      ),
+      1000,
     );
     $pipe->pipe(
-      Server\cm(($req, $next) ==>
-        $next->handle($req->withAttribute('test', $req->getAttribute('test') as string . 'c'))),
-      800
+      Server\cm(
+        ($req, $next) ==> $next->handle(
+          $req->withAttribute('test', $req->getAttribute('test') as string.'c'),
+        ),
+      ),
+      800,
     );
     $pipe->pipe(
-      Server\cm(($req, $next) ==>
-        $next->handle($req->withAttribute('test', $req->getAttribute('test') as string . 'b'))),
-      900
+      Server\cm(
+        ($req, $next) ==> $next->handle(
+          $req->withAttribute('test', $req->getAttribute('test') as string.'b'),
+        ),
+      ),
+      900,
     );
     $pipe->pipe(
-      Server\cm(($req, $next) ==>
-        $next->handle($req->withAttribute('test', $req->getAttribute('test') as string . 'e'))),
-      500
+      Server\cm(
+        ($req, $next) ==> $next->handle(
+          $req->withAttribute('test', $req->getAttribute('test') as string.'e'),
+        ),
+      ),
+      500,
     );
     $pipe->pipe(
-      Server\cm(($req, $next) ==> 
-        $next->handle($req->withAttribute('test', $req->getAttribute('test') as string . 'd'))),
-      700
+      Server\cm(
+        ($req, $next) ==> $next->handle(
+          $req->withAttribute('test', $req->getAttribute('test') as string.'d'),
+        ),
+      ),
+      700,
     );
 
     $response = await $pipe->process(
       $this->request(),
       Server\ch(
-        async ($r) ==> $this->response($r->getAttribute('test') as string)
-      )
+        async ($r) ==> $this->response($r->getAttribute('test') as string),
+      ),
     );
     expect($response->getBody()->toString())->toBeSame('abcde');
   }
@@ -93,17 +103,15 @@ class MiddlewarePipeTest extends HackTest {
   }
 
   private function request(
-    string $uri = '/foo'
+    string $uri = '/foo',
   ): Contract\ServerRequestInterface {
     return new Message\Factory()
       |> tuple($$, $$->createUri($uri))
       |> $$[0]->createServerRequest('GET', $$[1]);
   }
 
-  private function response(
-    string $content
-  ): Contract\ResponseInterface {
-    return new Message\Factory() 
+  private function response(string $content): Contract\ResponseInterface {
+    return new Message\Factory()
       |> tuple($$->createResponse(), $$->createStream($content))
       |> $$[0]->withBody($$[1]);
   }
