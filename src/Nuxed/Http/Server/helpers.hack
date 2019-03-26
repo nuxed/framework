@@ -112,7 +112,7 @@ function dm(
  * Neither the arguments nor the return value need be typehinted; however, if
  * the signature is incompatible, an Exception will likely be thrown.
  */
-function fdm(
+function dfm(
   (function(
     ServerRequestInterface,
     ResponseInterface,
