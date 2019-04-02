@@ -26,7 +26,6 @@ class HttpServiceProvider extends AbstractServiceProvider {
     CookieFactoryInterface::class,
     UriFactoryInterface::class,
     MiddlewarePipeInterface::class,
-    Http\Server\MiddlewareFactory::class,
     RouterInterface::class,
     RouteCollectorInterface::class,
     Http\Router\Middleware\DispatchMiddleware::class,
@@ -70,10 +69,6 @@ class HttpServiceProvider extends AbstractServiceProvider {
     $container->share(
       MiddlewarePipeInterface::class,
       Http\Server\MiddlewarePipe::class,
-    );
-    $container->share(
-      Http\Server\MiddlewareFactory::class,
-      () ==> new Http\Server\MiddlewareFactory($container),
     );
     // Router
     $container->share(RouterInterface::class, Http\Router\Router::class);

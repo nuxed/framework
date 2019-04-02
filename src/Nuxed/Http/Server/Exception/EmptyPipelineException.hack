@@ -12,7 +12,7 @@ class EmptyPipelineException
     classname<MiddlewarePipeInterface> $class,
   ): this {
     return new static(Str\format(
-      '%s cannot handle request; no middleware available to process the request',
+      '%s cannot handle request; no middleware available to process the request.',
       $class,
     ));
   }
