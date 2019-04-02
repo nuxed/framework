@@ -16,7 +16,7 @@ use type Nuxed\Contract\Http\Message\ResponseInterface;
  * they may be piped or routed to. When processed, they delegate handling to the
  * decorated handler, which will return a response.
  */
-final class RequestHandlerMiddleware
+final class RequestHandlerMiddlewareDecorator
   implements MiddlewareInterface, RequestHandlerInterface {
   public function __construct(private RequestHandlerInterface $handler) {}
 

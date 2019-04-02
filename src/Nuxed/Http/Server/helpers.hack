@@ -234,12 +234,12 @@ function lh(
  * they may be piped or routed to. When processed, they delegate handling to the
  * decorated handler, which will return a response.
  *
- * @see Middleware\RequestHandlerMiddleware
+ * @see Middleware\RequestHandlerMiddlewareDecorator
  */
 function hm(
   RequestHandlerInterface $handler,
-): Middleware\RequestHandlerMiddleware {
-  return new Middleware\RequestHandlerMiddleware($handler);
+): Middleware\RequestHandlerMiddlewareDecorator {
+  return new Middleware\RequestHandlerMiddlewareDecorator($handler);
 }
 
 function host(
