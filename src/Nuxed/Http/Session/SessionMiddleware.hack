@@ -14,10 +14,9 @@ class SessionMiddleware implements MiddlewareInterface {
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
   ): Awaitable<ResponseInterface> {
-    $session = $this->persistence->initialize($request);
-    $response =
-      await $handler->handle($request->withAttribute('session', $session));
+    $session = await $this->persistence->initialize($request);
+    $response = await $handler->handle($request->withAttribute('session', $session));
 
-    return $this->persistence->persist($session, $response);
+    return await $this->persistence->persist($session, $response);
   }
 }

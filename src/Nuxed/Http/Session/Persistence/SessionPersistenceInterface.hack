@@ -8,7 +8,7 @@ interface SessionPersistenceInterface {
   /**
    * Generate a session data instance based on the request.
    */
-  public function initialize(ServerRequestInterface $request): SessionInterface;
+  public function initialize(ServerRequestInterface $request): Awaitable<SessionInterface>;
 
   /**
    * Persist the session data instance
@@ -19,5 +19,5 @@ interface SessionPersistenceInterface {
   public function persist(
     SessionInterface $session,
     ResponseInterface $response,
-  ): ResponseInterface;
+  ): Awaitable<ResponseInterface>;
 }
