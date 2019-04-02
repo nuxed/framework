@@ -116,10 +116,6 @@ class Session implements SessionInterface {
    * This can be done to prevent session fixation. When executed, it SHOULD
    * return a new instance; that instance should always return true for
    * isRegenerated().
-   *
-   * An example of where this WOULD NOT return a new instance is within the
-   * shipped LazySession, where instead it would return itself, after
-   * internally re-setting the proxied session.
    */
   public function regenerate(): SessionInterface {
     $session = clone $this;
