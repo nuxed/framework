@@ -2,6 +2,7 @@ namespace Nuxed\Http\Server;
 
 use namespace Nuxed\Http\Message;
 use type Nuxed\Contract\Http\Server\MiddlewareInterface;
+use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
 use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
@@ -255,10 +256,11 @@ function path(
   return new Middleware\PathMiddlewareDecorator($path, $middleware);
 }
 
-function pipe(MiddlewareInterface ...$middlewares): MiddlewareInterface {
+function pipe(MiddlewareInterface ...$middlewares): MiddlewarePipeInterface {
   $pipe = new MiddlewarePipe();
   foreach ($middlewares as $middleware) {
     $pipe->pipe($middleware);
   }
+
   return $pipe;
 }
