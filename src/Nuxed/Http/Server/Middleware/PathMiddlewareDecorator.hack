@@ -42,8 +42,7 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
 
     // Trim off the part of the url that matches the prefix if it is not / only
     if ($this->prefix !== '/') {
-      $requestToProcess =
-        await $this->prepareRequestWithTruncatedPrefix($request);
+      $requestToProcess = $this->prepareRequestWithTruncatedPrefix($request);
     } else {
       $requestToProcess = $request;
     }
@@ -52,7 +51,7 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
     // If the middleware calls on the handler, the handler should be provided
     // the original request, as this indicates we've left the path-segregated
     // layer.
-    $handler = await $this->prepareHandlerForOriginalRequest($handler);
+    $handler = $this->prepareHandlerForOriginalRequest($handler);
     return await $this->middleware
       ->process($requestToProcess, $handler);
   }
@@ -67,20 +66,16 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
     return Str\length($path) > $length ? $path[$length] : '';
   }
 
-  private async function prepareRequestWithTruncatedPrefix(
+  private function prepareRequestWithTruncatedPrefix(
     ServerRequestInterface $request,
-  ): Awaitable<ServerRequestInterface> {
+  ): ServerRequestInterface {
     $uri = $request->getUri();
-    $path = await $this->getTruncatedPath($this->prefix, $uri->getPath());
+    $path = $this->getTruncatedPath($this->prefix, $uri->getPath());
     $new = $uri->withPath($path);
-
     return $request->withUri($new);
   }
 
-  private async function getTruncatedPath(
-    string $segment,
-    string $path,
-  ): Awaitable<string> {
+  private function getTruncatedPath(string $segment, string $path): string {
     if ($segment === $path) {
       // Decorated path and current path are the same; return empty string
       return '';
@@ -90,13 +85,13 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
     return Str\slice($path, Str\length($segment));
   }
 
-  private async function prepareHandlerForOriginalRequest(
+  private function prepareHandlerForOriginalRequest(
     RequestHandlerInterface $handler,
-  ): Awaitable<RequestHandlerInterface> {
-    $callable = (ServerRequestInterface $request): ResponseInterface ==> {
+  ): RequestHandlerInterface {
+    $callable = async ($request) ==> {
       $uri = $request->getUri();
       $uri = $uri->withPath($this->prefix.$uri->getPath());
-      return \HH\Asio\join($handler->handle($request->withUri($uri)));
+      return await $handler->handle($request->withUri($uri));
     };
 
     return new CallableRequestHandlerDecorator($callable);
