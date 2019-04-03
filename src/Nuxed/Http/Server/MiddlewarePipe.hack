@@ -81,11 +81,7 @@ class MiddlewarePipe implements MiddlewarePipeInterface {
     ServerRequestInterface $request,
     RequestHandlerInterface $handler,
   ): Awaitable<ResponseInterface> {
-    $next = new __Private\NextMiddlewareProcessor($this->pipeline, $handler);
+    $next = new _Private\NextMiddlewareProcessor($this->pipeline, $handler);
     return await $next->handle($request);
-  }
-
-  public function reset(): void {
-    $this->pipeline = new SplPriorityQueue<MiddlewareInterface>();
   }
 }
