@@ -1,8 +1,7 @@
 namespace Nuxed\Http\Session\Persistence;
 
-use namespace HH\Asio;
 use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
+use namespace Facebook\TypeSpec;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Session\SessionInterface;
@@ -36,28 +35,34 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
   ) {}
 
   <<__Override>>
-  public function initialize(
+  public async function initialize(
     ServerRequestInterface $request,
-  ): SessionInterface {
+  ): Awaitable<SessionInterface> {
     $this->pathTranslated =
       (string)($request->getServerParams()['PATH_TRANSLATED'] ?? '');
     $id = $this->getCookieFromRequest($request);
-    $sessionData = $id !== '' ? $this->getSessionDataFromCache($id) : dict[];
+    $sessionData = dict[];
+    if ($id !== '') {
+      $sessionData = await $this->getSessionDataFromCache($id);
+    }
     $session = new Session($sessionData, $id);
     $session->expire($this->cookieOptions['lifetime']);
     return $session;
   }
 
   <<__Override>>
-  public function persist(
+  public async function persist(
     SessionInterface $session,
     ResponseInterface $response,
-  ): ResponseInterface {
+  ): Awaitable<ResponseInterface> {
     $id = $session->getId();
 
     if ($session->flushed()) {
-      if (!Str\is_empty($id) && Asio\join($this->cache->contains($id))) {
-        Asio\join($this->cache->forget($id));
+      if ($id !== '') {
+        $contains = await $this->cache->contains($id);
+        if ($contains) {
+          await $this->cache->forget($id);
+        }
       }
 
       return $this->flush($session, $response);
@@ -65,8 +70,7 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
 
     // New session? No data? Nothing to do.
     if (
-      Str\is_empty($id) &&
-      (C\is_empty($session->items()) || !$session->changed())
+      '' === $id && (0 === C\count($session->items()) || !$session->changed())
     ) {
       return $response;
     }
@@ -75,11 +79,11 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
     // - we have no session identifier
     // - the session is marked as regenerated
     // - the session has changed (data is different)
-    if (Str\is_empty($id) || $session->regenerated() || $session->changed()) {
-      $id = $this->regenerateSession($id);
+    if ('' === $id || $session->regenerated() || $session->changed()) {
+      $id = await $this->regenerateSession($id);
     }
 
-    Asio\join($this->cache->put($id, $session->items(), $session->age()));
+    await $this->cache->put($id, $session->items(), $session->age());
 
     return $this->withCacheHeaders(
       $response->withCookie(
@@ -96,17 +100,23 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
    *
    * Regardless, it generates and returns a new session identifier.
    */
-  private function regenerateSession(string $id): string {
-    if (!Str\is_empty($id) && Asio\join($this->cache->contains($id))) {
-      Asio\join($this->cache->forget($id));
+  private async function regenerateSession(string $id): Awaitable<string> {
+    if ('' !== $id) {
+      $contains = await $this->cache->contains($id);
+      if ($contains) {
+        await $this->cache->forget($id);
+      }
     }
+
     return $this->generateSessionId();
   }
 
-  private function getSessionDataFromCache(
+  private async function getSessionDataFromCache(
     string $id,
-  ): KeyedContainer<string, mixed> {
-    /* HH_IGNORE_ERROR[4110] */
-    return $this->cache->get($id, dict[]);
+  ): Awaitable<KeyedContainer<string, mixed>> {
+    $data = await $this->cache->get($id, dict[]);
+
+    return TypeSpec\dict(TypeSpec\string(), TypeSpec\mixed())
+      ->coerceType($data);
   }
 }

@@ -22,33 +22,37 @@
     ],
     "require": {
         "hhvm": "^4.0",
+        "facebook/fbmarkdown": "^1.5",
+        "facebook/hack-router": "^0.18",
+        "facebook/xhp-lib": "^2.9",
+        "hhvm/hhvm-autoload": "^2.0",
         "hhvm/hsl": "^4.0",
         "hhvm/hsl-experimental": "^4.0",
-        "hhvm/hhvm-autoload": "^2.0",
-        "facebook/hack-router": "^0.18",
-        "facebook/fbmarkdown": "^1.5",
-        "facebook/xhp-lib": "^2.9"
+        "hhvm/type-assert": "^3.3"
     },
     "replace": {
-        "nuxed/io": "self.version",
-        "nuxed/contract": "self.version",
-        "nuxed/event": "self.version",
-        "nuxed/crypto": "self.version",
-        "nuxed/cache": "self.version",
-        "nuxed/markdown": "self.version",
         "nuxed/asset": "self.version",
-        "nuxed/period": "self.version",
-        "nuxed/kernel": "self.version",
+        "nuxed/cache": "self.version",
         "nuxed/container": "self.version",
-        "nuxed/util": "self.version",
+        "nuxed/contract": "self.version",
+        "nuxed/crypto": "self.version",
+        "nuxed/event": "self.version",
+        "nuxed/http": "self.version",
+        "nuxed/io": "self.version",
+        "nuxed/kernel": "self.version",
         "nuxed/log": "self.version",
+        "nuxed/markdown": "self.version",
+        "nuxed/period": "self.version",
         "nuxed/stopwatch": "self.version",
-        "nuxed/http": "self.version"
+        "nuxed/util": "self.version"
     },
     "require-dev": {
         "facebook/fbexpect": "^2.4",
         "hhvm/hacktest": "^1.4",
         "hhvm/hhast": "^4.0"
+    },
+    "config": {
+        "sort-packages": true
     },
     "autoload": {
         "psr-4": {
@@ -60,20 +64,17 @@
             "Nuxed\\Test\\": "tests/Nuxed/"
         }
     },
-    "config": {
-        "sort-packages": true
-    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "test": "hacktest -v tests/",
-        "lint": "hhast-lint -v src/",
-        "type-check": "hh_client src/",
         "check": [
             "@type-check",
             "@lint",
             "@test"
-        ]
+        ],
+        "lint": "hhast-lint -v src/",
+        "test": "hacktest -v tests/",
+        "type-check": "hh_client src/"
     },
     "support": {
         "issues": "https://github.com/nuxed/framework/issues",
