@@ -6,7 +6,6 @@ use type Nuxed\Contract\Http\Message\ServerRequestInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Session\SessionInterface;
 use type Nuxed\Contract\Cache\CacheInterface;
-use type Nuxed\Contract\Http\Message\CookieSameSite;
 use type Nuxed\Http\Session\CacheLimiter;
 use type Nuxed\Http\Session\Session;
 
@@ -20,16 +19,7 @@ use type Nuxed\Http\Session\Session;
 class CacheSessionPersistence extends AbstractSessionPersistence {
   public function __construct(
     private CacheInterface $cache,
-    protected shape(
-      'name' => string,
-      'lifetime' => int,
-      'path' => string,
-      'domain' => string,
-      'secure' => bool,
-      'http_only' => bool,
-      'same_site' => CookieSameSite,
-      ...
-    ) $cookieOptions,
+    protected this::TCookieOptions $cookieOptions,
     protected ?CacheLimiter $cacheLimiter,
     protected int $cacheExpire,
   ) {}
@@ -45,9 +35,7 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
     if ($id !== '') {
       $sessionData = await $this->getSessionDataFromCache($id);
     }
-    $session = new Session($sessionData, $id);
-    $session->expire($this->cookieOptions['lifetime']);
-    return $session;
+    return new Session($sessionData, $id);
   }
 
   <<__Override>>
@@ -56,6 +44,13 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
     ResponseInterface $response,
   ): Awaitable<ResponseInterface> {
     $id = $session->getId();
+
+    // New session? No data? Nothing to do.
+    if (
+      '' === $id && (0 === C\count($session->items()) || !$session->changed())
+    ) {
+      return $response;
+    }
 
     if ($session->flushed()) {
       if ($id !== '') {
@@ -68,13 +63,6 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
       return $this->flush($session, $response);
     }
 
-    // New session? No data? Nothing to do.
-    if (
-      '' === $id && (0 === C\count($session->items()) || !$session->changed())
-    ) {
-      return $response;
-    }
-
     // Regenerate the session if:
     // - we have no session identifier
     // - the session is marked as regenerated
@@ -83,12 +71,12 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
       $id = await $this->regenerateSession($id);
     }
 
-    await $this->cache->put($id, $session->items(), $session->age());
-
+    $age = $this->getPersistenceDuration($session);
+    await $this->cache->put($id, $session->items(), $age);
     return $this->withCacheHeaders(
       $response->withCookie(
         $this->cookieOptions['name'],
-        $this->createCookie($id, $session->age()),
+        $this->createCookie($id, $age),
       ),
     );
   }
