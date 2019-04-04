@@ -68,7 +68,7 @@ abstract class AbstractSessionPersistence
   protected function createCookie(string $id, int $expires): Cookie {
     return (new Cookie($id))
       ->withExpires(
-        (new DateTimeImmutable())->add(new DateInterval(Str\format('PT%dS', $expires))),
+        $expires > 0 ? (new DateTimeImmutable())->add(new DateInterval(Str\format('PT%dS', $expires))) : null,
       )
       ->withDomain($this->cookieOptions['domain'])
       ->withPath($this->cookieOptions['path'])
