@@ -68,7 +68,11 @@ abstract class AbstractSessionPersistence
   protected function createCookie(string $id, int $expires): Cookie {
     return (new Cookie($id))
       ->withExpires(
-        $expires > 0 ? (new DateTimeImmutable())->add(new DateInterval(Str\format('PT%dS', $expires))) : null,
+        $expires > 0
+          ? (new DateTimeImmutable())->add(
+            new DateInterval(Str\format('PT%dS', $expires)),
+          )
+          : null,
       )
       ->withDomain($this->cookieOptions['domain'])
       ->withPath($this->cookieOptions['path'])
@@ -181,10 +185,12 @@ abstract class AbstractSessionPersistence
     return $headers;
   }
 
-  protected function getPersistenceDuration(SessionInterface $session): int
-  {
+  protected function getPersistenceDuration(SessionInterface $session): int {
     $duration = $this->cookieOptions['lifetime'] ?? 0;
-    if ($session instanceof Session && $session->contains(Session::SESSION_AGE_KEY)) {
+    if (
+      $session instanceof Session &&
+      $session->contains(Session::SESSION_AGE_KEY)
+    ) {
       $duration = $session->age();
     }
 
