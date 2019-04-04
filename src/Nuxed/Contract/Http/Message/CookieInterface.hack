@@ -1,10 +1,10 @@
 namespace Nuxed\Contract\Http\Message;
 
-use type DateTime;
+use type DateTimeInterface;
 
 interface CookieInterface {
   /**
-   * Return an instance with the specified expires date.
+   * Return an instance with the specified value.
    *
    * This method MUST retain the state of the current instance, and return
    * an instance that contains the domain option.
@@ -12,12 +12,14 @@ interface CookieInterface {
   public function withValue(string $value): this;
 
   /**
-   * Return an instance with the specified expires date.
+   * Return an instance with the specified expiration date.
    *
    * This method MUST retain the state of the current instance, and return
    * an instance that contains the domain option.
+   *
+   * A null value is equivalent to removing the expiration date.
    */
-  public function withExpires(?DateTime $expires): this;
+  public function withExpires(?DateTimeInterface $expires): this;
 
   /**
    * Return an instance with the specified path option.
@@ -101,7 +103,7 @@ interface CookieInterface {
    *
    * @return DataTime the time the cookie expires if specified, or null.
    */
-  public function getExpires(): ?DateTime;
+  public function getExpires(): ?DateTimeInterface;
 
   /**
    * Retrieve the path on the server in which the cookie
