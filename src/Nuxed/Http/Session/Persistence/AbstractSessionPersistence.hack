@@ -7,7 +7,8 @@ use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Contract\Http\Session\SessionInterface;
 use type Nuxed\Contract\Http\Message\CookieSameSite;
 use type Nuxed\Http\Message\Cookie;
-use type DateTime;
+use type Nuxed\Http\Session\Session;
+use type DateTimeImmutable;
 use type DateInterval;
 use function strftime;
 use function file_exists;
@@ -34,7 +35,7 @@ abstract class AbstractSessionPersistence
    */
   const HTTP_DATE_FORMAT = '%a, %d %b %Y %T GMT';
 
-  protected shape(
+  const type TCookieOptions = shape(
     'name' => string,
     'lifetime' => int,
     'path' => string,
@@ -43,7 +44,9 @@ abstract class AbstractSessionPersistence
     'http_only' => bool,
     'same_site' => CookieSameSite,
     ...
-  ) $cookieOptions;
+  );
+
+  protected this::TCookieOptions $cookieOptions;
   protected ?CacheLimiter $cacheLimiter;
   protected int $cacheExpire;
   protected string $pathTranslated = '';
@@ -55,19 +58,17 @@ abstract class AbstractSessionPersistence
     return $response->withCookie(
       $this->cookieOptions['name'],
       (new Cookie(''))
-        ->withExpires(DateTime::createFromFormat(
+        ->withExpires(DateTimeImmutable::createFromFormat(
           'D, d M Y H:i:s T',
           static::CACHE_PAST_DATE,
         )),
     );
   }
 
-  protected function createCookie(string $id, ?int $expires = null): Cookie {
-    $expires = $expires ?? $this->cookieOptions['lifetime'];
-
+  protected function createCookie(string $id, int $expires): Cookie {
     return (new Cookie($id))
       ->withExpires(
-        (new DateTime())->add(new DateInterval(Str\format('PT%dS', $expires))),
+        (new DateTimeImmutable())->add(new DateInterval(Str\format('PT%dS', $expires))),
       )
       ->withDomain($this->cookieOptions['domain'])
       ->withPath($this->cookieOptions['path'])
@@ -178,5 +179,15 @@ abstract class AbstractSessionPersistence
       strftime(static::HTTP_DATE_FORMAT, filemtime($this->pathTranslated));
     $headers['Last-Modified'] = vec[$lastModified];
     return $headers;
+  }
+
+  protected function getPersistenceDuration(SessionInterface $session): int
+  {
+    $duration = $this->cookieOptions['lifetime'] ?? 0;
+    if ($session instanceof Session && $session->contains(Session::SESSION_AGE_KEY)) {
+      $duration = $session->age();
+    }
+
+    return $duration < 0 ? 0 : $duration;
   }
 }
