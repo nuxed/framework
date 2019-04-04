@@ -2,12 +2,12 @@ namespace Nuxed\Http\Message;
 
 use type Nuxed\Contract\Http\Message\CookieInterface;
 use type Nuxed\Contract\Http\Message\CookieSameSite;
-use type DateTime;
+use type DateTimeInterface;
 
 class Cookie implements CookieInterface {
   public function __construct(
     protected string $value,
-    protected ?DateTime $expires = null,
+    protected ?DateTimeInterface $expires = null,
     protected ?string $path = null,
     protected ?string $domain = null,
     protected bool $secure = false,
@@ -22,7 +22,7 @@ class Cookie implements CookieInterface {
     return $new;
   }
 
-  public function withExpires(?DateTime $expires): this {
+  public function withExpires(?DateTimeInterface $expires): this {
     $new = clone $this;
     $new->expires = $expires;
 
@@ -82,7 +82,7 @@ class Cookie implements CookieInterface {
     return $this->value;
   }
 
-  public function getExpires(): ?DateTime {
+  public function getExpires(): ?DateTimeInterface {
     return $this->expires;
   }
 
