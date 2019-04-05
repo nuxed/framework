@@ -3,7 +3,7 @@ namespace Nuxed\Test\Http\Message;
 use namespace Nuxed\Http\Message\Exception;
 use type Nuxed\Contract\Http\Message\StreamInterface;
 use type Nuxed\Contract\Http\Message\UploadedFileError;
-use type Nuxed\Http\Message\Factory;
+use type Nuxed\Http\Message\MessageFactory;
 use type Nuxed\Http\Message\Stream;
 use type Nuxed\Http\Message\UploadedFile;
 use type Facebook\HackTest\HackTest;
@@ -143,7 +143,7 @@ class UploadedFileTest extends HackTest {
   private function createStream(string $data = ''): StreamInterface {
     static $factory;
     if (null === $factory) {
-      $factory = new Factory();
+      $factory = new MessageFactory();
     }
     return $factory->createStream($data);
   }

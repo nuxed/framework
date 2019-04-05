@@ -105,13 +105,13 @@ class MiddlewarePipeTest extends HackTest {
   private function request(
     string $uri = '/foo',
   ): Contract\ServerRequestInterface {
-    return new Message\Factory()
+    return new Message\MessageFactory()
       |> tuple($$, $$->createUri($uri))
       |> $$[0]->createServerRequest('GET', $$[1]);
   }
 
   private function response(string $content): Contract\ResponseInterface {
-    return new Message\Factory()
+    return new Message\MessageFactory()
       |> tuple($$->createResponse(), $$->createStream($content))
       |> $$[0]->withBody($$[1]);
   }
