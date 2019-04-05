@@ -3,7 +3,7 @@ namespace Nuxed\Http\Message;
 use namespace Nuxed\Contract\Http\Message;
 use function fopen;
 
-class Factory
+class MessageFactory
   implements
     Message\ResponseFactoryInterface,
     Message\RequestFactoryInterface,
