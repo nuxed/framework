@@ -6,13 +6,6 @@ This repository is read-only. Please refer to the official framework repository 
 
 The Nuxed Container is a simple but powerful dependency injection container.
 
-> Note! This package is a highly inspired by The PHP Leagues `league/container` package.
-> we would like to thank everyone how have contributed to the League/Container package.
->
-> League Container : <https://github.com/thephpleague/container>
->
-> League Container Contributors : <https://github.com/thephpleague/container/graphs/contributors>
-
 ---
 
 ## Installation

@@ -1,9 +1,8 @@
 namespace Nuxed\Container\Exception;
 
-use type Nuxed\Contract\Container\NotFoundExceptionInterface;
-use type InvalidArgumentException;
+use namespace His\Container\Exception;
+use type Exception;
 
-class NotFoundException
-  extends InvalidArgumentException
-  implements NotFoundExceptionInterface {
-}
+final class NotFoundException
+  extends Exception
+  implements ExceptionInterface, Exception\NotFoundExceptionInterface {}
