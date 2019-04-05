@@ -5,18 +5,14 @@ use namespace Nuxed\Kernel\Handler;
 use namespace Nuxed\Kernel\Middleware;
 use namespace Nuxed\Http\Router\Middleware as Router;
 use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
 
 class HttpExtension extends AbstractExtension {
   <<__Override>>
   public function pipe(MiddlewarePipeInterface $pipe): void {
-    $preparem = ($middleware) ==> Server\lm(
-      () ==> $this->getContainer()->get($middleware) as MiddlewareInterface,
-    );
-    $prepareh = ($middleware) ==> Server\hm(Server\lh(
-      () ==> $this->getContainer()->get($middleware) as RequestHandlerInterface,
-    ));
+    $preparem =
+      ($middleware) ==> Server\lm(() ==> $this->container->get($middleware));
+    $prepareh = ($middleware) ==>
+      Server\hm(Server\lh(() ==> $this->container->get($middleware)));
 
     /*
      *  The error handler should be the first (most outer) middleware to catch
@@ -51,6 +47,6 @@ class HttpExtension extends AbstractExtension {
      * NotFoundHandler kicks in; alternately, you can provide other fallback
      * middleware to execute.
      */
-    $pipe->pipe($preparem(Handler\NotFoundHandler::class), -0x10000);
+    $pipe->pipe($prepareh(Handler\NotFoundHandler::class), -0x10000);
   }
 }

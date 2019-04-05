@@ -12,9 +12,9 @@ class LogExtension extends AbstractExtension {
       /**
        * Close Logger after sending the response.
        */
-      if ($this->getContainer()->has(LoggerInterface::class)) {
-        $logger =
-          $this->getContainer()->get(LoggerInterface::class) as LoggerInterface;
+      if ($this->container->has(LoggerInterface::class)) {
+        $logger = $this->container->get(LoggerInterface::class);
+
         if ($logger is Logger) {
           $logger->debug('closing logger instance.');
           $logger->close();

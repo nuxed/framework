@@ -1,89 +1,129 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace Nuxed\Http;
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
-use type Nuxed\Contract\Http\Emitter\EmitterInterface;
-use type Nuxed\Contract\Http\Message\ResponseFactoryInterface;
-use type Nuxed\Contract\Http\Message\RequestFactoryInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestFactoryInterface;
-use type Nuxed\Contract\Http\Message\StreamFactoryInterface;
-use type Nuxed\Contract\Http\Message\UploadedFileFactoryInterface;
-use type Nuxed\Contract\Http\Message\CookieFactoryInterface;
-use type Nuxed\Contract\Http\Message\UriFactoryInterface;
-use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
+use namespace Nuxed\Container;
+use namespace Nuxed\Contract\Http\Server;
+use namespace Nuxed\Contract\Http\Emitter;
+use namespace Nuxed\Contract\Http\Message;
 use type Nuxed\Contract\Http\Router\RouterInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
-use type Nuxed\Container\Container;
 
-class HttpServiceProvider extends AbstractServiceProvider {
-  protected vec<string> $provides = vec[
-    EmitterInterface::class,
-    ResponseFactoryInterface::class,
-    RequestFactoryInterface::class,
-    ServerRequestFactoryInterface::class,
-    StreamFactoryInterface::class,
-    UploadedFileFactoryInterface::class,
-    CookieFactoryInterface::class,
-    UriFactoryInterface::class,
-    MiddlewarePipeInterface::class,
-    RouterInterface::class,
-    RouteCollectorInterface::class,
-    Http\Router\Middleware\DispatchMiddleware::class,
-    Http\Router\Middleware\ImplicitHeadMiddleware::class,
-    Http\Router\Middleware\ImplicitOptionsMiddleware::class,
-    Http\Router\Middleware\MethodNotAllowedMiddleware::class,
-    Http\Router\Middleware\RouteMiddleware::class,
-  ];
+class HttpServiceProvider implements Container\ServiceProviderInterface {
+  public function register(Container\ContainerBuilder $builder): void {
+    $builder->add(
+      Emitter\EmitterInterface::class,
+      new Http\Emitter\EmitterFactory(),
+      true,
+    );
 
-  <<__Override>>
-  public function register(Container $container): void {
-    // Emitter
-    $container->share(EmitterInterface::class, Http\Emitter\Emitter::class);
-    // Messages
-    $container->share(
-      ResponseFactoryInterface::class,
-      Http\Message\Factory::class,
+    $builder->add(
+      Http\Message\MessageFactory::class,
+      new Http\Message\MessageFactoryFactory(),
+      true,
     );
-    $container->share(
-      RequestFactoryInterface::class,
-      Http\Message\Factory::class,
+
+    $builder->add(
+      Message\ResponseFactoryInterface::class,
+      Container\factory(
+        ($container) ==> $container->get(Http\Message\MessageFactory::class),
+      ),
+      true,
     );
-    $container->share(
-      ServerRequestFactoryInterface::class,
-      Http\Message\Factory::class,
+
+    $builder->add(
+      Message\RequestFactoryInterface::class,
+      Container\factory(
+        ($container) ==> $container->get(Http\Message\MessageFactory::class),
+      ),
+      true,
     );
-    $container->share(
-      StreamFactoryInterface::class,
-      Http\Message\Factory::class,
+
+    $builder->add(
+      Message\ServerRequestFactoryInterface::class,
+      Container\factory(
+        ($container) ==> $container->get(Http\Message\MessageFactory::class),
+      ),
+      true,
     );
-    $container->share(
-      UploadedFileFactoryInterface::class,
-      Http\Message\Factory::class,
+
+    $builder->add(
+      Message\StreamFactoryInterface::class,
+      Container\factory(
+        ($container) ==> $container->get(Http\Message\MessageFactory::class),
+      ),
+      true,
     );
-    $container->share(
-      CookieFactoryInterface::class,
-      Http\Message\Factory::class,
+
+    $builder->add(
+      Message\UploadedFileFactoryInterface::class,
+      Container\factory(
+        ($container) ==> $container->get(Http\Message\MessageFactory::class),
+      ),
+      true,
     );
-    $container->share(UriFactoryInterface::class, Http\Message\Factory::class);
-    // Server
-    $container->share(
-      MiddlewarePipeInterface::class,
-      Http\Server\MiddlewarePipe::class,
+
+    $builder->add(
+      Message\CookieFactoryInterface::class,
+      Container\factory(
+        ($container) ==> $container->get(Http\Message\MessageFactory::class),
+      ),
+      true,
     );
-    // Router
-    $container->share(RouterInterface::class, Http\Router\Router::class);
-    $container
-      ->share(RouteCollectorInterface::class, Http\Router\RouteCollector::class)
-      ->addArgument(RouterInterface::class);
-    $container->share(Http\Router\Middleware\DispatchMiddleware::class);
-    $container->share(Http\Router\Middleware\ImplicitHeadMiddleware::class)
-      ->addArgument(RouterInterface::class)
-      ->addArgument(StreamFactoryInterface::class);
-    $container->share(Http\Router\Middleware\ImplicitOptionsMiddleware::class)
-      ->addArgument(ResponseFactoryInterface::class);
-    $container->share(Http\Router\Middleware\MethodNotAllowedMiddleware::class)
-      ->addArgument(ResponseFactoryInterface::class);
-    $container->share(Http\Router\Middleware\RouteMiddleware::class)
-      ->addArgument(RouterInterface::class);
+
+    $builder->add(
+      Message\UriFactoryInterface::class,
+      Container\factory(
+        ($container) ==> $container->get(Http\Message\MessageFactory::class),
+      ),
+      true,
+    );
+
+    $builder->add(
+      Server\MiddlewarePipeInterface::class,
+      new Http\Server\MiddlewarePipeFactory(),
+      true,
+    );
+
+    $builder->add(
+      RouterInterface::class,
+      new Http\Router\RouterFactory(),
+      true,
+    );
+
+    $builder->add(
+      RouteCollectorInterface::class,
+      new Http\Router\RouteCollectorFactory(),
+      true,
+    );
+
+    $builder->add(
+      Http\Router\Middleware\DispatchMiddleware::class,
+      new Http\Router\Middleware\DispatchMiddlewareFactory(),
+      true,
+    );
+
+    $builder->add(
+      Http\Router\Middleware\ImplicitHeadMiddleware::class,
+      new Http\Router\Middleware\ImplicitHeadMiddlewareFactory(),
+      true,
+    );
+
+    $builder->add(
+      Http\Router\Middleware\ImplicitOptionsMiddleware::class,
+      new Http\Router\Middleware\ImplicitOptionsMiddlewareFactory(),
+      true,
+    );
+
+    $builder->add(
+      Http\Router\Middleware\MethodNotAllowedMiddleware::class,
+      new Http\Router\Middleware\MethodNotAllowedMiddlewareFactory(),
+      true,
+    );
+
+    $builder->add(
+      Http\Router\Middleware\RouteMiddleware::class,
+      new Http\Router\Middleware\RouteMiddlewareFactory(),
+      true,
+    );
   }
 }

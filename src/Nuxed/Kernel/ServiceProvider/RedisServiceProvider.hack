@@ -1,14 +1,9 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
-use type Nuxed\Container\Container;
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
+use namespace Nuxed\Container;
 use type Redis;
 
-class RedisServiceProvider extends AbstractServiceProvider {
-  protected vec<string> $provides = vec[
-    Redis::class,
-  ];
-
+class RedisServiceProvider implements Container\ServiceProviderInterface {
   const type TConfig = shape(
     ?'host' => string,
     ?'port' => int,
@@ -18,31 +13,31 @@ class RedisServiceProvider extends AbstractServiceProvider {
     ...
   );
 
-  <<__Override>>
-  public function __construct(private this::TConfig $config = shape()) {
-    parent::__construct();
-  }
+  public function __construct(private this::TConfig $config = shape()) {}
 
-  <<__Override>>
-  public function register(Container $container): void {
-    $container->share(Redis::class, () ==> {
-      $client = new Redis();
-      $client->connect(
-        $this->config['host'] ?? '127.0.0.1',
-        $this->config['port'] ?? 6379,
-        $this->config['timeout'] ?? 0,
-      );
+  public function register(Container\ContainerBuilder $builder): void {
+    $builder->add(
+      Redis::class,
+      Container\factory(($container) ==> {
+        $client = new Redis();
+        $client->connect(
+          $this->config['host'] ?? '127.0.0.1',
+          $this->config['port'] ?? 6379,
+          $this->config['timeout'] ?? 0,
+        );
 
-      $pw = $this->config['password'] ?? null;
-      $db = $this->config['database'] ?? null;
-      if ($pw is nonnull) {
-        $client->auth($pw);
-      }
-      if ($db is nonnull) {
-        $client->select($db);
-      }
+        $pw = $this->config['password'] ?? null;
+        $db = $this->config['database'] ?? null;
+        if ($pw is nonnull) {
+          $client->auth($pw);
+        }
+        if ($db is nonnull) {
+          $client->select($db);
+        }
 
-      return $client;
-    });
+        return $client;
+      }),
+      true,
+    );
   }
 }
