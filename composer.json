@@ -28,7 +28,8 @@
         "hhvm/hhvm-autoload": "^2.0",
         "hhvm/hsl": "^4.0",
         "hhvm/hsl-experimental": "^4.0",
-        "hhvm/type-assert": "^3.3"
+        "hhvm/type-assert": "^3.3",
+        "his/container": "^0.1"
     },
     "replace": {
         "nuxed/asset": "self.version",

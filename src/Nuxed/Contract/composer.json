@@ -22,7 +22,8 @@
     ],
     "require": {
         "hhvm": "^4.0",
-        "hhvm/hhvm-autoload": "^2.0"
+        "hhvm/hhvm-autoload": "^2.0",
+        "his/container": "^0.1.0"
     },
     "autoload": {
         "psr-4": {
