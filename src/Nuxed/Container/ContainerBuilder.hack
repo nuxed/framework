@@ -2,6 +2,7 @@ namespace Nuxed\Container;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
+use namespace HH\Lib\Dict;
 use namespace Nuxed\Contract\Service;
 use type His\Container\ContainerInterface;
 
@@ -56,6 +57,12 @@ final class ContainerBuilder {
   public function build(
     Container<ContainerInterface> $delegates = vec[],
   ): ContainerInterface {
-    return new ServiceContainer($this->definitions, $delegates);
+    return new ServiceContainer(
+      Dict\map(
+        $this->definitions,
+        ($definition) ==> $definition is ServiceDefinition<_> ? clone $definition : $definition
+      ),
+      $delegates
+    );
   }
 }
