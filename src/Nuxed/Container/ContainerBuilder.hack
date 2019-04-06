@@ -56,12 +56,18 @@ final class ContainerBuilder {
 
   public function build(
     Container<ContainerInterface> $delegates = vec[],
-  ): ContainerInterface {
+  ): ServiceContainer {
+    $definitions = Dict\map(
+      $this->definitions,
+      ($definition) ==> {
+        $definition as ServiceDefinition<_>;
+        return clone $definition;
+      }
+    );
+
     return new ServiceContainer(
-      Dict\map(
-        $this->definitions,
-        ($definition) ==> $definition is ServiceDefinition<_> ? clone $definition : $definition
-      ),
+      /* HH_IGNORE_ERROR[4110] */
+      $definitions,
       $delegates
     );
   }

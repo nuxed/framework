@@ -9,7 +9,7 @@ final class ServiceContainer implements ContainerInterface {
   private vec<ContainerInterface> $delegates;
 
   public function __construct(
-    private KeyedContainer<string, mixed> $definitions = dict[],
+    private KeyedContainer<string, ServiceDefinition<mixed>> $definitions = dict[],
     Container<ContainerInterface> $delegates = vec[],
   ) {
     $this->delegates = vec($delegates);
