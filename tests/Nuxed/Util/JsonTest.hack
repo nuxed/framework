@@ -9,6 +9,13 @@ use type Nuxed\Util\Json;
 use function Facebook\FBExpect\expect;
 
 class JsonTest extends HackTest {
+  const type TStructOne = dict<string, int>;
+  const type TStructTwo = shape(
+    'foo' => string,
+    'bar' => vec<this::TStructOne>,
+    ...
+  );
+
   public function testEncode(): void {
     expect(Json::encode(vec['a']))->toBeSame('["a"]');
   }
@@ -163,5 +170,25 @@ class JsonTest extends HackTest {
       Exception\JsonDecodeException::class,
       'Malformed UTF-8 characters, possibly incorrectly encoded',
     );
+  }
+
+  public function testStructure(): void {
+    $json = Json::encode(dict['foo' => 32, 'bar' => 3, 'c' => 5]);
+
+    expect(Json::structure($json, type_structure($this, 'TStructOne')))
+      ->toBeSame(dict['foo' => 32, 'bar' => 3, 'c' => 5]);
+
+    expect(
+      () ==> Json::structure($json, type_structure($this, 'TStructTwo'))
+    )->toThrow(Exception\JsonDecodeException::class);
+
+    $json = Json::encode(dict['foo' => 'hello', 'bar' => vec[
+      dict['foo' => 32, 'bar' => 3, 'c' => 5]
+    ]]);
+
+    expect(Json::structure($json, type_structure($this, 'TStructTwo')))
+      ->toBeSame(shape('foo' => 'hello', 'bar' => vec[
+        dict['foo' => 32, 'bar' => 3, 'c' => 5]
+      ]));
   }
 }
