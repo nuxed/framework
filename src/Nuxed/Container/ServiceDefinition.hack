@@ -36,6 +36,7 @@ final class ServiceDefinition<T> {
 
   public function setFactory(Service\FactoryInterface<T> $factory): this {
     $this->factory = $factory;
+    $this->resolved = null;
 
     return $this;
   }
