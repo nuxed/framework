@@ -1,18 +1,11 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace HH\Asio;
-use type Nuxed\Container\Container;
-use type Nuxed\Container\Argument\RawArgument;
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
+use namespace Nuxed\Container;
 use type AsyncMysqlConnectionPool;
 use type AsyncMysqlConnection;
 
-class MysqlServiceProvider extends AbstractServiceProvider {
-  protected vec<string> $provides = vec[
-    AsyncMysqlConnection::class,
-    AsyncMysqlConnectionPool::class,
-  ];
-
+class MysqlServiceProvider implements Container\ServiceProviderInterface {
   const type TConfig = shape(
     ?'pool' => shape(
       ?'per_key_connection_limit' => int,
@@ -32,24 +25,31 @@ class MysqlServiceProvider extends AbstractServiceProvider {
     ...
   );
 
-  <<__Override>>
-  public function __construct(private this::TConfig $config = shape()) {
-    parent::__construct();
-  }
+  public function __construct(private this::TConfig $config = shape()) {}
 
-  <<__Override>>
-  public function register(Container $container): void {
-    $container->share(AsyncMysqlConnectionPool::class)
-      ->addArgument(
-        new RawArgument(Shapes::idx($this->config, 'pool', shape())),
-      );
+  public function register(Container\ContainerBuilder $builder): void {
+    $builder->add(
+      AsyncMysqlConnectionPool::class,
+      Container\factory(
+        ($container) ==> {
+          $config = Shapes::idx($this->config, 'pool', shape());
+          return new AsyncMysqlConnectionPool(darray[
+            'per_key_connection_limit' =>
+              $config['per_key_connection_limit'] ?? 50,
+            'pool_connection_limit' => $config['pool_connection_limit'] ?? 5000,
+            'idle_timeout_micros' => $config['idle_timeout_micros'] ?? 4000000,
+            'age_timeout_micros' => $config['age_timeout_micros'] ?? 60000000,
+            'expiration_policy' => $config['expiration_policy'] ?? 'Age',
+          ]);
+        },
+      ),
+      true,
+    );
 
-    $container->add(
+    $builder->add(
       AsyncMysqlConnection::class,
-      () ==> {
-        $pool = $container
-          ->get(AsyncMysqlConnectionPool::class) as AsyncMysqlConnectionPool;
-
+      Container\factory(($container) ==> {
+        $pool = $container->get(AsyncMysqlConnectionPool::class);
         return Asio\join(
           $pool->connect(
             $this->config['host'] ?? '127.0.0.1',
@@ -61,7 +61,7 @@ class MysqlServiceProvider extends AbstractServiceProvider {
             $this->config['extra-key'] ?? '',
           ),
         );
-      },
+      }),
       false,
     );
   }

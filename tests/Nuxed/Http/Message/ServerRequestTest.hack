@@ -2,7 +2,7 @@ namespace Nuxed\Test\Http\Message;
 
 use namespace HH\Lib\C;
 use type Nuxed\Http\Message\ServerRequest;
-use type Nuxed\Http\Message\Factory;
+use type Nuxed\Http\Message\MessageFactory;
 use type Nuxed\Http\Message\Uri;
 use type Nuxed\Http\Message\UploadedFile;
 use type Nuxed\Http\Message\UploadsFolder;
@@ -13,7 +13,7 @@ use function Facebook\FBExpect\expect;
 class ServerRequestTest extends HackTest {
   public function testUploadsFiles(): void {
     $request1 = new ServerRequest('GET', new Uri('/'));
-    $factory = new Factory();
+    $factory = new MessageFactory();
     $file = $factory->createUploadedFile($factory->createStream('test'));
     $request2 = $request1->withUploadedFiles(['file' => $file]);
     expect($request2)->toNotBeSame($request1);

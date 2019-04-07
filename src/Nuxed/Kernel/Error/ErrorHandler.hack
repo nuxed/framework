@@ -2,7 +2,7 @@ namespace Nuxed\Kernel\Error;
 
 use namespace Nuxed\Http\Message\Response;
 use namespace Nuxed\Http\Message;
-use type Nuxed\Contract\Event\EventDispatcherInterface;
+use namespace Nuxed\Contract\Event;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
 use type Nuxed\Contract\Http\Message\ResponseInterface;
 use type Nuxed\Kernel\Event\ErrorEvent;
@@ -11,7 +11,7 @@ use type Throwable;
 class ErrorHandler implements ErrorHandlerInterface {
   public function __construct(
     protected bool $debug,
-    protected EventDispatcherInterface $events,
+    protected Event\EventDispatcherInterface $events,
   ) {}
 
   /**

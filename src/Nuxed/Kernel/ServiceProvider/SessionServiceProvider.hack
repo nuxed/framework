@@ -3,17 +3,9 @@ namespace Nuxed\Kernel\ServiceProvider;
 use namespace Nuxed\Contract\Http;
 use namespace Nuxed\Contract\Cache;
 use namespace Nuxed\Http\Session;
-use type Nuxed\Container\Container;
-use type Nuxed\Container\Argument\RawArgument;
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
+use namespace Nuxed\Container;
 
-class SessionServiceProvider extends AbstractServiceProvider {
-  protected vec<string> $provides = vec[
-    Session\SessionMiddleware::class,
-    Session\Persistence\SessionPersistenceInterface::class,
-    Session\Persistence\CacheSessionPersistence::class,
-  ];
-
+class SessionServiceProvider implements Container\ServiceProviderInterface {
   const type TConfig = shape(
     ?'cookie' => shape(
       #───────────────────────────────────────────────────────────────────────#
@@ -109,7 +101,7 @@ class SessionServiceProvider extends AbstractServiceProvider {
     # Session Persistence                                                   #
     #───────────────────────────────────────────────────────────────────────#
     # Specifies the session persistence implementation to use.              #
-    # Defaults to the native session persistence.                           #
+    # Defaults to the cache session persistence.                            #
     #───────────────────────────────────────────────────────────────────────#
     ?'persistence' =>
       classname<Session\Persistence\SessionPersistenceInterface>,
@@ -117,23 +109,24 @@ class SessionServiceProvider extends AbstractServiceProvider {
     ...
   );
 
-  <<__Override>>
-  public function __construct(private this::TConfig $config = shape()) {
-    parent::__construct();
-  }
+  public function __construct(private this::TConfig $config = shape()) {}
 
-  <<__Override>>
-  public function register(Container $container): void {
-    $container->share(Session\SessionMiddleware::class)
-      ->addArgument(Session\Persistence\SessionPersistenceInterface::class);
+  public function register(Container\ContainerBuilder $builder): void {
+    $builder->add(
+      Session\SessionMiddleware::class,
+      new Session\SessionMiddlewareFactory(),
+      true,
+    );
 
-    $container->share(
+    $builder->add(
       Session\Persistence\SessionPersistenceInterface::class,
-      () ==> $container
-        ->get(
+      Container\factory(
+        ($container) ==> $container->get(
           $this->config['persistence'] ??
             Session\Persistence\CacheSessionPersistence::class,
         ),
+      ),
+      true,
     );
 
     $cookie = shape(
@@ -149,10 +142,17 @@ class SessionServiceProvider extends AbstractServiceProvider {
     $cl = $this->config['cache-limiter'] ?? Session\CacheLimiter::PRIVATE;
     $ce = $this->config['cache-expire'] ?? 180;
 
-    $container->share(Session\Persistence\CacheSessionPersistence::class)
-      ->addArgument(Cache\CacheInterface::class)
-      ->addArgument(new RawArgument($cookie))
-      ->addArgument(new RawArgument($cl))
-      ->addArgument(new RawArgument($ce));
+    $builder->add(
+      Session\Persistence\CacheSessionPersistence::class,
+      Container\factory(
+        ($container) ==> new Session\Persistence\CacheSessionPersistence(
+          $container->get(Cache\CacheInterface::class),
+          $cookie,
+          $cl,
+          $ce,
+        ),
+      ),
+      true,
+    );
   }
 }

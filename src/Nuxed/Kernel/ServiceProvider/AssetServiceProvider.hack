@@ -1,12 +1,10 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
-use namespace HH\Lib\Str;
 use namespace Nuxed\Io;
 use namespace Nuxed\Asset;
-use type Nuxed\Container\Container as ServiceContainer;
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
+use namespace Nuxed\Container;
 
-class AssetServiceProvider extends AbstractServiceProvider {
+class AssetServiceProvider implements Container\ServiceProviderInterface {
   const type TConfig = shape(
     ?'default' => string,
     'packages' => Container<shape(
@@ -26,74 +24,75 @@ class AssetServiceProvider extends AbstractServiceProvider {
     ...
   );
 
-  protected vec<string> $provides = vec[
-    Asset\Packages::class,
-  ];
+  public function __construct(private this::TConfig $config) {}
 
-  public function __construct(private this::TConfig $config) {
-    parent::__construct();
-  }
+  public function register(Container\ContainerBuilder $builder): void {
+    $builder->add(
+      Asset\Packages::class,
+      Container\factory(
+        ($_) ==> {
+          $startegies = dict[];
+          foreach (
+            ($this->config['version_strategy'] ?? vec[]) as $versionStartegy
+          ) {
+            $manifest = $versionStartegy['manifest'] ?? null;
 
-  <<__Override>>
-  public function register(ServiceContainer $container): void {
-    foreach (($this->config['version_strategy'] ?? vec[]) as $config) {
-      $container->share(
-        Str\format('asset.version_strategy.%s', $config['name']),
-        () ==> {
-          $manifest = $config['manifest'] ?? null;
-          if ($manifest is nonnull) {
-            return new Asset\VersionStrategy\JsonManifestVersionStrategy(
-              new Io\File(Io\Path::create($manifest)),
-            );
+            if ($manifest is nonnull) {
+              $startegies[$versionStartegy['name']] =
+                new Asset\VersionStrategy\JsonManifestVersionStrategy(
+                  new Io\File(Io\Path::create($manifest)),
+                );
+            } else {
+              $version = $versionStartegy['version'] ?? null;
+
+              if ($version is nonnull) {
+                $startegies[$versionStartegy['name']] =
+                  new Asset\VersionStrategy\StaticVersionStrategy(
+                    $version,
+                    $versionStartegy['format'] ?? null,
+                  );
+              } else {
+                $startegies[$versionStartegy['name']] =
+                  new Asset\VersionStrategy\EmptyVersionStrategy();
+              }
+            }
           }
-          $version = $config['version'] ?? null;
-          if ($version is nonnull) {
-            return new Asset\VersionStrategy\StaticVersionStrategy(
-              $version,
-              $config['format'] ?? null,
-            );
-          }
-          return new Asset\VersionStrategy\EmptyVersionStrategy();
-        },
-      );
-    }
 
-    foreach (($this->config['packages'] ?? vec[]) as $package) {
-      $container->share(
-        Str\format('asset.package.%s', $package['name']),
-        () ==> {
-          $vsn = $package['version_strategy'] ?? null;
-          if (null === $vsn) {
-            $vs = new Asset\VersionStrategy\EmptyVersionStrategy();
+          $packages = dict[];
+          foreach ($this->config['packages'] as $package) {
+            $versionStartegy = $package['version_strategy'] ?? null;
+
+            if ($versionStartegy is nonnull) {
+              $versionStartegy = $startegies[$versionStartegy];
+            } else {
+              $versionStartegy =
+                new Asset\VersionStrategy\EmptyVersionStrategy();
+            }
+
+            $path = $package['path'] ?? null;
+
+            if ($path is nonnull) {
+              $packages[$package['name']] =
+                new Asset\PathPackage($path, $versionStartegy);
+            } else {
+              $packages[$package['name']] = new Asset\UrlPackage(
+                $package['urls'] ?? vec[],
+                $versionStartegy,
+              );
+            }
+          }
+
+          $default = $this->config['default'] ?? null;
+          if ($default is nonnull) {
+            $default = $packages[$default];
           } else {
-            $vs = $container->get($vsn) as
-              Asset\VersionStrategy\VersionStrategyInterface;
+            $default = null;
           }
-          $path = $package['path'] ?? null;
-          if ($path is nonnull) {
-            return new Asset\PathPackage($path, $vs);
-          } else {
-            return new Asset\UrlPackage($package['urls'] ?? vec[], $vs);
-          }
-        },
-      );
-    }
 
-    $container->share(Asset\Packages::class, (): Asset\Packages ==> {
-      $packages = dict[];
-      foreach ($this->config['packages'] as $package) {
-        $packages[$package['name']] =
-          $container->get(Str\format('asset.package.%s', $package['name'])) as
-            Asset\PackageInterface;
-      }
-      $default = $this->config['default'] ?? null;
-      if ($default is nonnull) {
-        $default = $container->get(Str\format('asset.package.%s', $default)) as
-          Asset\PackageInterface;
-      } else {
-        $default = null;
-      }
-      return new Asset\Packages($default, $packages);
-    });
+          return new Asset\Packages($default, $packages);
+        },
+      ),
+      true,
+    );
   }
 }

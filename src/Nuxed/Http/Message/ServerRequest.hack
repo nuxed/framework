@@ -37,7 +37,7 @@ class ServerRequest extends Request implements ServerRequestInterface {
    * @see Factory->createServerRequestFromGlobals()
    */
   public static function capture(): ServerRequestInterface {
-    return (new Factory())->createServerRequestFromGlobals();
+    return (new MessageFactory())->createServerRequestFromGlobals();
   }
 
   public function getServerParams(): KeyedContainer<string, mixed> {

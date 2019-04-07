@@ -2,7 +2,6 @@ namespace Nuxed\Kernel\Extension;
 
 use namespace Nuxed\Http;
 use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
 
 class SessionExtension extends AbstractExtension {
   <<__Override>>
@@ -14,8 +13,7 @@ class SessionExtension extends AbstractExtension {
      */
     $pipe->pipe(
       Http\Server\lm(
-        () ==> $this->getContainer()
-          ->get(Http\Session\SessionMiddleware::class) as MiddlewareInterface,
+        () ==> $this->container->get(Http\Session\SessionMiddleware::class),
       ),
       0x9100,
     );

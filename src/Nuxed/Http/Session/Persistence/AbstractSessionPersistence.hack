@@ -39,7 +39,7 @@ abstract class AbstractSessionPersistence
     'name' => string,
     'lifetime' => int,
     'path' => string,
-    'domain' => string,
+    'domain' => ?string,
     'secure' => bool,
     'http_only' => bool,
     'same_site' => CookieSameSite,

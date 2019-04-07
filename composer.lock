@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9e07f0321f12f54dc22f4f0abf70af44",
+    "content-hash": "8590242bae82167dac0a420c1d8aa464",
     "packages": [
         {
             "name": "facebook/fbmarkdown",
@@ -324,6 +324,51 @@
                 "hack"
             ],
             "time": "2019-03-22T20:19:06+00:00"
+        },
+        {
+            "name": "his/container",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hack-interface-standards/container.git",
+                "reference": "d5a5e56029c42a0248a2c154dc8da2ac48a4d1b0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hack-interface-standards/container/zipball/d5a5e56029c42a0248a2c154dc8da2ac48a4d1b0",
+                "reference": "d5a5e56029c42a0248a2c154dc8da2ac48a4d1b0",
+                "shasum": ""
+            },
+            "require": {
+                "hhvm": "^4.0",
+                "hhvm/hhvm-autoload": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "azjezz",
+                    "email": "azjezz@protonmail.com"
+                }
+            ],
+            "description": "Hack Standard Interface for Service Container.",
+            "keywords": [
+                "container",
+                "container-interface",
+                "container-interop",
+                "hack",
+                "hhvm",
+                "his"
+            ],
+            "time": "2019-03-04T07:50:32+00:00"
         }
     ],
     "packages-dev": [

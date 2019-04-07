@@ -1,7 +1,7 @@
 namespace Nuxed\Kernel;
 
 use namespace HH\Asio;
-use type Nuxed\Contract\Container\ContainerInterface;
+use type His\Container\ContainerInterface;
 use type Nuxed\Contract\Event\EventDispatcherInterface;
 use type Nuxed\Contract\Kernel\KernelInterface;
 use type Nuxed\Contract\Http\Message\ServerRequestInterface;
@@ -16,8 +16,6 @@ use type Nuxed\Contract\Log\LoggerAwareTrait;
 use type Nuxed\Contract\Event\EventSubscriberInterface;
 use type Nuxed\Contract\Event\EventListener;
 use type Nuxed\Contract\Event\EventInterface;
-use type Nuxed\Container\Container as C;
-use type Nuxed\Container\ReflectionContainer;
 use type Nuxed\Http\Message\ServerRequest;
 
 final class Kernel implements KernelInterface {
@@ -31,32 +29,10 @@ final class Kernel implements KernelInterface {
     private RouteCollectorInterface $collector,
   ) {}
 
-  public static function create(): (C, Kernel) {
-    $container = new C();
-    $container->delegate(new ReflectionContainer(true));
-    $container->defaultToShared();
-
-    $container->addServiceProvider(new ServiceProvider\HttpServiceProvider());
-    $container->addServiceProvider(new ServiceProvider\EventServiceProvider());
-    $container->addServiceProvider(new ServiceProvider\ErrorServiceProvider());
-
-    $kernel = new Kernel(
-      $container,
-      $container->get(MiddlewarePipeInterface::class) as
-        MiddlewarePipeInterface,
-      $container->get(EmitterInterface::class) as EmitterInterface,
-      $container->get(EventDispatcherInterface::class) as
-        EventDispatcherInterface,
-      $container->get(RouteCollectorInterface::class) as
-        RouteCollectorInterface,
-    );
-    $kernel->use(new Extension\HttpExtension());
-
-    return tuple($container, $kernel);
-  }
-
-  public function use(Extension\ExtensionInterface $extension): void {
-    $extension->setContainer($this->container);
+  public function use(
+    classname<Extension\ExtensionInterface> $extension,
+  ): void {
+    $extension = new $extension($this->container);
     $extension->route($this);
     $extension->pipe($this);
     $extension->subscribe($this->events);

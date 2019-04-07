@@ -11,7 +11,7 @@ trait RequestFactoryTestTrait {
   final protected function request(
     string $uri,
   ): Contract\ServerRequestInterface {
-    $factory = new Message\Factory();
+    $factory = new Message\MessageFactory();
     $request = $factory->createServerRequest('GET', $factory->createUri($uri));
     return $request;
   }

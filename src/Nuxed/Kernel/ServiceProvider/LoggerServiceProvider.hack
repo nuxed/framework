@@ -3,21 +3,11 @@ namespace Nuxed\Kernel\ServiceProvider;
 use namespace HH\Lib\Vec;
 use namespace Nuxed\Contract\Log as Contract;
 use namespace Nuxed\Log;
-use type Nuxed\Container\Container as ServiceContainer;
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
+use namespace Nuxed\Container;
 use function sys_get_temp_dir;
 use const LOG_PID;
 
-class LoggerServiceProvider extends AbstractServiceProvider {
-  protected vec<string> $provides = vec[
-    Contract\LoggerInterface::class,
-    Log\Handler\RotatingFileHandler::class,
-    Log\Handler\StreamHandler::class,
-    Log\Handler\SysLogHandler::class,
-    Log\Processor\ContextProcessor::class,
-    Log\Processor\MessageLengthProcessor::class,
-  ];
-
+class LoggerServiceProvider implements Container\ServiceProviderInterface {
   const type TConfig = shape(
     #───────────────────────────────────────────────────────────────────────#
     # Log Handlers                                                          #
@@ -73,72 +63,101 @@ class LoggerServiceProvider extends AbstractServiceProvider {
     ...
   );
 
-  <<__Override>>
   public function __construct(private this::TConfig $config = shape()) {
-    parent::__construct();
   }
 
-  <<__Override>>
-  public function register(ServiceContainer $container): void {
-    $container->share(Contract\LoggerInterface::class, () ==> {
-      $handlers = Vec\map(
-        Shapes::idx(
-          $this->config,
-          'handlers',
-          vec[
-            Log\Handler\SysLogHandler::class,
-          ],
+  public function register(Container\ContainerBuilder $builder): void {
+    $builder->add(
+      Contract\LoggerInterface::class,
+      Container\factory(
+        ($container) ==> new Log\Logger(
+          Vec\map(
+            Shapes::idx(
+              $this->config,
+              'handlers',
+              vec[Log\Handler\SysLogHandler::class],
+            ),
+            ($handler) ==> $container->get($handler),
+          ),
+          Vec\map(
+            Shapes::idx(
+              $this->config,
+              'processors',
+              vec[Log\Processor\ContextProcessor::class],
+            ),
+            ($processor) ==> $container->get($processor),
+          ),
         ),
-        (classname<Log\Handler\HandlerInterface> $class) ==>
-          $container->get($class) as Log\Handler\HandlerInterface,
-      );
-      $processors = Vec\map(
-        Shapes::idx(
-          $this->config,
-          'processors',
-          vec[
-            Log\Processor\ContextProcessor::class,
-          ],
-        ),
-        (classname<Log\Processor\ProcessorInterface> $class) ==> $container
-          ->get($class) as Log\Processor\ProcessorInterface,
-      );
-      return new Log\Logger($handlers, $processors);
-    });
+      ),
+      true,
+    );
 
     $options = Shapes::idx($this->config, 'options', shape());
-    $container->share(Log\Handler\RotatingFileHandler::class, () ==> {
-      $options = Shapes::idx($options, 'rotating-file', shape());
-      return new Log\Handler\RotatingFileHandler(
-        $options['filename'] ?? sys_get_temp_dir().'/nuxed.log',
-        $options['max-files'] ?? 0,
-        $options['level'] ?? Contract\LogLevel::INFO,
-        $options['bubble'] ?? true,
-        $options['file-permission'] ?? null,
-        $options['use-lock'] ?? false,
-      );
-    });
-    $container->share(Log\Handler\StreamHandler::class, () ==> {
-      $options = Shapes::idx($options, 'stream', shape());
-      return new Log\Handler\StreamHandler(
-        $options['url'] ?? sys_get_temp_dir().'/nuxed.log',
-        $options['level'] ?? Contract\LogLevel::INFO,
-        $options['bubble'] ?? true,
-        $options['file-permission'] ?? null,
-        $options['use-lock'] ?? false,
-      );
-    });
-    $container->share(Log\Handler\SysLogHandler::class, () ==> {
-      $options = Shapes::idx($options, 'syslog', shape());
-      return new Log\Handler\SysLogHandler(
-        $options['ident'] ?? 'nuxed',
-        $options['facility'] ?? Log\Handler\SysLogFacility::USER,
-        $options['level'] ?? Contract\LogLevel::INFO,
-        $options['bubble'] ?? true,
-        $options['options'] ?? LOG_PID,
-      );
-    });
-    $container->share(Log\Processor\MessageLengthProcessor::class);
-    $container->share(Log\Processor\ContextProcessor::class);
+
+    $builder->add(
+      Log\Handler\RotatingFileHandler::class,
+      Container\factory(
+        ($container) ==> {
+          $options = Shapes::idx($options, 'rotating-file', shape());
+          return new Log\Handler\RotatingFileHandler(
+            $options['filename'] ?? sys_get_temp_dir().'/nuxed.log',
+            $options['max-files'] ?? 0,
+            $options['level'] ?? Contract\LogLevel::INFO,
+            $options['bubble'] ?? true,
+            $options['file-permission'] ?? null,
+            $options['use-lock'] ?? false,
+          );
+        },
+      ),
+      true,
+    );
+
+    $builder->add(
+      Log\Handler\StreamHandler::class,
+      Container\factory(
+        ($container) ==> {
+          $options = Shapes::idx($options, 'stream', shape());
+          return new Log\Handler\StreamHandler(
+            $options['url'] ?? sys_get_temp_dir().'/nuxed.log',
+            $options['level'] ?? Contract\LogLevel::INFO,
+            $options['bubble'] ?? true,
+            $options['file-permission'] ?? null,
+            $options['use-lock'] ?? false,
+          );
+        },
+      ),
+      true,
+    );
+
+    $builder->add(
+      Log\Handler\SysLogHandler::class,
+      Container\factory(
+        ($container) ==> {
+          $options = Shapes::idx($options, 'syslog', shape());
+          return new Log\Handler\SysLogHandler(
+            $options['ident'] ?? 'nuxed',
+            $options['facility'] ?? Log\Handler\SysLogFacility::USER,
+            $options['level'] ?? Contract\LogLevel::INFO,
+            $options['bubble'] ?? true,
+            $options['options'] ?? LOG_PID,
+          );
+        },
+      ),
+      true,
+    );
+
+    $builder->add(
+      Log\Processor\MessageLengthProcessor::class,
+      Container\factory(
+        ($container) ==> new Log\Processor\MessageLengthProcessor(),
+      ),
+      true,
+    );
+
+    $builder->add(
+      Log\Processor\ContextProcessor::class,
+      Container\factory(($container) ==> new Log\Processor\ContextProcessor()),
+      true,
+    );
   }
 }

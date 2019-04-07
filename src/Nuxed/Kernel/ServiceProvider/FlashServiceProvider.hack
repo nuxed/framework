@@ -1,16 +1,14 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace Nuxed\Http;
-use type Nuxed\Container\Container;
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
+use namespace Nuxed\Container;
 
-class FlashServiceProvider extends AbstractServiceProvider {
-  protected vec<string> $provides = vec[
-    Http\Flash\FlashMessagesMiddleware::class,
-  ];
-
-  <<__Override>>
-  public function register(Container $container): void {
-    $container->share(Http\Flash\FlashMessagesMiddleware::class);
+class FlashServiceProvider implements Container\ServiceProviderInterface {
+  public function register(Container\ContainerBuilder $builder): void {
+    $builder->add(
+      Http\Flash\FlashMessagesMiddleware::class,
+      new Http\Flash\FlashMessagesMiddlewareFactory(),
+      true,
+    );
   }
 }

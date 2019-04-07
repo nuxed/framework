@@ -1,20 +1,15 @@
 namespace Nuxed\Kernel\ServiceProvider;
 
 use namespace Nuxed\Event;
+use namespace Nuxed\Container;
 use type Nuxed\Contract\Event\EventDispatcherInterface;
-use type Nuxed\Container\Container;
-use type Nuxed\Container\ServiceProvider\AbstractServiceProvider;
 
-class EventServiceProvider extends AbstractServiceProvider {
-  protected vec<string> $provides = vec[
-    EventDispatcherInterface::class,
-  ];
-
-  <<__Override>>
-  public function register(Container $container): void {
-    $container->share(
+class EventServiceProvider implements Container\ServiceProviderInterface {
+  public function register(Container\ContainerBuilder $builder): void {
+    $builder->add(
       EventDispatcherInterface::class,
-      Event\EventDispatcher::class,
+      new Event\EventDispatcherFactory(),
+      true,
     );
   }
 }

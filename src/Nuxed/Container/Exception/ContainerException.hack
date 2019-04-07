@@ -1,9 +1,7 @@
 namespace Nuxed\Container\Exception;
 
-use type Nuxed\Contract\Container\ContainerExceptionInterface;
-use type RuntimeException;
+use type Exception;
 
-class ContainerException
-  extends RuntimeException
-  implements ContainerExceptionInterface {
-}
+final class ContainerException
+  extends Exception
+  implements ExceptionInterface {}
