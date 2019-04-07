@@ -57,6 +57,7 @@ final class ServiceDefinition<T> {
 
   public function inflect(Service\InflectorInterface<T> $inflector): this {
     $this->inflectors[] = $inflector;
+    $this->resolved = null;
 
     return $this;
   }
