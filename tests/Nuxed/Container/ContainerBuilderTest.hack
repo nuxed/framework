@@ -86,9 +86,8 @@ class ContainerBuilderTest extends HackTest\HackTest {
     $builder->inflect(
       Map::class,
       Container\inflector(
-        ($map, $_) ==>  Map { 'baz' => 'qux' }
-          |> $$->addAll($map->items())
-        ,
+        ($map, $_) ==> Map {'baz' => 'qux'}
+          |> $$->addAll($map->items()),
       ),
     );
 
@@ -104,29 +103,31 @@ class ContainerBuilderTest extends HackTest\HackTest {
 
   public function testInflectThrowsIfServiceIsMissing(): void {
     $builder = new Container\ContainerBuilder();
-    expect(() ==> $builder->inflect(
-      Set::class,
-      Container\inflector(($set, $_) ==> $set),
-    ))->toThrow(Container\Exception\NotFoundException::class);
+    expect(
+      () ==>
+        $builder->inflect(Set::class, Container\inflector(($set, $_) ==> $set)),
+    )->toThrow(Container\Exception\NotFoundException::class);
   }
 
   public function testBuild(): void {
     $builder1 = new Container\ContainerBuilder();
     $builder2 = new Container\ContainerBuilder();
     $builder3 = new Container\ContainerBuilder();
-  
-    $builder1->add(Vector::class, Container\factory(
-      ($_) ==> Vector { 1, 2, 3, },
-    ), true);
-    
-    $builder2->add(Set::class, Container\factory(
-      ($_) ==> Set { 1, 2, 3, },
-    ), true);
-    
-    $builder3->add(Map::class, Container\factory(
-      ($_) ==> Map { 1 => 'foo', 2 => 'bar', 3 => 'baz', },
-    ), true);
-    
+
+    $builder1->add(
+      Vector::class,
+      Container\factory(($_) ==> Vector {1, 2, 3}),
+      true,
+    );
+
+    $builder2->add(Set::class, Container\factory(($_) ==> Set {1, 2, 3}), true);
+
+    $builder3->add(
+      Map::class,
+      Container\factory(($_) ==> Map {1 => 'foo', 2 => 'bar', 3 => 'baz'}),
+      true,
+    );
+
     $container1 = $builder1->build();
     $container2 = $builder2->build();
     $container3 = $builder3->build();
@@ -138,11 +139,11 @@ class ContainerBuilderTest extends HackTest\HackTest {
     expect($container1->has(Vector::class))->toBeTrue();
     expect($container1->has(Set::class))->toBeFalse();
     expect($container1->has(Map::class))->toBeFalse();
-    
+
     expect($container2->has(Vector::class))->toBeFalse();
     expect($container2->has(Set::class))->toBeTrue();
     expect($container2->has(Map::class))->toBeFalse();
-    
+
     expect($container3->has(Vector::class))->toBeFalse();
     expect($container3->has(Set::class))->toBeFalse();
     expect($container3->has(Map::class))->toBeTrue();
@@ -159,19 +160,21 @@ class ContainerBuilderTest extends HackTest\HackTest {
     $builder1 = new Container\ContainerBuilder();
     $builder2 = new Container\ContainerBuilder();
     $builder3 = new Container\ContainerBuilder();
-  
-    $builder1->add(Vector::class, Container\factory(
-      ($_) ==> Vector { 1, 2, 3, },
-    ), true);
-    
-    $builder2->add(Set::class, Container\factory(
-      ($_) ==> Set { 1, 2, 3, },
-    ), true);
-    
-    $builder3->add(Map::class, Container\factory(
-      ($_) ==> Map { 1 => 'foo', 2 => 'bar', 3 => 'baz', },
-    ), true);
-    
+
+    $builder1->add(
+      Vector::class,
+      Container\factory(($_) ==> Vector {1, 2, 3}),
+      true,
+    );
+
+    $builder2->add(Set::class, Container\factory(($_) ==> Set {1, 2, 3}), true);
+
+    $builder3->add(
+      Map::class,
+      Container\factory(($_) ==> Map {1 => 'foo', 2 => 'bar', 3 => 'baz'}),
+      true,
+    );
+
     $container1 = $builder1->build();
     $container2 = $builder2->build();
     $container3 = $builder3->build();
@@ -187,15 +190,17 @@ class ContainerBuilderTest extends HackTest\HackTest {
   public function testInflectDoesntEffectBuiltContainers(): void {
     $builder = new Container\ContainerBuilder();
 
-    $builder->add(Map::class, Container\factory(
-      ($_) ==> Map { 'foo' => 'bar' }
-    ), true);
+    $builder->add(
+      Map::class,
+      Container\factory(($_) ==> Map {'foo' => 'bar'}),
+      true,
+    );
 
     $container = $builder->build();
 
     $builder->inflect(Map::class, Container\inflector(
-      ($map, $_) ==> Map { 'bar' => 'baz' }
-        |> $$->addAll($map->items())
+      ($map, $_) ==> Map {'bar' => 'baz'}
+        |> $$->addAll($map->items()),
     ));
 
     $map = $container->get(Map::class);

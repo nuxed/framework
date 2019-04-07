@@ -62,13 +62,13 @@ final class ContainerBuilder {
       ($definition) ==> {
         $definition as ServiceDefinition<_>;
         return clone $definition;
-      }
+      },
     );
 
     return new ServiceContainer(
       /* HH_IGNORE_ERROR[4110] */
       $definitions,
-      $delegates
+      $delegates,
     );
   }
 }

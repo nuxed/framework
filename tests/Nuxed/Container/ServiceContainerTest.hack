@@ -12,12 +12,10 @@ class ServiceContainerTest extends HackTest\HackTest {
 
     $definition = new Container\ServiceDefinition(
       Map::class,
-      Container\factory(
-        ($_) ==> Map {}
-      ),
+      Container\factory(($_) ==> Map {}),
     );
     $container = new Container\ServiceContainer(dict[
-      Map::class => $definition 
+      Map::class => $definition,
     ]);
     expect($container->has(Map::class))->toBeTrue();
 
@@ -29,12 +27,10 @@ class ServiceContainerTest extends HackTest\HackTest {
   public function testGet(): void {
     $definition = new Container\ServiceDefinition(
       Map::class,
-      Container\factory(
-        ($_) ==> Map {}
-      ),
+      Container\factory(($_) ==> Map {}),
     );
     $container = new Container\ServiceContainer(dict[
-      Map::class => $definition 
+      Map::class => $definition,
     ]);
     expect($container->get(Map::class))->toBeInstanceOf(Map::class);
 
@@ -45,11 +41,13 @@ class ServiceContainerTest extends HackTest\HackTest {
     $definition = new Container\ServiceDefinition(
       Map::class,
       Container\factory(
-        ($_) ==> { throw new \Exception('foo'); }
+        ($_) ==> {
+          throw new \Exception('foo');
+        },
       ),
     );
     $container = new Container\ServiceContainer(dict[
-      Map::class => $definition 
+      Map::class => $definition,
     ]);
 
     expect(() ==> $container->get(Map::class))
@@ -62,12 +60,10 @@ class ServiceContainerTest extends HackTest\HackTest {
 
     $definition = new Container\ServiceDefinition(
       Map::class,
-      Container\factory(
-        ($_) ==> Map {}
-      ),
+      Container\factory(($_) ==> Map {}),
     );
     $container = new Container\ServiceContainer(dict[
-      Map::class => $definition 
+      Map::class => $definition,
     ]);
     $container = new Container\ServiceContainer(dict[], vec[$container]);
     expect($container->get(Map::class))->toBeInstanceOf(Map::class);
