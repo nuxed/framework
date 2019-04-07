@@ -18,6 +18,7 @@ use namespace Nuxed\Asset\Exception;
  * You could then ask for the version of "main.js" or "css/styles.css".
  */
 class JsonManifestVersionStrategy implements VersionStrategyInterface {
+  const type TManifest = KeyedContainer<string, string>;
   private ?KeyedContainer<string, string> $manifestData;
 
   public function __construct(private Io\File $manifest) {
@@ -45,10 +46,10 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface {
         ));
       }
 
-      $manifest = Util\Json::decode(Asio\join($this->manifest->read())) as
-        KeyedTraversable<_, _>;
-      // UNSAFE
-      $this->manifestData = dict($manifest);
+      $this->manifestData = Util\Json::structure(
+        Asio\join($this->manifest->read()),
+        type_structure($this, 'TManifest'),
+      );
     }
 
     return idx($this->manifestData, $path, null);
