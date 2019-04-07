@@ -81,4 +81,60 @@ class ServiceDefinitionTest extends HackTest\HackTest {
 
     expect($definition->getInflectors())->toContain($inflector);
   }
+
+  public function testSharedDefinitionIsResetAfterChangingFactory(): void {
+    $container = new Container\ServiceContainer(dict[]);
+    $definition = new Container\ServiceDefinition(
+      Map::class,
+      Container\factory(
+        ($_) ==> Map { 'foo' => 'bar' }
+      ),
+      true
+    );
+
+    $map1 = $definition->resolve($container);
+    $map2 = $definition->resolve($container);
+
+    expect($map1->at('foo'))->toBeSame('bar');
+    expect($map1)->toBeSame($map2);
+
+    $definition->setFactory(Container\factory(
+      ($_) ==> Map { 'baz' => 'qux' }
+    ));
+
+    $map3 = $definition->resolve($container);
+
+    expect($map3)->toNotBeSame($map1);
+    expect($map3)->toNotBeSame($map2);
+    expect($map3->at('baz'))->toBeSame('qux');
+  }
+
+  public function testSharedDefinitionIsResetAfterAddingInflector(): void {
+    $container = new Container\ServiceContainer(dict[]);
+    $definition = new Container\ServiceDefinition(
+      Map::class,
+      Container\factory(
+        ($_) ==> Map { 'foo' => 'bar' }
+      ),
+      true
+    );
+
+    $map1 = $definition->resolve($container);
+    $map2 = $definition->resolve($container);
+
+    expect($map1->at('foo'))->toBeSame('bar');
+    expect($map1)->toBeSame($map2);
+
+    $definition->inflect(Container\inflector(
+      ($map, $_) ==> Map { 'baz' => 'qux' }
+        |> $$->addAll($map->items())
+    ));
+
+    $map3 = $definition->resolve($container);
+
+    expect($map3)->toNotBeSame($map1);
+    expect($map3)->toNotBeSame($map2);
+    expect($map3->at('baz'))->toBeSame('qux');
+    expect($map3->at('foo'))->toBeSame('bar');
+  }
 }
