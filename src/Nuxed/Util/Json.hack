@@ -61,9 +61,13 @@ final abstract class Json {
     string $json,
     TypeStructure<T> $structure
   ): T {
-    return TypeAssert\matches_type_structure(
-      $structure,
-      static::decode($json),
-    );
+    try {
+      return TypeAssert\matches_type_structure(
+        $structure,
+        static::decode($json),
+      );
+    } catch(TypeAssert\IncorrectTypeException $e) {
+      throw new Exception\JsonDecodeException($e->getMessage(), $e->getCode(), $e);
+    }
   }
 }
