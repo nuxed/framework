@@ -1,5 +1,6 @@
 namespace Nuxed\Util;
 
+use namespace Facebook\TypeAssert;
 use type Nuxed\Contract\Util\Jsonable;
 use type Throwable;
 use function json_encode;
@@ -54,5 +55,15 @@ final abstract class Json {
       throw
         new Exception\JsonDecodeException($e->getMessage(), (int)$e->getCode());
     }
+  }
+
+  public static function structure<T>(
+    string $json,
+    TypeStructure<T> $structure
+  ): T {
+    return TypeAssert\matches_type_structure(
+      $structure,
+      static::decode($json),
+    );
   }
 }

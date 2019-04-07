@@ -23,7 +23,9 @@
     "require": {
         "hhvm": "^4.0",
         "hhvm/hsl": "^4.0",
-        "hhvm/hhvm-autoload": "^2.0"
+        "hhvm/hhvm-autoload": "^2.0",
+        "hhvm/type-assert": "^3.3",
+        "nuxed/contract": "^0.1"
     },
     "autoload": {
         "psr-4": {
