@@ -62,7 +62,7 @@ class MessageFactory
     $protocolVersion =
       (new __Private\ProtocolVersionMarshaler())->marshal($server);
 
-    $stream = new CachingStream(fopen('php://input', 'rb'));
+    $stream = new Stream(fopen('php://input', 'rb'));
 
     return (
       new ServerRequest(
