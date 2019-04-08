@@ -178,17 +178,22 @@ class JsonTest extends HackTest {
     expect(Json::structure($json, type_structure($this, 'TStructOne')))
       ->toBeSame(dict['foo' => 32, 'bar' => 3, 'c' => 5]);
 
-    expect(
-      () ==> Json::structure($json, type_structure($this, 'TStructTwo'))
-    )->toThrow(Exception\JsonDecodeException::class);
+    expect(() ==> Json::structure($json, type_structure($this, 'TStructTwo')))
+      ->toThrow(Exception\JsonDecodeException::class);
 
-    $json = Json::encode(dict['foo' => 'hello', 'bar' => vec[
-      dict['foo' => 32, 'bar' => 3, 'c' => 5]
-    ]]);
+    $json = Json::encode(dict[
+      'foo' => 'hello',
+      'bar' => vec[
+        dict['foo' => 32, 'bar' => 3, 'c' => 5],
+      ],
+    ]);
 
     expect(Json::structure($json, type_structure($this, 'TStructTwo')))
-      ->toBeSame(shape('foo' => 'hello', 'bar' => vec[
-        dict['foo' => 32, 'bar' => 3, 'c' => 5]
-      ]));
+      ->toBeSame(shape(
+        'foo' => 'hello',
+        'bar' => vec[
+          dict['foo' => 32, 'bar' => 3, 'c' => 5],
+        ],
+      ));
   }
 }

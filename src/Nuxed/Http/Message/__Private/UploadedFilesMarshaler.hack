@@ -1,6 +1,5 @@
 namespace Nuxed\Http\Message\__Private;
 
-use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
 use namespace Nuxed\Http\Message\Exception;
