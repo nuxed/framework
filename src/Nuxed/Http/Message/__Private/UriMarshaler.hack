@@ -6,10 +6,8 @@ use namespace HH\Lib\Regex;
 use namespace Nuxed\Http\Message\Exception;
 use type Nuxed\Contract\Http\Message\UriInterface;
 use type Nuxed\Http\Message\Uri;
-use function explode;
-use function gettype;
 
-class UriMarshaler {
+final class UriMarshaler {
   public function marshal(
     KeyedContainer<string, mixed> $server,
     KeyedContainer<string, Container<string>> $headers,
@@ -28,7 +26,7 @@ class UriMarshaler {
     if (
       $https ||
       Str\lowercase(
-        (string)$this->getHeadersFromMap('x-forwarded-proto', $headers, ''),
+        $this->getHeadersFromMap('x-forwarded-proto', $headers, '') as string,
       ) ===
         'https'
     ) {
@@ -50,16 +48,18 @@ class UriMarshaler {
     }
 
     $path = $this->marshalRequestPath($server);
-    $path = explode('?', $path, 2)[0];
+    $path = C\firstx(Str\split($path, '?', 2));
     $query = '';
     if (C\contains_key($server, 'QUERY_STRING')) {
       $query = Str\trim_left((string)$server['QUERY_STRING'], '?');
     }
     // URI fragment
     $fragment = '';
+
     if (Str\contains($path, '#')) {
-      list($path, $fragment) = explode('#', $path, 2);
+      list($path, $fragment) = Str\split($path, '#', 2);
     }
+
     return $uri
       ->withPath($path)
       ->withFragment($fragment)
@@ -72,7 +72,7 @@ class UriMarshaler {
     ?int $port,
   ): shape('host' => string, 'port' => ?int, ...) {
     $host = '['.((string)$server['SERVER_ADDR'] ?? '').']';
-    $port = $port ?? 80;
+    $port ??= 80;
     if (
       $port.']' === Str\slice($host, ((int)Str\search_last($host, ':')) + 1)
     ) {
@@ -94,16 +94,10 @@ class UriMarshaler {
    * @copyright Copyright (c) 2004-2018 Fabien Potencier <fabien@symfony.com>
    * @license   https://github.com/symfony/symfony/blob/master/LICENSE MIT License
    */
-  private function marshalHostFromHeader(mixed $host): string {
-    if ($host is Container<_>) {
-      /* HH_IGNORE_ERROR[4110] */
-      $host = Str\join($host, ', ');
-    }
-
+  private function marshalHostFromHeader(string $host): string {
     // trim and remove port number from host
     // host is lowercase as per RFC 952/2181
-    $host =
-      Str\lowercase(Regex\replace(Str\trim((string)$host), re"/:\d+$/", ''));
+    $host = Str\lowercase(Regex\replace(Str\trim($host), re"/:\d+$/", ''));
 
     // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
     // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
@@ -125,9 +119,7 @@ class UriMarshaler {
    * @copyright Copyright (c) 2004-2018 Fabien Potencier <fabien@symfony.com>
    * @license   https://github.com/symfony/symfony/blob/master/LICENSE MIT License
    */
-  private function marshalPortFromHeader(mixed $host): ?int {
-    $host = (string)$host;
-
+  private function marshalPortFromHeader(string $host): ?int {
     if ('[' === Str\slice($host, 0, 1)) {
       $pos = Str\search($host, ':', (int)Str\search_last($host, ']'));
     } else {
@@ -150,8 +142,6 @@ class UriMarshaler {
     KeyedContainer<string, Container<string>> $headers,
     KeyedContainer<string, mixed> $server,
   ): shape('host' => string, 'port' => ?int, ...) {
-    static $defaults = shape('host' => '', 'port' => null);
-
     $header = $this->getHeadersFromMap('host', $headers);
     if (null !== $header) {
       return shape(
@@ -161,7 +151,7 @@ class UriMarshaler {
     }
 
     if (!C\contains_key($server, 'SERVER_NAME')) {
-      return $defaults;
+      return shape('host' => '', 'port' => null);
     }
 
     $host = $server['SERVER_NAME'] as string;
@@ -233,7 +223,7 @@ class UriMarshaler {
       throw new Exception\InvalidArgumentException(
         Str\format(
           'SAPI HTTPS value MUST be a string or boolean; received %s',
-          gettype($https),
+          \gettype($https),
         ),
       );
     }
@@ -244,8 +234,8 @@ class UriMarshaler {
   private function getHeadersFromMap(
     string $name,
     KeyedContainer<string, Container<string>> $headers,
-    mixed $default = null,
-  ): mixed {
+    ?string $default = null,
+  ): ?string {
     $header = Str\lowercase($name);
 
     foreach ($headers as $key => $value) {
