@@ -1,6 +1,6 @@
 namespace Nuxed\Http\Message\Response;
 
-use namespace Nuxed\Http\Message\__Private;
+use namespace Nuxed\Http\Message\_Private;
 use namespace Nuxed\Http\Message;
 use namespace Nuxed\Util;
 
@@ -33,7 +33,7 @@ final class JsonResponse extends Message\Response {
     $body = Message\stream($json);
 
     $headers =
-      __Private\inject_content_type_in_headers('application/json', $headers);
+      _Private\inject_content_type_in_headers('application/json', $headers);
 
     parent::__construct($status, $headers, $body);
   }
