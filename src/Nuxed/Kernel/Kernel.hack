@@ -46,7 +46,7 @@ final class Kernel implements KernelInterface {
 
   public function on<TEvent as EventInterface>(
     classname<TEvent> $event,
-    EventListener<TEvent> $listener,
+    (function(TEvent): Awaitable<void>) $listener,
     int $priority = 0,
   ): void {
     $this->events->on($event, $listener, $priority);
