@@ -4,7 +4,6 @@ use type Nuxed\Contract\Event\EventSubscriberInterface;
 use type Nuxed\Contract\Event\EventDispatcherInterface;
 use type Nuxed\Contract\Event\EventInterface;
 use type Nuxed\Contract\Event\StoppableEventInterface;
-use type Nuxed\Contract\Event\EventListener;
 use type SplPriorityQueue;
 use function get_class;
 

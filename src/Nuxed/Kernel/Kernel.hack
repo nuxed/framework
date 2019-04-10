@@ -14,7 +14,6 @@ use type Nuxed\Contract\Http\Router\RouteInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
 use type Nuxed\Contract\Log\LoggerAwareTrait;
 use type Nuxed\Contract\Event\EventSubscriberInterface;
-use type Nuxed\Contract\Event\EventListener;
 use type Nuxed\Contract\Event\EventInterface;
 use type Nuxed\Http\Message\ServerRequest;
 

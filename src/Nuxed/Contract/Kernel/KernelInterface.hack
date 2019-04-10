@@ -9,7 +9,6 @@ use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
 use type Nuxed\Contract\Log\LoggerAwareInterface;
 use type Nuxed\Contract\Event\EventSubscriberInterface;
 use type Nuxed\Contract\Event\EventInterface;
-use type Nuxed\Contract\Event\EventListener;
 
 interface KernelInterface
   extends
