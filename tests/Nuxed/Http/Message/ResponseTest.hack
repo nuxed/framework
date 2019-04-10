@@ -8,14 +8,15 @@ use type Nuxed\Contract\Http\Message\StreamInterface;
 use function Facebook\FBExpect\expect;
 
 class ResponseTest extends HackTest {
-  public function testDefaultConstructor(): void {
+  public async function testDefaultConstructor(): Awaitable<void> {
     $r = new Message\Response();
     expect($r->getStatusCode())->toBeSame(200);
     expect($r->getProtocolVersion())->toBeSame('1.1');
     expect($r->getReasonPhrase())->toBeSame('OK');
     expect($r->getHeaders())->toBeEmpty();
     expect($r->getBody())->toBeInstanceOf(StreamInterface::class);
-    expect((string)$r->getBody())->toBeSame('');
+    $content = await $r->getBody()->readAsync();
+    expect($content)->toBeSame('');
   }
 
   public function testCanConstructWithStatusCode(): void {
@@ -30,16 +31,21 @@ class ResponseTest extends HackTest {
     expect($r->getHeaderLine('Foo'))->toBeSame('Bar');
     expect($r->getHeader('Foo'))->toBePHPEqual(vec['Bar']);
   }
-  public function testCanConstructWithBody(): void {
+
+  public async function testCanConstructWithBody(): Awaitable<void> {
     $r = new Message\Response(200, dict[], Message\stream('baz'));
-    expect($r->getBody())->toBeInstanceOf(StreamInterface::class);
-    expect((string)$r->getBody())->toBeSame('baz');
+    $b = $r->getBody();
+    expect($b)->toBeInstanceOf(StreamInterface::class);
+    $content = await $b->readAsync();
+    expect($content)->toBeSame('baz');
   }
 
-  public function testNullBody(): void {
+  public async function testNullBody(): Awaitable<void> {
     $r = new Message\Response(200, dict[], null);
-    expect($r->getBody())->toBeInstanceOf(StreamInterface::class);
-    expect((string)$r->getBody())->toBeSame('');
+    $b = $r->getBody();
+    expect($b)->toBeInstanceOf(StreamInterface::class);
+    $content = await $b->readAsync();
+    expect($content)->toBeSame('');
   }
 
   public function testCanConstructWithReason(): void {
@@ -80,11 +86,13 @@ class ResponseTest extends HackTest {
     expect($r->withProtocolVersion('1.1'))->toBeSame($r);
   }
 
-  public function testWithBody(): void {
+  public async function testWithBody(): Awaitable<void> {
     $b = Message\stream('0');
     $r = (new Message\Response())->withBody($b);
     expect($r->getBody())->toBeInstanceOf(StreamInterface::class);
-    expect((string)$r->getBody())->toBeSame('0');
+    expect($r->getBody())->toBeSame($b);
+    $content = await $r->getBody()->readAsync();
+    expect($content)->toBeSame('0');
   }
 
   public function testSameInstanceWhenSameBody(): void {

@@ -18,23 +18,23 @@ class PathMiddlewareDecoratorTest extends HackTest {
     $decorator = Server\path('/foo/bar', $middleware);
 
     $response = await $decorator->process($this->request('/bar/foo'), $handler);
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('handler');
 
     $response =
       await $decorator->process($this->request('/foo/bar/baz'), $handler);
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('middleware');
 
     $response = await $decorator->process($this->request('/FOO/BAR'), $handler);
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('middleware');
 
     $response = await $decorator->process(
       $this->request('https://example.com/foo/bar'),
       $handler,
     );
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('middleware');
   }
 
@@ -50,7 +50,7 @@ class PathMiddlewareDecoratorTest extends HackTest {
     $decorator = Server\path('/foo/bar', $middleware);
 
     $response = await $decorator->process($this->request('/foo'), $handler);
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('handler');
   }
 
@@ -66,7 +66,7 @@ class PathMiddlewareDecoratorTest extends HackTest {
     $decorator = Server\path('/foo/bar', $middleware);
 
     $response = await $decorator->process($this->request('/qux'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('handler');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('handler');
   }
 
   public async function testHandlerIsCalledIfMathIsNotAtBorder(
@@ -82,7 +82,7 @@ class PathMiddlewareDecoratorTest extends HackTest {
 
     $response =
       await $decorator->process($this->request('/foo/barbar'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('handler');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('handler');
   }
 
   public async function testPrefixIsRemovedFromTheRequest(): Awaitable<void> {
@@ -100,7 +100,7 @@ class PathMiddlewareDecoratorTest extends HackTest {
 
     $response =
       await $decorator->process($this->request('/foo/bar/qux'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
   }
 
   public async function testHandlerAlwaysGetsOriginalPath(): Awaitable<void> {
@@ -120,7 +120,7 @@ class PathMiddlewareDecoratorTest extends HackTest {
 
     $response =
       await $decorator->process($this->request('/foo/bar/qux'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('handler');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('handler');
   }
 
   public async function testEmptyPathAlwaysMatch(): Awaitable<void> {
@@ -135,17 +135,17 @@ class PathMiddlewareDecoratorTest extends HackTest {
 
     $response =
       await $decorator->process($this->request('/foo/barbar'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request('/foo/bar'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request('/foo/'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request('/foo'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request('/'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request(''), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
   }
 
   public async function testForwardSlashAlwaysMatch(): Awaitable<void> {
@@ -161,16 +161,16 @@ class PathMiddlewareDecoratorTest extends HackTest {
 
     $response =
       await $decorator->process($this->request('/foo/barbar'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request('/foo/bar'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request('/foo/'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request('/foo'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request('/'), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
     $response = await $decorator->process($this->request(''), $handler);
-    $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('middleware');
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();     expect($content)->toBeSame('middleware');
   }
 }

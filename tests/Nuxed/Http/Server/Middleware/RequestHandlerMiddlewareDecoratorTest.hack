@@ -26,10 +26,13 @@ class RequestHandlerMiddlewareDecoratorTest extends HackTest {
       $this->request('/'),
       Server\dh(async ($request, $response) ==> $response),
     );
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('foo');
     $response = await $middleware->handle($this->request('/'));
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();
+    $body->rewind();
+    $content = await $body->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('foo');
   }
 }

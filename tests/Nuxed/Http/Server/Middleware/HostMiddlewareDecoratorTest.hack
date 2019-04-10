@@ -24,7 +24,7 @@ class HostMiddlewareDecoratorTest extends HackTest {
       $handler,
     );
 
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('middleware');
   }
 
@@ -44,7 +44,7 @@ class HostMiddlewareDecoratorTest extends HackTest {
     $response =
       await $decorator->process($this->request('example.com'), $handler);
 
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('handler');
   }
 
@@ -64,7 +64,7 @@ class HostMiddlewareDecoratorTest extends HackTest {
       $handler,
     );
 
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('middleware');
 
     $decorator = Server\host('example.Com', $middleware);
@@ -72,7 +72,7 @@ class HostMiddlewareDecoratorTest extends HackTest {
       $this->request('Https://ExamPle.com/'),
       $handler,
     );
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('middleware');
 
     $decorator = Server\host('eXaMple.Com', $middleware);
@@ -80,7 +80,7 @@ class HostMiddlewareDecoratorTest extends HackTest {
       $this->request('Https://ExamPle.com'),
       $handler,
     );
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('middleware');
 
     $decorator = Server\host('EXAMPLE.COM', $middleware);
@@ -88,7 +88,7 @@ class HostMiddlewareDecoratorTest extends HackTest {
       $this->request('https://example.com/'),
       $handler,
     );
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('middleware');
 
     $decorator = Server\host('example.com', $middleware);
@@ -96,7 +96,7 @@ class HostMiddlewareDecoratorTest extends HackTest {
       $this->request('HTTPS://EXAMPLE.COM/FOO'),
       $handler,
     );
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('middleware');
   }
 }

@@ -26,7 +26,10 @@ class SessionMiddlewareTest extends HackTest {
       $handler,
     );
 
-    $content = await $resposne->getBody()->readAsync();
+    $body = $resposne->getBody();
+    await $body->flushAsync();
+    $body->rewind();
+    $content = await $body->readAsync();
     expect($content)->toBeSame('foo');
     expect($resposne->getHeaderLine('foo'))->toBeSame('bar');
   }

@@ -13,10 +13,11 @@ class RequestTest extends HackTest {
     expect($r->getUri())->toBeSame($uri);
   }
 
-  public function testNullBody(): void {
+  public async function testNullBody(): Awaitable<void> {
     $r = new Message\Request('GET', Message\uri('/'), dict[], null);
     expect($r->getBody())->toBeInstanceOf(StreamInterface::class);
-    expect((string)$r->getBody())->toBeSame('');
+    $body = await $r->getBody()->readAsync();
+    expect($body)->toBeSame('');
   }
 
   public function testWithUri(): void {

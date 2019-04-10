@@ -43,7 +43,7 @@ class OriginalMessageMiddlewareTest extends HackTest {
     );
 
     $response = await $middleware->process($originalRequest, $hanlder);
-    $content = await $response->getBody()->readAsync();
+    $body = $response->getBody();     $body->rewind();     $content = await $body->readAsync();
     expect($content)->toBeSame('pass.');
   }
 }
