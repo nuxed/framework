@@ -11,7 +11,7 @@ use function get_class;
 final class EventDispatcher implements EventDispatcherInterface {
   private dict<
     classname<EventInterface>,
-    SplPriorityQueue<EventListener<EventInterface>>,
+    SplPriorityQueue<(function(EventInterface): Awaitable<void>)>,
   > $listeners = dict[];
 
   /**
@@ -19,11 +19,11 @@ final class EventDispatcher implements EventDispatcherInterface {
    */
   public function on<TEvent as EventInterface>(
     classname<TEvent> $event,
-    EventListener<TEvent> $listener,
+    (function(TEvent): Awaitable<void>) $listener,
     int $priority = 0,
   ): void {
     $listeners = $this->listeners[$event] ??
-      new SplPriorityQueue<EventListener<EventInterface>>();
+      new SplPriorityQueue<(function(EventInterface): Awaitable<void>)>();
     $listeners->insert($listener, $priority);
     $this->listeners[$event] = $listeners;
   }

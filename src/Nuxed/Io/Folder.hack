@@ -193,7 +193,6 @@ final class Folder extends Node {
       $nodes,
       ($node) ==> $node->exists() ? $node->delete() : async { return false; }
     ));
-
     return $this;
   }
 
