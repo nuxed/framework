@@ -26,6 +26,7 @@
     ],
     "require": {
         "hhvm": "^4.0",
+        "azjezz/http-normalizer": "^0.1.1",
         "hhvm/hsl": "^4.0",
         "hhvm/hhvm-autoload": "^2.0",
         "hhvm/type-assert": "^3.3",

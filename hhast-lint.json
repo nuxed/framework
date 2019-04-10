@@ -1,15 +1,22 @@
 {
-    "roots": [ "src/" ],
-    "builtinLinters": "all",
-    "overrides": [
-      {
-        "patterns": [ "src/*" ],
-        "disabledLinters": [
-            "Facebook\\HHAST\\Linters\\LicenseHeaderLinter",
-            "Facebook\\HHAST\\Linters\\AsyncFunctionAndMethodLinter",
-            "Facebook\\HHAST\\Linters\\UseStatementWithAsLinter"
-        ],
-        "disableAllAutoFixes": false
-      }
-    ]
-  }
+  "roots": [ "src/" ],
+  "builtinLinters": "all",
+  "disabledLinters": [
+    "Facebook\\HHAST\\Linters\\LicenseHeaderLinter",
+    "Facebook\\HHAST\\Linters\\AsyncFunctionAndMethodLinter",
+    "Facebook\\HHAST\\Linters\\UseStatementWithAsLinter",
+    "Facebook\\HHAST\\Linters\\CamelCasedMethodsUnderscoredFunctionsLinter"
+  ],
+  "disableAllAutoFixes": false,
+  "overrides": [
+    {
+      "patterns": [
+        "src/Nuxed/Http/Message/Stream.hack",
+        "src/Nuxed/Http/Message/UploadedFile.hack"
+      ],
+      "disabledLinters": [
+        "Facebook\\HHAST\\Linters\\DontAwaitInALoopLinter"
+      ]
+    }
+  ]
+}

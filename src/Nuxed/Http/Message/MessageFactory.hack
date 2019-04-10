@@ -1,7 +1,13 @@
 namespace Nuxed\Http\Message;
 
+use namespace HH\Asio;
+use namespace HH\Lib\C;
+use namespace HH\Lib\Vec;
+use namespace HH\Lib\Str;
+use namespace HH\Lib\Dict;
 use namespace Nuxed\Contract\Http\Message;
-use function fopen;
+use namespace AzJezz\HttpNormalizer;
+
 
 class MessageFactory
   implements
@@ -38,57 +44,74 @@ class MessageFactory
   public function createServerRequestFromGlobals(
   ): Message\ServerRequestInterface {
     /* HH_IGNORE_ERROR[2050] */
-    $server = (new __Private\ServerParametersMarshaler())->marshale($_SERVER);
-    $headers = (new __Private\HeadersMarshaler())->marshal($server);
-    $cookies = (new __Private\CookiesMarshaler())->marshal(
-      $headers['cookie'] ?? vec[],
+    $server = (new _Private\ServerParametersMarshaler())->marshale($_SERVER);
+    $headers = (new _Private\HeadersMarshaler())->marshal($server);
+    $uri = (new _Private\UriMarshaler())->marshal($server, $headers);
+    $protocol = (new _Private\ProtocolVersionMarshaler())->marshal($server);
+
+    $query = HttpNormalizer\parse($uri->getQuery());
+    $method = Str\uppercase(($server['REQUEST_METHOD'] ?? 'GET') as string);
+    $ct = $value ==> C\contains($headers['content-type'] ?? vec[], $value);
+
+    if ('POST' === $method && (
+      $ct('application/x-www-form-urlencoded') ||
+      $ct('multipart/form-data')
+    )) {
       /* HH_IGNORE_ERROR[2050] */
-      $_COOKIE ?? dict[],
-    );
-    $uri = (new __Private\UriMarshaler())->marshal($server, $headers);
-    /* HH_IGNORE_ERROR[2050] */
-    $uploads = (new __Private\UploadedFilesMarshaler())->marshal($_FILES);
-    $method = (new __Private\MethodMarshaler())->marshal($server);
-    $body = dict[];
-    /* HH_IGNORE_ERROR[2050] */
-    foreach ($_POST as $key => $value) {
-      $body[$key as string] = $value;
+      $body = HttpNormalizer\normalize($_POST);
+    } else {
+      $body = null;
     }
-    $query = dict[];
+
     /* HH_IGNORE_ERROR[2050] */
-    foreach ($_GET as $key => $value) {
-      $query[$key as string] = $value;
-    }
-    $protocolVersion =
-      (new __Private\ProtocolVersionMarshaler())->marshal($server);
+    $uploads = HttpNormalizer\normalize_files($_FILES);
+    /* HH_IGNORE_ERROR[2050] */
+    $cookies = HttpNormalizer\normalize($_COOKIE);
 
-    $stream = new Stream(fopen('php://input', 'rb'));
-
-    return (
-      new ServerRequest(
-        $method,
-        $uri,
-        $headers,
-        $stream,
-        $protocolVersion,
-        $server,
-      )
+    return new ServerRequest(
+      $method, $uri, $headers, $this->createStreamFromFile('php://input', 'rb'), $protocol, $server
     )
-      ->withCookieParams($cookies)
-      ->withQueryParams($query)
-      ->withParsedBody($body)
-      ->withUploadedFiles($uploads);
+      |> $$->withCookieParams(Dict\pull(
+        $cookies,
+        $value ==> $value[1],
+        $value ==> $value[0],
+      ))
+      |> $$->withQueryParams(Dict\pull(
+        $query,
+        $value ==> $value[1],
+        $value ==> $value[0],
+      ))
+      |> $body is nonnull ? $$->withParsedBody(Dict\pull(
+        $body,
+        $value ==> $value[1],
+        $value ==> $value[0],
+      )) : $$
+      |> $$->withUploadedFiles(
+        Dict\pull(Vec\map($uploads, ($value) ==> tuple(
+          $value[0],
+          $this->createUploadedFile(
+            $this->createStreamFromFile($value[1]['tmp_name'], 'rb'),
+            $value[1]['size'],
+            Message\UploadedFileError::assert($value[1]['error']),
+            $value[1]['name'] ?? null,
+            $value[1]['type'] ?? null,
+          )
+        )),
+        $value ==> $value[1],
+        $value ==> $value[0],
+        )
+      );
   }
 
   public function createStream(string $content = ''): Message\StreamInterface {
-    return __Private\create_stream_from_string($content);
+    return stream($content);
   }
 
   public function createStreamFromFile(
     string $filename,
     string $mode = 'r',
   ): Message\StreamInterface {
-    return new Stream(fopen($filename, $mode));
+    return new Stream(\fopen($filename, $mode));
   }
 
   public function createStreamFromResource(
@@ -114,10 +137,10 @@ class MessageFactory
   }
 
   public function createCookie(string $value): Message\CookieInterface {
-    return new Cookie($value);
+    return cookie($value);
   }
 
   public function createUri(string $uri = ''): Message\UriInterface {
-    return new Uri($uri);
+    return uri($uri);
   }
 }

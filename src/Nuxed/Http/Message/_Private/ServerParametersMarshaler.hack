@@ -1,9 +1,9 @@
-namespace Nuxed\Http\Message\__Private;
+namespace Nuxed\Http\Message\_Private;
 
 use namespace HH\Lib\C;
 use function function_exists;
 
-class ServerParametersMarshaler {
+final class ServerParametersMarshaler {
   public function marshale(
     KeyedContainer<string, mixed> $server,
   ): KeyedContainer<string, mixed> {

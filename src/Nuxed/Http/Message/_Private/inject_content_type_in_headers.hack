@@ -1,4 +1,4 @@
-namespace Nuxed\Http\Message\__Private;
+namespace Nuxed\Http\Message\_Private;
 
 use namespace HH\Lib\Str;
 use namespace HH\Lib\C;

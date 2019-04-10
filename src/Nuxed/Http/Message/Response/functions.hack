@@ -1,6 +1,6 @@
 namespace Nuxed\Http\Message\Response;
 
-use namespace Nuxed\Http\Message\__Private;
+use namespace Nuxed\Http\Message\_Private;
 use namespace Nuxed\Contract\Http\Message as Contract;
 use namespace Nuxed\Http\Message;
 
@@ -17,7 +17,7 @@ function text(
 ): Contract\ResponseInterface {
   return new Message\Response(
     $status,
-    __Private\inject_content_type_in_headers(
+    _Private\inject_content_type_in_headers(
       'text/plain; charset=utf-8',
       $headers,
     ),
@@ -38,7 +38,7 @@ function html(
 ): Contract\ResponseInterface {
   return new Message\Response(
     $status,
-    __Private\inject_content_type_in_headers(
+    _Private\inject_content_type_in_headers(
       'text/html; charset=utf8',
       $headers,
     ),
@@ -59,7 +59,7 @@ function xml(
 ): Contract\ResponseInterface {
   return new Message\Response(
     $status,
-    __Private\inject_content_type_in_headers(
+    _Private\inject_content_type_in_headers(
       'application/xml; charset=utf8',
       $headers,
     ),

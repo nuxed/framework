@@ -22,6 +22,7 @@
     ],
     "require": {
         "hhvm": "^4.0",
+        "azjezz/http-normalizer": "^0.1.1",
         "facebook/fbmarkdown": "^1.5",
         "facebook/hack-router": "^0.18",
         "facebook/xhp-lib": "^2.9",

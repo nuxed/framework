@@ -1,19 +1,16 @@
-namespace Nuxed\Http\Message\__Private;
+namespace Nuxed\Http\Message\_Private;
 
 use namespace HH\Lib\Str;
 use namespace HH\Lib\C;
-use function strtr;
 
-class HeadersMarshaler {
+final class HeadersMarshaler {
   public function marshal(
     KeyedContainer<string, mixed> $server,
   ): KeyedContainer<string, Container<string>> {
     $headers = dict[];
 
-    $valid = (mixed $value): bool ==> {
-      return
-        $value is Container<_> ? C\count($value) > 0 : ((string)$value) !== '';
-    };
+    $valid = (mixed $value): bool ==>
+      $value is Container<_> ? C\count($value) > 0 : ((string)$value) !== '';
 
     foreach ($server as $key => $value) {
       // Apache prefixes environment variables with REDIRECT_
@@ -31,9 +28,8 @@ class HeadersMarshaler {
         continue;
       }
 
-
       if (Str\search($key, 'HTTP_') === 0) {
-        $name = strtr(Str\lowercase(Str\slice($key, 5)), '_', '-');
+        $name = \strtr(Str\lowercase(Str\slice($key, 5)), '_', '-');
 
         if (!$value is Container<_>) {
           $value = vec[(string)$value];

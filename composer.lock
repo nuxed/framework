@@ -4,8 +4,43 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc7f6deee22b19e45f709c4a3bbd0eb1",
+    "content-hash": "6ee3743a1060d14e8d922dc814a8b97c",
     "packages": [
+        {
+            "name": "azjezz/http-normalizer",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/azjezz/http-normalizer.git",
+                "reference": "1472df5c1254fb6a746b8f880650f5ebe8f381b8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/azjezz/http-normalizer/zipball/1472df5c1254fb6a746b8f880650f5ebe8f381b8",
+                "reference": "1472df5c1254fb6a746b8f880650f5ebe8f381b8",
+                "shasum": ""
+            },
+            "require": {
+                "hhvm/hhvm-autoload": "^2.0",
+                "hhvm/type-assert": "^3.3"
+            },
+            "require-dev": {
+                "hhvm/hhast": "^4.0"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "azjezz",
+                    "email": "azjezz@protonmail.com"
+                }
+            ],
+            "description": "Normalize Http super globals",
+            "time": "2019-04-09T14:02:48+00:00"
+        },
         {
             "name": "facebook/fbmarkdown",
             "version": "v1.5.1",

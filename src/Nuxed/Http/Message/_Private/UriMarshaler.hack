@@ -1,4 +1,4 @@
-namespace Nuxed\Http\Message\__Private;
+namespace Nuxed\Http\Message\_Private;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
@@ -156,7 +156,7 @@ final class UriMarshaler {
 
     $host = $server['SERVER_NAME'] as string;
     $port = C\contains_key($server, 'SERVER_PORT')
-      ? $server['SERVER_PORT'] as int
+      ? (int) $server['SERVER_PORT']
       : null;
 
     if (
