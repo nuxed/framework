@@ -1,20 +1,18 @@
 namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
-use type Nuxed\Util\Dict;
-use type Nuxed\Contract\Http\Message\RequestInterface;
-use type Nuxed\Contract\Http\Message\StreamInterface;
-use type Nuxed\Contract\Http\Message\UriInterface;
+use namespace Nuxed\Util;
+use namespace Nuxed\Contract\Http\Message;
 
-class Request implements RequestInterface {
+class Request implements Message\RequestInterface {
   use MessageTrait;
   use RequestTrait;
 
   public function __construct(
     string $method,
-    UriInterface $uri,
+    Message\UriInterface $uri,
     KeyedContainer<string, Container<string>> $headers = dict[],
-    ?StreamInterface $body = null,
+    ?Message\StreamInterface $body = null,
     string $version = '1.1',
   ) {
     $this->method = $method;
@@ -49,7 +47,7 @@ class Request implements RequestInterface {
       $this->headerNames['host'] = 'Host';
     }
 
-    $this->headers = Dict::union(dict[$header => vec[$host]], $this->headers);
+    $this->headers = Util\Dict::union(dict[$header => vec[$host]], $this->headers);
   }
 
   public function __clone(): void {
