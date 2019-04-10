@@ -7,7 +7,7 @@ use function Facebook\FBExpect\expect;
 
 class CallableRequestHandlerDecoratorTest extends HackTest {
   public async function testCallableMiddleware(): Awaitable<void> {
-    $resposne = new Message\Response\TextResponse('foo');
+    $resposne = Message\Response\text('foo');
     $call = async ($request) ==> $resposne;
     $handler = new Server\RequestHandler\CallableRequestHandlerDecorator($call);
     $return = await $handler->handle(

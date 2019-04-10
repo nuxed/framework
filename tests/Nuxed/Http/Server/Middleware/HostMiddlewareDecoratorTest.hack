@@ -10,11 +10,11 @@ class HostMiddlewareDecoratorTest extends HackTest {
   public async function testProcessCallsMiddlewareIfHostMatchs(
   ): Awaitable<void> {
     $middleware = Server\dfm(async ($request, $response, $next) ==> {
-      $response->getBody()->write('middleware');
+      await $response->getBody()->writeAsync('middleware');
       return $response;
     });
     $handler = Server\dh(async ($request, $response) ==> {
-      $response->getBody()->write('handler');
+      await $response->getBody()->writeAsync('handler');
       return $response;
     });
 
@@ -24,17 +24,18 @@ class HostMiddlewareDecoratorTest extends HackTest {
       $handler,
     );
 
-    expect($response->getBody()->toString())->toBeSame('middleware');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('middleware');
   }
 
   public async function testProcessCallsHandlerIfHostDoesntMatch(
   ): Awaitable<void> {
     $middleware = Server\dfm(async ($request, $response, $next) ==> {
-      $response->getBody()->write('middleware');
+      await $response->getBody()->writeAsync('middleware');
       return $response;
     });
     $handler = Server\dh(async ($request, $response) ==> {
-      $response->getBody()->write('handler');
+      await $response->getBody()->writeAsync('handler');
       return $response;
     });
 
@@ -43,16 +44,17 @@ class HostMiddlewareDecoratorTest extends HackTest {
     $response =
       await $decorator->process($this->request('example.com'), $handler);
 
-    expect($response->getBody()->toString())->toBeSame('handler');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('handler');
   }
 
   public async function testHostIsCaseInsensitive(): Awaitable<void> {
     $middleware = Server\dfm(async ($request, $response, $next) ==> {
-      $response->getBody()->write('middleware');
+      await $response->getBody()->writeAsync('middleware');
       return $response;
     });
     $handler = Server\dh(async ($request, $response) ==> {
-      $response->getBody()->write('handler');
+      await $response->getBody()->writeAsync('handler');
       return $response;
     });
 
@@ -62,34 +64,39 @@ class HostMiddlewareDecoratorTest extends HackTest {
       $handler,
     );
 
-    expect($response->getBody()->toString())->toBeSame('middleware');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('middleware');
 
     $decorator = Server\host('example.Com', $middleware);
     $response = await $decorator->process(
       $this->request('Https://ExamPle.com/'),
       $handler,
     );
-    expect($response->getBody()->toString())->toBeSame('middleware');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('middleware');
 
     $decorator = Server\host('eXaMple.Com', $middleware);
     $response = await $decorator->process(
       $this->request('Https://ExamPle.com'),
       $handler,
     );
-    expect($response->getBody()->toString())->toBeSame('middleware');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('middleware');
 
     $decorator = Server\host('EXAMPLE.COM', $middleware);
     $response = await $decorator->process(
       $this->request('https://example.com/'),
       $handler,
     );
-    expect($response->getBody()->toString())->toBeSame('middleware');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('middleware');
 
     $decorator = Server\host('example.com', $middleware);
     $response = await $decorator->process(
       $this->request('HTTPS://EXAMPLE.COM/FOO'),
       $handler,
     );
-    expect($response->getBody()->toString())->toBeSame('middleware');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('middleware');
   }
 }

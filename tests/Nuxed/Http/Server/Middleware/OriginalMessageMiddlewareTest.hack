@@ -23,7 +23,7 @@ class OriginalMessageMiddlewareTest extends HackTest {
       expect($request->getAttribute('OriginalRequest'))
         ->toBeSame($originalRequest);
 
-      $response->getBody()->write('pass.');
+      await $response->getBody()->writeAsync('pass.');
       return $response;
     });
 
@@ -43,6 +43,7 @@ class OriginalMessageMiddlewareTest extends HackTest {
     );
 
     $response = await $middleware->process($originalRequest, $hanlder);
-    expect($response->getBody()->toString())->toBeSame('pass.');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('pass.');
   }
 }

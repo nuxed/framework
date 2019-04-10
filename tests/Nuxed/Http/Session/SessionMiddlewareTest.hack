@@ -26,7 +26,8 @@ class SessionMiddlewareTest extends HackTest {
       $handler,
     );
 
-    expect($resposne->getBody()->toString())->toBeSame('foo');
+    $content = await $resposne->getBody()->readAsync();
+    expect($content)->toBeSame('foo');
     expect($resposne->getHeaderLine('foo'))->toBeSame('bar');
   }
 
@@ -44,7 +45,7 @@ class DummyPersistence
     Http\Session\SessionInterface $session,
     Http\Message\ResponseInterface $response,
   ): Awaitable<Http\Message\ResponseInterface> {
-    $response->getBody()->write('foo');
+    await $response->getBody()->writeAsync('foo');
     return $response;
   }
 }

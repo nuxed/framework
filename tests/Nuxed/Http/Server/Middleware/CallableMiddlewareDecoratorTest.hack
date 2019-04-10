@@ -14,12 +14,15 @@ class CallableMiddlewareDecoratorTest extends HackTest {
     $middleware = new Server\Middleware\CallableMiddlewareDecorator($call);
 
     $handler = Server\dh(async ($request, $response) ==> {
-      $response->getBody()->write($request->getAttribute('foo') as string);
+      await $response->getBody()->writeAsync($request->getAttribute('foo') as string);
       return $response;
     });
 
     $response = await $middleware->process($this->request('/'), $handler);
-    expect($response->getBody()->toString())->toBeSame('bar');
+    $body = $response->getBody();
+    $body->rewind();
+    $content = await $body->readAsync();
+    expect($content)->toBeSame('bar');
   }
 
 }

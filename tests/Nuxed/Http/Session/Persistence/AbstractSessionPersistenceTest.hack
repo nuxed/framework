@@ -71,7 +71,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     $session->set('a', 'b');
     $response = await $persistence->persist(
       $session,
-      new Message\Response\EmptyResponse(),
+      Message\Response\empty(),
     );
     $httpCookie = $response->getCookie($cookie['name']);
     expect($httpCookie)->toNotBeNull();
@@ -93,7 +93,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
       await $this->createSessionPersistence($cookie, $limiter, $expiry);
     $request = new Message\ServerRequest('GET', new Message\Uri());
     $session = await $persistence->initialize($request);
-    $originalResponse = new Message\Response\EmptyResponse();
+    $originalResponse = Message\Response\empty();
     $response = await $persistence->persist($session, $originalResponse);
     expect($response)->toBeSame($originalResponse);
   }
@@ -116,7 +116,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     $session = await $persistence->initialize($request);
     $session->flush();
     expect($session->flushed())->toBeTrue();
-    $originalResponse = new Message\Response\EmptyResponse();
+    $originalResponse = Message\Response\empty();
     $response = await $persistence->persist($session, $originalResponse);
     expect($response)->toNotBeSame($originalResponse);
     $httpCookie = $response->getCookie($cookie['name']);
@@ -144,7 +144,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
       |> $$->withCookieParams(dict[$cookie['name'] => 'baz']);
     $session = await $persistence->initialize($request);
     $session->set('a', 'b');
-    $originalResponse = new Message\Response\EmptyResponse();
+    $originalResponse = Message\Response\empty();
     $response = await $persistence->persist($session, $originalResponse);
     expect($response)->toNotBeSame($originalResponse);
     expect($response->hasHeader('Expires'))->toBeFalse();
@@ -170,7 +170,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
       |> $$->withCookieParams(dict[$cookie['name'] => 'baz']);
     $session = await $persistence->initialize($request);
     $session->set('a', 'b');
-    $originalResponse = new Message\Response\EmptyResponse()
+    $originalResponse = Message\Response\empty()
       |> $$->withAddedHeader('Expires', vec['foo'])
       |> $$->withAddedHeader('Pragma', vec['foo']);
     $response = await $persistence->persist($session, $originalResponse);
