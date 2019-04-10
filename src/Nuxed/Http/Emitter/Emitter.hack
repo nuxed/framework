@@ -28,7 +28,11 @@ class Emitter implements EmitterInterface {
 
     $this->emitHeaders($response);
     $this->emitStatusLine($response);
-    $this->emitBody($response);
+
+    $stream = $response->getBody();
+    $stream->rewind();
+    $content = await $stream->readAsync();
+    echo $content;
 
     return true;
   }
@@ -107,13 +111,6 @@ class Emitter implements EmitterInterface {
     return Str\replace($filtered, ' ', '-');
   }
 
-  /**
-   * Emit the message body.
-   */
-  private function emitBody(ResponseInterface $response): void {
-    echo $response->getBody();
-  }
-
   private function renderCookiesIntoHeader(
     ResponseInterface $response,
   ): ResponseInterface {
@@ -162,9 +159,5 @@ class Emitter implements EmitterInterface {
     }
 
     return Str\join($cookieStringParts, '; ');
-  }
-
-  public function reset(): void {
-    // noop
   }
 }
