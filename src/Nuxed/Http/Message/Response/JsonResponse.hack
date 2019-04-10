@@ -1,10 +1,8 @@
 namespace Nuxed\Http\Message\Response;
 
 use namespace Nuxed\Http\Message\__Private;
-use type Nuxed\Http\Message\Response;
-use type Nuxed\Util\Json;
-use function is_object;
-use const JSON_ERROR_NONE;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Util;
 
 /**
  * JSON response.
@@ -13,35 +11,26 @@ use const JSON_ERROR_NONE;
  * serializes the data to JSON, sets a status code of 200 and sets the
  * Content-Type header to application/json.
  */
-class JsonResponse extends Response {
+final class JsonResponse extends Message\Response {
   private mixed $payload;
 
   /**
    * Create a JSON response with the given data.
    *
-   * Default JSON encoding is performed with the following options, which
-   * produces RFC4627-compliant JSON, capable of embedding into HTML.
-   *
-   * - JSON_HEX_TAG
-   * - JSON_HEX_APOS
-   * - JSON_HEX_AMP
-   * - JSON_HEX_QUOT
-   * - JSON_UNESCAPED_SLASHES
-   *
    * @param mixed $data Data to convert to JSON.
    * @param int $status Integer status code for the response; 200 by default.
-   * @param KeyedContainer<string, Container<string>> $headers Map of headers to use at initialization.
+   * @param KeyedContainer<string, Container<string>> $headers Container of headers to use at initialization.
    * @param int $encodingOptions JSON encoding options to use.
-   * @throws Exception\InvalidArgumentException if unable to encode the $data to JSON.
    */
   public function __construct(
     mixed $data,
     int $status = 200,
     KeyedContainer<string, Container<string>> $headers = dict[],
+    ?int $encodingOptions = null,
   ) {
     $this->setPayload($data);
-    $json = Json::encode($data);
-    $body = __Private\create_stream_from_string($json);
+    $json = static::encode($data, $encodingOptions);
+    $body = Message\stream($json);
 
     $headers =
       __Private\inject_content_type_in_headers('application/json', $headers);
@@ -49,9 +38,6 @@ class JsonResponse extends Response {
     parent::__construct($status, $headers, $body);
   }
 
-  /**
-   * @return mixed
-   */
   public function getPayload(): mixed {
     return $this->payload;
   }
@@ -62,11 +48,8 @@ class JsonResponse extends Response {
     return $this->updateBodyFor($new);
   }
 
-  /**
-   * @param mixed $data
-   */
   private function setPayload(mixed $data): void {
-    if (is_object($data)) {
+    if (\is_object($data)) {
       /* HH_IGNORE_ERROR[4110] $data is an object*/
       $data = clone $data;
     }
@@ -77,12 +60,35 @@ class JsonResponse extends Response {
   /**
    * Update the response body for the given instance.
    *
-   * @param self $toUpdate Instance to update.
-   * @return JsonResponse Returns a new instance with an updated body.
+   * @param this $toUpdate Instance to update.
+   * @return this Returns a new instance with an updated body.
    */
-  private function updateBodyFor(JsonResponse $toUpdate): JsonResponse {
-    $json = Json::encode($toUpdate->payload);
-    $body = __Private\create_stream_from_string($json);
+  private function updateBodyFor(this $toUpdate): this {
+    $json = static::encode($toUpdate->payload);
+    $body = Message\stream($json);
     return $toUpdate->withBody($body);
+  }
+
+  /**
+   * Default JSON encoding is performed with the following options, which
+   * produces RFC4627-compliant JSON, capable of embedding into HTML.
+   *
+   * - JSON_HEX_TAG
+   * - JSON_HEX_APOS
+   * - JSON_HEX_AMP
+   * - JSON_HEX_QUOT
+   * - JSON_UNESCAPED_SLASHES
+   */
+  private static function encode(mixed $value, ?int $flags = null): string {
+    return Util\Json::encode(
+      $value,
+      false,
+      $flags ??
+        \JSON_HEX_TAG |
+          \JSON_HEX_AMP |
+          \JSON_HEX_APOS |
+          \JSON_HEX_QUOT |
+          \JSON_UNESCAPED_SLASHES,
+    );
   }
 }
