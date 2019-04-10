@@ -1,6 +1,5 @@
 namespace Nuxed\Http\Message;
 
-use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
