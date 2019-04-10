@@ -14,7 +14,6 @@ use type Nuxed\Contract\Http\Router\RouteInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
 use type Nuxed\Contract\Log\LoggerAwareTrait;
 use type Nuxed\Contract\Event\EventSubscriberInterface;
-use type Nuxed\Contract\Event\EventListener;
 use type Nuxed\Contract\Event\EventInterface;
 use type Nuxed\Http\Message\ServerRequest;
 
@@ -46,7 +45,7 @@ final class Kernel implements KernelInterface {
 
   public function on<TEvent as EventInterface>(
     classname<TEvent> $event,
-    EventListener<TEvent> $listener,
+    (function(TEvent): Awaitable<void>) $listener,
     int $priority = 0,
   ): void {
     $this->events->on($event, $listener, $priority);
