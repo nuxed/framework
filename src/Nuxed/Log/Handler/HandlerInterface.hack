@@ -1,6 +1,6 @@
 namespace Nuxed\Log\Handler;
 
-use type Nuxed\Log\record;
+use type Nuxed\Log\Record;
 
 interface HandlerInterface {
   /**
@@ -12,11 +12,11 @@ interface HandlerInterface {
    * is no guarantee that handle() will not be called, and isHandling() might not be called
    * for a given record.
    *
-   * @param record $record Partial log record containing only a level key
+   * @param Record $record Partial log record containing only a level key
    *
    * @return bool
    */
-  public function isHandling(record $record): bool;
+  public function isHandling(Record $record): bool;
 
   /**
    * Handles a record.
@@ -32,7 +32,7 @@ interface HandlerInterface {
    * @return bool     true means that this handler handled the record, and that bubbling is not permitted.
    *         false means the record was either not processed or that this handler allows bubbling.
    */
-  public function handle(record $record): bool;
+  public function handle(Record $record): bool;
 
   /**
    * Closes the handler.

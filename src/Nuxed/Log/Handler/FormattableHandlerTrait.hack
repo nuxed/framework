@@ -1,20 +1,19 @@
 namespace Nuxed\Log\Handler;
 
-use type Nuxed\Log\Formatter\FormatterInterface;
-use type Nuxed\Log\Formatter\LineFormatter;
+use namespace Nuxed\Log\Formatter;
 
 trait FormattableHandlerTrait {
   require implements FormattableHandlerInterface;
 
-  protected ?FormatterInterface $formatter = null;
+  protected ?Formatter\FormatterInterface $formatter = null;
 
-  public function setFormatter(FormatterInterface $formatter): this {
+  public function setFormatter(Formatter\FormatterInterface $formatter): this {
     $this->formatter = $formatter;
 
     return $this;
   }
 
-  public function getFormatter(): FormatterInterface {
+  public function getFormatter(): Formatter\FormatterInterface {
     if (!$this->formatter) {
       $this->formatter = $this->getDefaultFormatter();
     }
@@ -27,7 +26,7 @@ trait FormattableHandlerTrait {
    *
    * Overwrite this if the LineFormatter is not a good default for your handler.
    */
-  protected function getDefaultFormatter(): FormatterInterface {
-    return new LineFormatter();
+  protected function getDefaultFormatter(): Formatter\FormatterInterface {
+    return new Formatter\LineFormatter();
   }
 }

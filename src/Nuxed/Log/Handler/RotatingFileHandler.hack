@@ -2,17 +2,8 @@ namespace Nuxed\Log\Handler;
 
 use namespace HH\Lib\{C, Str, Dict};
 use type Nuxed\Contract\Log\LogLevel;
-use type Nuxed\Log\record;
+use type Nuxed\Log\Record;
 use type Nuxed\Log\Exception\InvalidArgumentException;
-use type DateTimeImmutable;
-use function preg_match;
-use function substr_count;
-use function file_exists;
-use function date;
-use function pathinfo;
-use function glob;
-use function is_writable;
-use function unlink;
 
 class RotatingFileHandler extends StreamHandler {
   const string FILE_PER_DAY = 'Y-m-d';
@@ -22,7 +13,7 @@ class RotatingFileHandler extends StreamHandler {
   protected string $filename;
   protected int $maxFiles;
   protected ?bool $mustRotate = null;
-  protected DateTimeImmutable $nextRotation;
+  protected \DateTimeImmutable $nextRotation;
   protected string $filenameFormat;
   protected string $dateFormat;
 
@@ -45,7 +36,7 @@ class RotatingFileHandler extends StreamHandler {
   ) {
     $this->filename = $filename;
     $this->maxFiles = $maxFiles;
-    $this->nextRotation = new DateTimeImmutable('tomorrow');
+    $this->nextRotation = new \DateTimeImmutable('tomorrow');
     $this->filenameFormat = '{filename}-{date}';
     $this->dateFormat = static::FILE_PER_DAY;
 
@@ -80,7 +71,7 @@ class RotatingFileHandler extends StreamHandler {
     string $filenameFormat,
     string $dateFormat,
   ): this {
-    if (!preg_match('{^Y(([/_.-]?m)([/_.-]?d)?)?$}', $dateFormat)) {
+    if (!\preg_match('{^Y(([/_.-]?m)([/_.-]?d)?)?$}', $dateFormat)) {
       throw new InvalidArgumentException(
         'Invalid date format - format must be one of '.
         'RotatingFileHandler::FILE_PER_DAY ("Y-m-d"), RotatingFileHandler::FILE_PER_MONTH ("Y-m") '.
@@ -88,7 +79,7 @@ class RotatingFileHandler extends StreamHandler {
         'date formats using slashes, underscores and/or dots instead of dashes.',
       );
     }
-    if (substr_count($filenameFormat, '{date}') === 0) {
+    if (\substr_count($filenameFormat, '{date}') === 0) {
       throw new InvalidArgumentException(
         'Invalid filename format - format must contain at least `{date}`, because otherwise rotating is impossible.',
       );
@@ -102,10 +93,10 @@ class RotatingFileHandler extends StreamHandler {
   }
 
   <<__Override>>
-  protected function write(record $record): void {
+  protected function write(Record $record): void {
     // on the first record written, if the log is new, we should rotate (once per day)
     if (null === $this->mustRotate) {
-      $this->mustRotate = !file_exists($this->url);
+      $this->mustRotate = !\file_exists($this->url);
     }
 
     if ($this->nextRotation <= $record['time']) {
@@ -119,14 +110,14 @@ class RotatingFileHandler extends StreamHandler {
   private function rotate(): void {
     // update filename
     $this->url = $this->getTimedFilename();
-    $this->nextRotation = new DateTimeImmutable('tomorrow');
+    $this->nextRotation = new \DateTimeImmutable('tomorrow');
 
     // skip GC of old logs if files are unlimited
     if (0 === $this->maxFiles) {
       return;
     }
 
-    $logFiles = dict(glob($this->getGlobPattern()));
+    $logFiles = dict(\glob($this->getGlobPattern()));
 
     if ($this->maxFiles >= C\count($logFiles)) {
       // no files to remove
@@ -143,10 +134,10 @@ class RotatingFileHandler extends StreamHandler {
     );
 
     foreach ($logFiles as $file) {
-      if (is_writable($file)) {
+      if (\is_writable($file)) {
         // suppress errors here as unlink() might fail if two processes
         // are cleaning up/rotating at the same time
-        @unlink($file);
+        @\unlink($file);
       }
     }
 
@@ -154,13 +145,13 @@ class RotatingFileHandler extends StreamHandler {
   }
 
   private function getTimedFilename(): string {
-    $fileInfo = dict(pathinfo($this->filename));
+    $fileInfo = dict(\pathinfo($this->filename));
 
     $timedFilename = Str\replace_every(
       $fileInfo['dirname'].'/'.$this->filenameFormat,
       dict[
         '{filename}' => $fileInfo['filename'],
-        '{date}' => date($this->dateFormat),
+        '{date}' => \date($this->dateFormat),
       ],
     );
 
@@ -174,7 +165,7 @@ class RotatingFileHandler extends StreamHandler {
   }
 
   private function getGlobPattern(): string {
-    $fileInfo = dict(pathinfo($this->filename));
+    $fileInfo = dict(\pathinfo($this->filename));
 
     $glob = Str\replace_every(
       $fileInfo['dirname'].'/'.$this->filenameFormat,

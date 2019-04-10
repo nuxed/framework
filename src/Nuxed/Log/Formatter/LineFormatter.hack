@@ -1,11 +1,10 @@
 namespace Nuxed\Log\Formatter;
 
+use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
-use namespace HH\Lib\C;
 use namespace Nuxed\Util;
-use type Nuxed\Log\record;
-use function strtr;
+use namespace Nuxed\Log;
 
 class LineFormatter implements FormatterInterface {
   const string SIMPLE_DATE = "Y-m-d\TH:i:s.uP";
@@ -44,19 +43,19 @@ class LineFormatter implements FormatterInterface {
     $this->allowInlineLineBreaks = $allow;
   }
 
-  public function format(record $record): record {
+  public function format(Log\Record $record): Log\Record {
     $output = $this->format;
 
     foreach ($record['extra'] as $var => $val) {
       if (null !== Str\search($output, '%extra.'.$var.'%')) {
-        $output = strtr($output, '%extra.'.$var.'%', $this->stringify($val));
+        $output = \strtr($output, '%extra.'.$var.'%', $this->stringify($val));
         unset($record['extra'][$var]);
       }
     }
 
     foreach ($record['context'] as $var => $val) {
       if (null !== Str\search($output, '%context.'.$var.'%')) {
-        $output = strtr($output, '%context.'.$var.'%', $this->stringify($val));
+        $output = \strtr($output, '%context.'.$var.'%', $this->stringify($val));
         unset($record['context'][$var]);
       }
     }
@@ -79,7 +78,7 @@ class LineFormatter implements FormatterInterface {
       '%extra%' => Util\stringify($record['extra']),
     ];
 
-    $output = strtr($output, $replaces);
+    $output = \strtr($output, $replaces);
 
     // remove leftover %context.xxx% if any
     if (null !== Str\search($output, '%')) {
@@ -98,14 +97,14 @@ class LineFormatter implements FormatterInterface {
   protected function replaceNewlines(string $str): string {
     if ($this->allowInlineLineBreaks) {
       if (0 === Str\search($str, '{')) {
-        return strtr($str, Dict\associate(vec['\r', '\n'], vec["\r", "\n"]));
+        return \strtr($str, Dict\associate(vec['\r', '\n'], vec["\r", "\n"]));
       }
 
       return $str;
     }
 
     return
-      strtr($str, Dict\associate(vec["\r\n", "\r", "\n"], vec[' ', ' ', ' ']));
+      \strtr($str, Dict\associate(vec["\r\n", "\r", "\n"], vec[' ', ' ', ' ']));
   }
 
 }

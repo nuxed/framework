@@ -1,22 +1,8 @@
 namespace Nuxed\Log\Handler;
 
 use namespace HH\Lib\Str;
-use namespace Nuxed\Log\Exception;
+use namespace Nuxed\Log;
 use type Nuxed\Contract\Log\LogLevel;
-use type Nuxed\Log\record;
-use function fclose;
-use function flock;
-use function fwrite;
-use function chmod;
-use function fopen;
-use function dirname;
-use function is_dir;
-use function set_error_handler;
-use function restore_error_handler;
-use function mkdir;
-use function preg_replace;
-use const LOCK_EX;
-use const LOCK_UN;
 
 class StreamHandler extends AbstractHandler {
   protected ?resource $stream;
@@ -49,7 +35,7 @@ class StreamHandler extends AbstractHandler {
   <<__Override>>
   public function close(): void {
     if ($this->url !== '' && $this->stream is resource) {
-      fclose($this->stream);
+      \fclose($this->stream);
     }
 
     $this->stream = null;
@@ -73,29 +59,29 @@ class StreamHandler extends AbstractHandler {
    * {@inheritdoc}
    */
   <<__Override>>
-  protected function write(record $record): void {
+  protected function write(Log\Record $record): void {
     $message = $record['formatted'] ?? $record['message'];
 
     if (null === $this->stream) {
       if (null === $this->url || '' === $this->url) {
-        throw new Exception\LogicException(
+        throw new Log\Exception\LogicException(
           'Missing stream url, the stream can not be opened. This may be caused by a premature call to close().',
         );
       }
 
       $this->createDir();
       $this->errorMessage = null;
-      set_error_handler([$this, 'customErrorHandler']);
-      $this->stream = fopen($this->url, 'a') ?: null;
+      \set_error_handler([$this, 'customErrorHandler']);
+      $this->stream = \fopen($this->url, 'a') ?: null;
 
       if ($this->filePermission !== null) {
-        @chmod($this->url, $this->filePermission);
+        @\chmod($this->url, $this->filePermission);
       }
 
-      restore_error_handler();
+      \restore_error_handler();
 
       if (null === $this->stream) {
-        throw new Exception\UnexpectedValueException(Str\format(
+        throw new Log\Exception\UnexpectedValueException(Str\format(
           'The stream or file "%s" could not be opened: %s',
           $this->url,
           $this->errorMessage ?? '',
@@ -104,14 +90,14 @@ class StreamHandler extends AbstractHandler {
     }
 
     if ($this->useLocking) {
-      flock($this->stream, LOCK_EX);
+      \flock($this->stream, \LOCK_EX);
     }
 
     /* HH_IGNORE_ERROR[4110] */
     $this->streamWrite($this->stream, $message);
 
     if ($this->useLocking) {
-      flock($this->stream as nonnull, LOCK_UN);
+      \flock($this->stream as nonnull, \LOCK_UN);
     }
   }
 
@@ -119,22 +105,22 @@ class StreamHandler extends AbstractHandler {
    * Write to stream
    */
   protected function streamWrite(resource $stream, string $message): void {
-    fwrite($stream, $message);
+    \fwrite($stream, $message);
   }
 
   protected function customErrorHandler(int $_, string $msg): void {
-    $this->errorMessage = preg_replace('{^(fopen|mkdir)\(.*?\): }', '', $msg);
+    $this->errorMessage = \preg_replace('{^(fopen|mkdir)\(.*?\): }', '', $msg);
   }
 
   private function getDirFromStream(string $stream): ?string {
     $pos = Str\search($stream, '://');
 
     if (null === $pos) {
-      return dirname($stream);
+      return \dirname($stream);
     }
 
     if ('file://' === Str\slice($stream, 0, 7)) {
-      return dirname(Str\slice($stream, 7));
+      return \dirname(Str\slice($stream, 7));
     }
 
     return null;
@@ -147,12 +133,12 @@ class StreamHandler extends AbstractHandler {
     }
 
     $dir = $this->getDirFromStream($this->url);
-    if (null !== $dir && !is_dir($dir)) {
+    if (null !== $dir && !\is_dir($dir)) {
       $this->errorMessage = null;
-      set_error_handler([$this, 'customErrorHandler']);
-      $status = mkdir($dir, 0777, true);
-      restore_error_handler();
-      if (false === $status && !is_dir($dir)) {
+      \set_error_handler([$this, 'customErrorHandler']);
+      $status = \mkdir($dir, 0777, true);
+      \restore_error_handler();
+      if (false === $status && !\is_dir($dir)) {
         throw new \UnexpectedValueException(Str\format(
           'There is no existing directory at "%s" and its not buildable: %s',
           $dir,

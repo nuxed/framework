@@ -1,7 +1,7 @@
 namespace Nuxed\Log\Processor;
 
-use type Nuxed\Log\record;
+use type Nuxed\Log\Record;
 
 interface ProcessorInterface {
-  public function process(record $record): record;
+  public function process(Record $record): Record;
 }

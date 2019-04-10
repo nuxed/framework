@@ -2,10 +2,10 @@ namespace Nuxed\Log\Processor;
 
 use namespace HH\Lib\Str;
 use namespace Nuxed\Util;
-use type Nuxed\Log\record;
+use type Nuxed\Log\Record;
 
 class ContextProcessor implements ProcessorInterface {
-  public function process(record $record): record {
+  public function process(Record $record): Record {
     if (!Str\contains($record['message'], '}')) {
       return $record;
     }

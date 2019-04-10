@@ -1,15 +1,15 @@
 namespace Nuxed\Log\Handler;
 
-use type Nuxed\Log\Formatter\FormatterInterface;
+use namespace Nuxed\Log\Formatter;
 
 interface FormattableHandlerInterface extends HandlerInterface {
   /**
    * Sets the formatter.
    */
-  public function setFormatter(FormatterInterface $formatter): this;
+  public function setFormatter(Formatter\FormatterInterface $formatter): this;
 
   /**
    * Gets the formatter.
    */
-  public function getFormatter(): FormatterInterface;
+  public function getFormatter(): Formatter\FormatterInterface;
 }
