@@ -13,13 +13,13 @@ namespace Nuxed\Contract\Http\Message;
  * - Message body
  *
  * Additionally, it encapsulates all data as it has arrived to the
- * application from the CGI and/or Hack environment, including:
+ * application from the CGI and/or HHVM environment, including:
  *
- * - The values represented in $_SERVER.
- * - Any cookies provided (generally via $_COOKIE)
- * - Query string arguments (generally via $_GET, or as parsed via parse_str())
- * - Upload files, if any (as represented by $_FILES)
- * - Deserialized body parameters (generally from $_POST)
+ * - The values represented in $_SERVER
+ * - Any cookies provided
+ * - Query string arguments
+ * - Upload files, if any
+ * - Deserialized body parameters
  *
  * $_SERVER values MUST be treated as immutable, as they represent application
  * state at the time of request; as such, no methods are provided to allow
@@ -42,9 +42,7 @@ interface ServerRequestInterface extends RequestInterface {
   /**
    * Retrieve server parameters.
    *
-   * Retrieves data related to the incoming request environment,
-   * typically derived from Hack's $_SERVER superglobal. The data IS NOT
-   * REQUIRED to originate from $_SERVER.
+   * Retrieves data related to the incoming request environment.
    */
   public function getServerParams(): KeyedContainer<string, mixed>;
 
@@ -61,9 +59,7 @@ interface ServerRequestInterface extends RequestInterface {
   /**
    * Return an instance with the specified cookies.
    *
-   * The data IS NOT REQUIRED to come from the $_COOKIE superglobal, but MUST
-   * be compatible with the structure of $_COOKIE. Typically, this data will
-   * be injected at instantiation.
+   * Typically, this data will be injected at instantiation.
    *
    * This method MUST NOT update the related Cookie header of the request
    * instance, nor related values in the server params.
@@ -88,18 +84,13 @@ interface ServerRequestInterface extends RequestInterface {
    * values, you may need to parse the query string from `getUri()->getQuery()`
    * or from the `QUERY_STRING` server param.
    */
-  public function getQueryParams(): KeyedContainer<string, mixed>;
+  public function getQueryParams(): KeyedContainer<string, string>;
 
   /**
    * Return an instance with the specified query string arguments.
    *
    * These values SHOULD remain immutable over the course of the incoming
-   * request. They MAY be injected during instantiation, such as from Hack's
-   * $_GET superglobal, or MAY be derived from some other value such as the
-   * URI. In cases where the arguments are parsed from the URI, the data
-   * MUST be compatible with what Hack's parse_str() would return for
-   * purposes of how duplicate query parameters are handled, and how nested
-   * sets are handled.
+   * request.
    *
    * Setting query string arguments MUST NOT change the URI stored by the
    * request, nor the values in the server params.
@@ -108,19 +99,12 @@ interface ServerRequestInterface extends RequestInterface {
    * immutability of the message, and MUST return an instance that has the
    * updated query string arguments.
    *
-   * @param KeyedContainer<string, mixed> $query KeyedContainer of query string arguments, typically from
-   *     $_GET.
+   * @param KeyedContainer<string, string> $query A KeyedContainer of query string arguments.
    */
-  public function withQueryParams(KeyedContainer<string, mixed> $query): this;
+  public function withQueryParams(KeyedContainer<string, string> $query): this;
 
   /**
    * Retrieve normalized file upload data.
-   *
-   * If the uploaded files has not been previously set, returns
-   * Null.
-   *
-   * These values of the UploadsFolder MAY be prepared from $_FILES or
-   * the message body during instantiation, or MAY be injected via withUploadsFolder().
    *
    * @return KeyedContainer<string, UploadedFileInterface> A KeyedContainer of
    * UploadedFileInterface instances; an empty KeyedContainer MUST
@@ -136,7 +120,8 @@ interface ServerRequestInterface extends RequestInterface {
    * immutability of the message, and MUST return an instance that has the
    * updated body parameters.
    *
-   * @param UploadsFolderInterface An UploadsFolderInterface instances;
+   * @param  KeyedContainer<string, UploadedFileInterface> $uploadedFiles A KeyedContainer of
+   * UploadedFileInterface instances.
    */
   public function withUploadedFiles(
     KeyedContainer<string, UploadedFileInterface> $uploadedFiles,
@@ -145,32 +130,23 @@ interface ServerRequestInterface extends RequestInterface {
   /**
    * Retrieve any parameters provided in the request body.
    *
-   * If the request Content-Type is either application/x-www-form-urlencoded
-   * or multipart/form-data, and the request method is POST, this method MUST
-   * return the contents of $_POST.
-   *
-   * Otherwise, this method may return any results of deserializing
+   * This method may return any results of deserializing
    * the request body content; as parsing returns structured content, the
    * potential types MUST be a KeyedContainer only. A null value indicates
    * the absence of body content.
    *
-   * @return KeyedContainer<string, mixed> The deserialized body parametersm if any.
+   * @return KeyedContainer<string, string> The deserialized body parametersm if any.
    */
-  public function getParsedBody(): ?KeyedContainer<string, mixed>;
+  public function getParsedBody(): ?KeyedContainer<string, string>;
 
   /**
    * Return an instance with the specified body parameters.
    *
    * These MAY be injected during instantiation.
    *
-   * If the request Content-Type is either application/x-www-form-urlencoded
-   * or multipart/form-data, and the request method is POST, use this method
-   * ONLY to inject the contents of $_POST.
-   *
-   * The data IS NOT REQUIRED to come from $_POST, but MUST be the results of
-   * deserializing the request body content. Deserialization/parsing returns
-   * structured data, and, as such, this method ONLY accepts Maps,
-   * or a null value if nothing was available to parse.
+   * The data MUST be the results of deserializing the request body content.
+   * Deserialization/parsing returns structured data, and, as such,
+   * this method ONLY accepts keyed containers, or a null value if nothing was available to parse.
    *
    * As an example, if content negotiation determines that the request data
    * is a JSON payload, this method could be used to create a request
@@ -180,12 +156,9 @@ interface ServerRequestInterface extends RequestInterface {
    * immutability of the message, and MUST return an instance that has the
    * updated body parameters.
    *
-   * @param KeyedContainer<string, mixed> $data The deserialized body data.
-
-   * @throws \InvalidArgumentException if an unsupported argument type is
-   *     provided.
+   * @param KeyedContainer<string, string> $data The deserialized body data.
    */
-  public function withParsedBody(?KeyedContainer<string, mixed> $data): this;
+  public function withParsedBody(?KeyedContainer<string, string> $data): this;
 
   /**
    * Retrieve attributes derived from the request.

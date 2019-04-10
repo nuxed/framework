@@ -1,7 +1,5 @@
 namespace Nuxed\Contract\Http\Message;
 
-use type Nuxed\Contract\Util\Stringable;
-
 /**
  * Value object representing a URI.
  *
@@ -22,7 +20,7 @@ use type Nuxed\Contract\Util\Stringable;
  *
  * @link http://tools.ietf.org/html/rfc3986 (the URI specification)
  */
-interface UriInterface extends Stringable {
+interface UriInterface {
   /**
    * Retrieve the scheme component of the URI.
    *

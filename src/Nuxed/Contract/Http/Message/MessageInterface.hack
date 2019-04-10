@@ -77,17 +77,17 @@ interface MessageInterface {
   /**
    * Retrieves a message header value by the given case-insensitive name.
    *
-   * This method returns a set of all the header values of the given
+   * This method returns a Container of all the header values of the given
    * case-insensitive header name.
    *
    * If the header does not appear in the message, this method MUST return an
-   * empty Set.
+   * empty Container.
    *
    * @param string $name Case-insensitive header field name.
    *
    * @return Container<string> A Container of string values as provided for the given
    *    header. If the header does not appear in the message, this method MUST
-   *    return an empty Set.
+   *    return an empty Container.
    */
   public function getHeader(string $name): Container<string>;
 

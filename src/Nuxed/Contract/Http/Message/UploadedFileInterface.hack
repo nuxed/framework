@@ -52,14 +52,12 @@ interface UploadedFileInterface {
    * If you wish to move to a stream, use getStream(), as SAPI operations
    * cannot guarantee writing to stream destinations.
    *
-   * @see http://php.net/is_uploaded_file
-   * @see http://php.net/move_uploaded_file
    * @param string $targetPath Path to which to move the uploaded file.
    * @throws \InvalidArgumentException if the $targetPath specified is invalid.
    * @throws \RuntimeException on any error during the move operation, or on
    *     the second or subsequent call to the method.
    */
-  public function moveTo(string $targetPath): void;
+  public function moveTo(string $targetPath): Awaitable<void>;
 
   /**
    * Retrieve the file size.
