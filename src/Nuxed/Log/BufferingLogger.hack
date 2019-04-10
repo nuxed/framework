@@ -1,14 +1,13 @@
 namespace Nuxed\Log;
 
-use type Nuxed\Contract\Log\AbstractLogger;
-use type Nuxed\Contract\Log\LogLevel;
+use namespace Nuxed\Contract\Log;
 
 /**
  * A buffering logger that stacks logs for later.
  */
-class BufferingLogger extends AbstractLogger {
+class BufferingLogger extends Log\AbstractLogger {
   private vec<shape(
-    'level' => LogLevel,
+    'level' => Log\LogLevel,
     'message' => string,
     'context' => KeyedContainer<string, mixed>,
     ...
@@ -16,7 +15,7 @@ class BufferingLogger extends AbstractLogger {
 
   <<__Override>>
   public function log(
-    LogLevel $level,
+    Log\LogLevel $level,
     string $message,
     KeyedContainer<string, mixed> $context = dict[],
   ): void {
@@ -29,7 +28,7 @@ class BufferingLogger extends AbstractLogger {
 
   public function cleanLogs(
   ): vec<shape(
-    'level' => LogLevel,
+    'level' => Log\LogLevel,
     'message' => string,
     'context' => KeyedContainer<string, mixed>,
     ...

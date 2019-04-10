@@ -3,7 +3,7 @@ namespace Nuxed\Log;
 use type Nuxed\Contract\Log\LogLevel;
 use type DateTime;
 
-type record = shape(
+type Record = shape(
   'level' => LogLevel,
   'message' => string,
   'context' => dict<string, mixed>,

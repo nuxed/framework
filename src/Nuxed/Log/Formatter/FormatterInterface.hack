@@ -1,7 +1,7 @@
 namespace Nuxed\Log\Formatter;
 
-use type Nuxed\Log\record;
+use namespace Nuxed\Log;
 
 interface FormatterInterface {
-  public function format(record $record): record;
+  public function format(Log\Record $record): Log\Record;
 }

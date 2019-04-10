@@ -1,6 +1,6 @@
 namespace Nuxed\Log\Handler;
 
-use type Nuxed\Log\record;
+use type Nuxed\Log\Record;
 use type Nuxed\Contract\Log\LogLevel;
 use type Nuxed\Contract\Service\ResetInterface;
 
@@ -28,14 +28,14 @@ abstract class AbstractHandler
     public bool $bubble = true,
   ) {}
 
-  public function isHandling(record $record): bool {
+  public function isHandling(Record $record): bool {
     $minimum = static::LEVELS[$this->level];
     $level = static::LEVELS[$record['level']];
 
     return $level >= $minimum;
   }
 
-  public function handle(record $record): bool {
+  public function handle(Record $record): bool {
     if (!$this->isHandling($record)) {
       return false;
     }
@@ -50,7 +50,7 @@ abstract class AbstractHandler
   /**
    * Writes the record down to the log of the implementing handler
    */
-  abstract protected function write(record $record): void;
+  abstract protected function write(Record $record): void;
 
   public function close(): void {
   }
