@@ -16,12 +16,16 @@ use const JSON_ERROR_NONE;
 use const JSON_FB_HACK_ARRAYS;
 
 final abstract class Json {
-  public static function encode(mixed $value, bool $pretty = false): string {
+  public static function encode(
+    mixed $value,
+    bool $pretty = false,
+    int $flags = 0,
+  ): string {
     if ($value is Jsonable) {
       return $value->toJson($pretty);
     }
 
-    $flags = JSON_UNESCAPED_UNICODE |
+    $flags |= JSON_UNESCAPED_UNICODE |
       JSON_UNESCAPED_SLASHES |
       JSON_PRESERVE_ZERO_FRACTION;
     if ($pretty) {
