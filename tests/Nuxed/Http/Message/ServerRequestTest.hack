@@ -1,19 +1,15 @@
 namespace Nuxed\Test\Http\Message;
 
 use namespace HH\Lib\C;
-use type Nuxed\Http\Message\ServerRequest;
-use type Nuxed\Http\Message\MessageFactory;
-use type Nuxed\Http\Message\Uri;
-use type Nuxed\Http\Message\UploadedFile;
-use type Nuxed\Http\Message\UploadsFolder;
+use namespace Nuxed\Http\Message;
 use type Nuxed\Contract\Http\Message\UploadedFileError;
 use type Facebook\HackTest\HackTest;
 use function Facebook\FBExpect\expect;
 
 class ServerRequestTest extends HackTest {
   public function testUploadsFiles(): void {
-    $request1 = new ServerRequest('GET', new Uri('/'));
-    $factory = new MessageFactory();
+    $request1 = new Message\ServerRequest('GET', Message\uri('/'));
+    $factory = new Message\MessageFactory();
     $file = $factory->createUploadedFile($factory->createStream('test'));
     $request2 = $request1->withUploadedFiles(['file' => $file]);
     expect($request2)->toNotBeSame($request1);
@@ -26,12 +22,12 @@ class ServerRequestTest extends HackTest {
   public function testServerParams(): void {
     $params = dict['name' => 'value'];
     $request =
-      new ServerRequest('GET', new Uri('/'), dict[], null, '1.1', $params);
+      new Message\ServerRequest('GET', Message\uri('/'), dict[], null, '1.1', $params);
     expect($request->getServerParams())->toBeSame($params);
   }
 
   public function testCookieParams(): void {
-    $request1 = new ServerRequest('GET', new Uri('/'));
+    $request1 = new Message\ServerRequest('GET', Message\uri('/'));
     $params = dict['name' => 'value'];
     $request2 = $request1->withCookieParams($params);
     expect($request1)->toNotBeSame($request2);
@@ -40,7 +36,7 @@ class ServerRequestTest extends HackTest {
   }
 
   public function testQueryParams(): void {
-    $request1 = new ServerRequest('GET', new Uri('/'));
+    $request1 = new Message\ServerRequest('GET', Message\uri('/'));
     $params = dict['name' => 'value'];
     $request2 = $request1->withQueryParams($params);
     expect($request1)->toNotBeSame($request2);
@@ -49,7 +45,7 @@ class ServerRequestTest extends HackTest {
   }
 
   public function testParsedBody(): void {
-    $request1 = new ServerRequest('GET', new Uri('/'));
+    $request1 = new Message\ServerRequest('GET', Message\uri('/'));
     $params = dict['name' => 'value'];
     $request2 = $request1->withParsedBody($params);
     expect($request1)->toNotBeSame($request2);
@@ -58,7 +54,7 @@ class ServerRequestTest extends HackTest {
   }
 
   public function testAttributes(): void {
-    $request1 = new ServerRequest('GET', new Uri('/'));
+    $request1 = new Message\ServerRequest('GET', Message\uri('/'));
     $request2 = $request1->withAttribute('name', 'value');
     $request3 = $request2->withAttribute('other', 'otherValue');
     $request4 = $request3->withoutAttribute('other');
@@ -83,7 +79,7 @@ class ServerRequestTest extends HackTest {
 
   public function testNullAttribute(): void {
     $request =
-      (new ServerRequest('GET', new Uri('/')))->withAttribute('name', null);
+      (new Message\ServerRequest('GET', Message\uri('/')))->withAttribute('name', null);
     expect($request->getAttributes())->toBeSame(dict['name' => null]);
     expect($request->getAttribute('name', 'different-default'))->toBeNull();
     $requestWithoutAttribute = $request->withoutAttribute('name');
