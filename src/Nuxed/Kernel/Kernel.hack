@@ -207,8 +207,9 @@ final class Kernel implements KernelInterface {
   ): Awaitable<void> {
     $event = await $this->events
       ->dispatch(new Event\TerminateEvent($request, $response));
-    $event->request->getBody()->close();
-    $event->response->getBody()->close();
+
+    await $event->request->getBody()->closeAsync();
+    await $event->response->getBody()->closeAsync();
   }
 
   /**
