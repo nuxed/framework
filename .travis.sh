@@ -14,6 +14,4 @@ composer --version
 
 composer install
 
-hh_client
-
 composer check
