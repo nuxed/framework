@@ -1,15 +1,10 @@
 namespace Nuxed\Http\Message\Exception;
 
-use type RuntimeException;
-use type Exception;
-
-class UploadedFileAlreadyMovedException
-  extends RuntimeException
-  implements ExceptionInterface {
+final class UploadedFileAlreadyMovedException extends RuntimeException {
   public function __construct(
-    string $message = 'Cannot retrieve stream after it has already moved',
+    string $message = 'Cannot retrieve stream after it has already moved.',
     int $code = 0,
-    ?Exception $previous = null,
+    ?\Exception $previous = null,
   ) {
     parent::__construct($message, $code, $previous);
   }

@@ -1,8 +1,6 @@
 namespace Nuxed\Http\Message\Exception;
 
-use type InvalidArgumentException as ParentException;
-
-class InvalidArgumentException
-  extends ParentException
+final class InvalidArgumentException
+  extends \InvalidArgumentException
   implements ExceptionInterface {
 }

@@ -1,11 +1,9 @@
 namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\CookieInterface;
-use type Nuxed\Contract\Http\Message\StreamInterface;
+use namespace Nuxed\Contract\Http\Message;
 
-class Response implements ResponseInterface {
+class Response implements Message\ResponseInterface {
   use MessageTrait;
 
   /** Map of standard HTTP status code/reason phrases */
@@ -70,7 +68,7 @@ class Response implements ResponseInterface {
     511 => 'Network Authentication Required',
   ];
 
-  protected dict<string, CookieInterface> $cookies = dict[];
+  protected dict<string, Message\CookieInterface> $cookies = dict[];
 
   private string $reasonPhrase = '';
 
@@ -79,7 +77,7 @@ class Response implements ResponseInterface {
   public function __construct(
     int $status = 200,
     KeyedContainer<string, Container<string>> $headers = dict[],
-    ?StreamInterface $body = null,
+    ?Message\StreamInterface $body = null,
     string $version = '1.1',
     ?string $reason = null,
   ) {
@@ -133,16 +131,15 @@ class Response implements ResponseInterface {
     }
   }
 
-
-  public function getCookies(): dict<string, CookieInterface> {
+  public function getCookies(): KeyedContainer<string, Message\CookieInterface> {
     return $this->cookies;
   }
 
-  public function getCookie(string $name): ?CookieInterface {
+  public function getCookie(string $name): ?Message\CookieInterface {
     return $this->cookies[$name] ?? null;
   }
 
-  public function withCookie(string $name, CookieInterface $cookie): this {
+  public function withCookie(string $name, Message\CookieInterface $cookie): this {
     $new = clone $this;
     $new->cookies[$name] = $cookie;
     return $new;

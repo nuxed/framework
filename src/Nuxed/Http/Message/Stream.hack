@@ -1,129 +1,241 @@
 namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
-use type Nuxed\Contract\Http\Message\StreamInterface;
-use type Nuxed\Util\StringableTrait;
-use function fclose;
-use function fwrite;
-use function fstat;
-use function ftell;
-use function fseek;
-use function feof;
-use function fread;
-use function stream_get_contents;
-use function stream_get_meta_data;
-use function stream_set_blocking;
-use function strstr;
-use const SEEK_SET;
+use namespace HH\Lib\Str;
+use namespace Nuxed\Contract\Http\Message;
+
+/**
+ * Logic largely refactored from the Hsl Experimental HH\Lib\_Private\NativeHandler class.
+ *
+ * @see       https://github.com/hhvm/hsl-experimental/blob/master/src/io/_Private/NativeHandle.php
+ * @copyright Copyright (c) 2004-present, Facebook, Inc. (https://www.facebook.com)
+ * @license   https://github.com/hhvm/hsl-experimental/blob/master/LICENSE.md MIT License
+ */
 
 <<__ConsistentConstruct>>
-class Stream implements StreamInterface {
-  use StringableTrait;
+class Stream implements Message\StreamInterface {
+  private ?Awaitable<mixed> $lastOperation;
+  private bool $isAwaitable = true;
+  private ?int $size;
 
-  protected ?resource $stream;
-
-  protected mixed $uri;
-
-  protected ?int $size;
-
-  public function __construct(resource $body) {
-    stream_set_blocking($body, false);
-
-    $this->stream = $body;
-    $this->uri = $this->getMetadata('uri');
+  public function __construct(private resource $impl) {
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    \stream_set_blocking($impl, false);
   }
 
-  public function toString(): string {
-    try {
-      if ($this->isSeekable()) {
-        $this->seek(0);
-      }
-      return $this->getContents();
-    } catch (\Exception $e) {
+  protected function queuedAsync<T>(
+    (function(): Awaitable<T>) $next,
+  ): Awaitable<T> {
+    $last = $this->lastOperation;
+    $queue = async {
+      await $last;
+      return await $next();
+    };
+    $this->lastOperation = $queue;
+    return $queue;
+  }
+
+  final public function rawReadBlocking(?int $max_bytes = null): string {
+    if (!$this->isReadable()) {
+      throw new Exception\UnreadableStreamException('Stream is unreadable.');
+    }
+
+    if ($max_bytes is int && $max_bytes < 0) {
+      throw new Exception\InvalidArgumentException(
+        'Expected $max_bytes to be null, or >= 0',
+      );
+    }
+
+    if ($max_bytes === 0) {
       return '';
     }
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    $result = \stream_get_contents($this->impl, $max_bytes ?? -1);
+    if ($result === false) {
+      throw new Exception\RuntimeException();
+    }
+    return $result as string;
   }
 
-  public function close(): void {
-    if ($this->stream is resource) {
-      fclose($this->stream);
-      $this->detach();
+  private async function selectAsync(int $flags): Awaitable<void> {
+    if (!$this->isAwaitable) {
+      return;
+    }
+    if ($this->isEndOfFile()) {
+      return;
+    }
+    try {
+      /* HH_FIXME[2049] *not* PHP stdlib */
+      /* HH_FIXME[4107] *not* PHP stdlib */
+      await \stream_await($this->impl, $flags);
+    } catch (\InvalidOperationException $_) {
+      // e.g. real files on Linux when using epoll
+      $this->isAwaitable = false;
     }
   }
 
-  public function detach(): ?resource {
-    if (null === $this->stream) {
-      return null;
+  final public async function readAsync(
+    ?int $max_bytes = null,
+  ): Awaitable<string> {
+    if (!$this->isReadable()) {
+      throw new Exception\UnreadableStreamException('Stream is unreadable.');
     }
 
-    $result = $this->stream;
+    if ($max_bytes is int && $max_bytes < 0) {
+      throw new Exception\InvalidArgumentException(
+        'Expected $max_bytes to be null, or >= 0',
+      );
+    }
 
-    $this->stream = null;
+    await $this->flushAsync();
 
-    $this->size = $this->uri = null;
-
-    return $result;
+    $data = '';
+    while (($max_bytes === null || $max_bytes > 0) && !$this->isEndOfFile()) {
+      $chunk = $this->rawReadBlocking($max_bytes);
+      $data .= $chunk;
+      if ($max_bytes !== null) {
+        $max_bytes -= Str\length($chunk);
+      }
+      if ($max_bytes === null || $max_bytes > 0) {
+        await $this->selectAsync(\STREAM_AWAIT_READ);
+      }
+    }
+    return $data;
   }
 
-  public function getSize(): ?int {
-    if (null !== $this->size) {
-      return $this->size;
+  final public async function readLineAsync(
+    ?int $max_bytes = null,
+  ): Awaitable<string> {
+    if (!$this->isReadable()) {
+      throw new Exception\UnreadableStreamException('Stream is unreadable.');
     }
 
-    if (null === $this->stream) {
-      return null;
+    if ($max_bytes is int && $max_bytes < 0) {
+      throw new Exception\InvalidArgumentException(
+        'Expected $max_bytes to be null, or >= 0',
+      );
     }
 
-    $stats = fstat($this->stream);
+    await $this->flushAsync();
 
-    if (C\contains_key($stats, 'size')) {
-      $this->size = (int)$stats['size'];
-      return $this->size;
+    if ($max_bytes === null) {
+      // The placeholder value for 'default' is not documented
+      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      $impl = () ==> \fgets($this->impl);
+    } else {
+      // ... but if you specify a value, it returns 1 less.
+      /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+      /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+      $impl = () ==> \fgets($this->impl, $max_bytes + 1);
     }
-
-    return null;
+    $data = $impl();
+    while ($data === false && !$this->isEndOfFile()) {
+      await $this->selectAsync(\STREAM_AWAIT_READ);
+      $data = $impl();
+    }
+    return $data === false ? '' : $data;
   }
 
-  public function tell(): int {
-    if (null === $this->stream) {
-      throw Exception\UntellableStreamException::dueToMissingResource();
+  final public function rawWriteBlocking(string $bytes): int {
+    if (!$this->isWritable()) {
+      throw new Exception\UnwritableStreamException('Stream is unwritable.');
     }
 
-    $result = ftell($this->stream);
-
-    if (false === $result) {
-      throw Exception\UntellableStreamException::dueToPhpError();
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    $result = \fwrite($this->impl, $bytes);
+    if ($result === false) {
+      throw new Exception\RuntimeException();
     }
 
-    return $result;
+    return $result as int;
   }
 
-  public function eof(): bool {
-    return null === $this->stream || feof($this->stream);
+
+  final public function writeAsync(string $bytes): Awaitable<void> {
+    return $this->queuedAsync(async () ==> {
+      while (true) {
+        $written = $this->rawWriteBlocking($bytes);
+        $bytes = Str\slice($bytes, $written);
+        if ($bytes === '') {
+          break;
+        }
+        await $this->selectAsync(\STREAM_AWAIT_WRITE);
+      }
+    });
   }
 
+  final public function flushAsync(): Awaitable<void> {
+    return $this->queuedAsync(async () ==> {
+      /* HH_IGNORE_ERROR[2049] */
+      /* HH_IGNORE_ERROR[4107] */
+      @\fflush($this->impl);
+    });
+  }
+
+  final public function isEndOfFile(): bool {
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    return \feof($this->impl);
+  }
+
+  final public async function closeAsync(): Awaitable<void> {
+    await $this->flushAsync();
+    /* HH_IGNORE_ERROR[2049] __PHPStdLib */
+    /* HH_IGNORE_ERROR[4107] __PHPStdLib */
+    @\fclose($this->impl);
+  }
+
+  /**
+   * Returns whether or not the stream is writable.
+   */
+  public function isWritable(): bool {
+    $meta = @\stream_get_meta_data($this->impl);
+    $mode = $meta['mode'] ?? '';
+
+    return (
+      Str\contains($mode, 'x') ||
+      Str\contains($mode, 'w') ||
+      Str\contains($mode, 'c') ||
+      Str\contains($mode, 'a') ||
+      Str\contains($mode, '+')
+    );
+  }
+
+  /**
+   * Returns whether or not the stream is readable.
+   */
+  public function isReadable(): bool {
+    $meta = @\stream_get_meta_data($this->impl);
+    $mode = $meta['mode'] ?? '';
+
+    return (Str\contains($mode, 'r') || Str\contains($mode, '+'));
+  }
+
+  /**
+   * Returns whether or not the stream is seekable.
+   */
   public function isSeekable(): bool {
-    if (null === $this->stream) {
-      return false;
-    }
-
-    $meta = stream_get_meta_data($this->stream);
-    return $meta['seekable'];
+    $meta = @\stream_get_meta_data($this->impl);
+    return $meta['seekable'] ?? false;
   }
 
-  public function seek(int $offset, int $whence = SEEK_SET): void {
-    if (null === $this->stream) {
-      throw Exception\UnseekableStreamException::dueToMissingResource();
-    }
-
+  public function seek(
+    int $offset,
+    Message\StreamSeekWhence $whence = Message\StreamSeekWhence::SET,
+  ): void {
     if (!$this->isSeekable()) {
-      throw Exception\UnseekableStreamException::dueToConfiguration();
+      throw new Exception\UnseekableStreamException('Stream is not seekable');
     }
 
-    $retval = fseek($this->stream as nonnull, $offset, $whence);
+    $retval = @\fseek($this->impl, $offset, $whence as int);
 
     if ($retval === -1) {
-      throw Exception\UnseekableStreamException::dueToPhpError();
+      throw
+        new Exception\UnseekableStreamException('Error seeking within stream');
     }
   }
 
@@ -131,101 +243,28 @@ class Stream implements StreamInterface {
     $this->seek(0);
   }
 
-  public function isWritable(): bool {
-    if (null === $this->stream) {
-      return false;
+  public function getSize(): ?int {
+    if ($this->size is nonnull) {
+      return $this->size;
     }
 
-    $meta = stream_get_meta_data($this->stream);
-    $mode = $meta['mode'];
+    $stats = @\fstat($this->impl);
 
-    return (
-      strstr($mode, 'x') ||
-      strstr($mode, 'w') ||
-      strstr($mode, 'c') ||
-      strstr($mode, 'a') ||
-      strstr($mode, '+')
-    );
+    if ($stats !== false && C\contains_key($stats, 'size')) {
+      $this->size = (int) $stats['size'];
+      return $this->size;
+    }
+
+    return null;
   }
 
-  public function write(string $string): int {
-    if (null === $this->stream) {
-      throw Exception\UnwritableStreamException::dueToMissingResource();
-    }
-
-    if (!$this->isWritable()) {
-      throw Exception\UnwritableStreamException::dueToConfiguration();
-    }
-
-    $this->size = null;
-
-    $result = fwrite($this->stream as nonnull, $string);
+  public function tell(): int {
+    $result = @\ftell($this->impl);
 
     if (false === $result) {
-      throw Exception\UnwritableStreamException::dueToPhpError();
+      throw new Exception\UntellableStreamException('Error occurred during tell operation');
     }
 
     return $result;
-  }
-
-  public function isReadable(): bool {
-    if (null === $this->stream) {
-      return false;
-    }
-
-    $meta = stream_get_meta_data($this->stream);
-    $mode = $meta['mode'];
-
-    return (strstr($mode, 'r') || strstr($mode, '+'));
-  }
-
-  public function read(int $length): string {
-    if (null === $this->stream) {
-      throw Exception\UnreadableStreamException::dueToMissingResource();
-    }
-
-    if (!$this->isReadable()) {
-      throw Exception\UnreadableStreamException::dueToConfiguration();
-    }
-
-    $result = fread($this->stream as nonnull, $length);
-
-    if (false === $result) {
-      throw Exception\UnreadableStreamException::dueToPhpError();
-    }
-
-    return $result;
-  }
-
-  public function getContents(): string {
-    if (null === $this->stream) {
-      throw Exception\UnreadableStreamException::dueToMissingResource();
-    }
-
-    if (!$this->isReadable()) {
-      throw Exception\UnreadableStreamException::dueToConfiguration();
-    }
-
-    $contents = stream_get_contents($this->stream as nonnull);
-
-    if (false === $contents) {
-      throw Exception\UnreadableStreamException::dueToPhpError();
-    }
-
-    return $contents;
-  }
-
-  public function getMetadata(?string $key = null): mixed {
-    if (null === $this->stream) {
-      return null === $key ? null : [];
-    }
-
-    $meta = stream_get_meta_data($this->stream);
-
-    if (null === $key) {
-      return $meta;
-    }
-
-    return C\contains_key($meta, $key) ? $meta[$key] : null;
   }
 }

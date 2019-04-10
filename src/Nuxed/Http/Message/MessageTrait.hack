@@ -120,7 +120,7 @@ trait MessageTrait {
 
   public function getBody(): StreamInterface {
     if (null === $this->stream) {
-      $this->stream = __Private\create_stream_from_string('');
+      $this->stream = stream('');
     }
 
     return $this->stream;

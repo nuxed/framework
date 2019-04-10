@@ -1,18 +1,15 @@
 namespace Nuxed\Http\Message;
 
-use namespace HH\Lib\Str;
-use type Nuxed\Contract\Http\Message\StreamInterface;
-use type Nuxed\Contract\Http\Message\UploadedFileInterface;
-use type Nuxed\Contract\Http\Message\UploadedFileError;
-use function fopen;
+use namespace HH\Lib\Experimental\Filesystem;
+use namespace Nuxed\Contract\Http\Message;
 
-class UploadedFile implements UploadedFileInterface {
+class UploadedFile implements Message\UploadedFileInterface {
   private bool $moved = false;
 
   public function __construct(
-    private StreamInterface $stream,
+    private Message\StreamInterface $stream,
     private ?int $size,
-    private UploadedFileError $error,
+    private Message\UploadedFileError $error,
     private ?string $clientFilename = null,
     private ?string $clientMediaType = null,
   ) {}
@@ -21,7 +18,7 @@ class UploadedFile implements UploadedFileInterface {
    * @return bool return true if there is no upload error
    */
   private function isOk(): bool {
-    return UploadedFileError::ERROR_OK === $this->error;
+    return Message\UploadedFileError::ERROR_OK === $this->error;
   }
 
   /**
@@ -29,7 +26,7 @@ class UploadedFile implements UploadedFileInterface {
    */
   private function validateActive(): void {
     if (false === $this->isOk()) {
-      throw Exception\UploadedFileErrorException::dueToStreamUploadError();
+      throw new Exception\UploadedFileErrorException('Cannot retrieve stream due to upload error.');
     }
 
     if ($this->moved) {
@@ -37,13 +34,13 @@ class UploadedFile implements UploadedFileInterface {
     }
   }
 
-  public function getStream(): StreamInterface {
+  public function getStream(): Message\StreamInterface {
     $this->validateActive();
 
     return $this->stream;
   }
 
-  public function moveTo(string $targetPath): void {
+  public async function moveTo(string $targetPath): Awaitable<void> {
     $this->validateActive();
 
     if ('' === $targetPath) {
@@ -57,13 +54,15 @@ class UploadedFile implements UploadedFileInterface {
       $stream->rewind();
     }
 
-    $handle = fopen($targetPath, 'w');
-
-    if (false === $handle) {
-      throw Exception\UploadedFileErrorException::dueToUnwritablePath();
+    await using (
+      $handle = Filesystem\open_write_only($targetPath, Filesystem\FileWriteMode::OPEN_OR_CREATE)
+    ) {
+      while (!$stream->isEndOfFile()) {
+        $content = await $stream->readAsync(1048576);
+        await $handle->writeAsync($content);
+      }
     }
 
-    $this->copyToStream($stream, new Stream($handle));
     $this->moved = true;
   }
 
@@ -71,7 +70,7 @@ class UploadedFile implements UploadedFileInterface {
     return $this->size;
   }
 
-  public function getError(): UploadedFileError {
+  public function getError(): Message\UploadedFileError {
     return $this->error;
   }
 
@@ -81,45 +80,5 @@ class UploadedFile implements UploadedFileInterface {
 
   public function getClientMediaType(): ?string {
     return $this->clientMediaType;
-  }
-
-  /**
-   * Copy the contents of a stream into another stream until the given number
-   * of bytes have been read.
-   *
-   * @param StreamInterface $source Stream to read from
-   * @param StreamInterface $dest   Stream to write to
-   * @param int             $maxLen Maximum number of bytes to read. Pass -1
-   *                                to read the entire stream
-   *
-   * @throws \RuntimeException on error
-   */
-  private function copyToStream(
-    StreamInterface $source,
-    StreamInterface $dest,
-    int $maxLen = -1,
-  ): void {
-    if ($maxLen === -1) {
-      while (!$source->eof()) {
-        if (!$dest->write($source->read(1048576))) {
-          break;
-        }
-      }
-
-      return;
-    }
-
-    $bytes = 0;
-    while (!$source->eof()) {
-      $buf = $source->read($maxLen - $bytes);
-      if (!($len = Str\length($buf))) {
-        break;
-      }
-      $bytes += $len;
-      $dest->write($buf);
-      if ($bytes === $maxLen) {
-        break;
-      }
-    }
   }
 }

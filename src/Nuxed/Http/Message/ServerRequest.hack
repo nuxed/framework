@@ -1,28 +1,25 @@
 namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\StreamInterface;
-use type Nuxed\Contract\Http\Message\UriInterface;
-use type Nuxed\Contract\Http\Message\UploadedFileInterface;
+use namespace Nuxed\Contract\Http\Message;
 
-class ServerRequest extends Request implements ServerRequestInterface {
+class ServerRequest extends Request implements Message\ServerRequestInterface {
   protected dict<string, mixed> $attributes = dict[];
 
   protected KeyedContainer<string, string> $cookieParams = dict[];
 
-  protected ?KeyedContainer<string, mixed> $parsedBody = null;
+  protected ?KeyedContainer<string, string> $parsedBody = null;
 
-  protected KeyedContainer<string, mixed> $queryParams = dict[];
+  protected KeyedContainer<string, string> $queryParams = dict[];
 
-  protected KeyedContainer<string, UploadedFileInterface> $uploadedFiles =
+  protected KeyedContainer<string, Message\UploadedFileInterface> $uploadedFiles =
     dict[];
 
   public function __construct(
     string $method,
-    UriInterface $uri,
+    Message\UriInterface $uri,
     KeyedContainer<string, Container<string>> $headers = dict[],
-    ?StreamInterface $body = null,
+    ?Message\StreamInterface $body = null,
     string $version = '1.1',
     protected KeyedContainer<string, mixed> $serverParams = dict[],
   ) {
@@ -36,7 +33,7 @@ class ServerRequest extends Request implements ServerRequestInterface {
    *
    * @see Factory->createServerRequestFromGlobals()
    */
-  public static function capture(): ServerRequestInterface {
+  public static function capture(): Message\ServerRequestInterface {
     return (new MessageFactory())->createServerRequestFromGlobals();
   }
 
@@ -45,12 +42,12 @@ class ServerRequest extends Request implements ServerRequestInterface {
   }
 
   public function getUploadedFiles(
-  ): KeyedContainer<string, UploadedFileInterface> {
+  ): KeyedContainer<string, Message\UploadedFileInterface> {
     return $this->uploadedFiles;
   }
 
   public function withUploadedFiles(
-    KeyedContainer<string, UploadedFileInterface> $uploadedFiles,
+    KeyedContainer<string, Message\UploadedFileInterface> $uploadedFiles,
   ): this {
     $new = clone $this;
     $new->uploadedFiles = $uploadedFiles;
@@ -71,23 +68,23 @@ class ServerRequest extends Request implements ServerRequestInterface {
     return $new;
   }
 
-  public function getQueryParams(): KeyedContainer<string, mixed> {
+  public function getQueryParams(): KeyedContainer<string, string> {
     return $this->queryParams;
   }
 
-  public function withQueryParams(KeyedContainer<string, mixed> $query): this {
+  public function withQueryParams(KeyedContainer<string, string> $query): this {
     $new = clone $this;
     $new->queryParams = $query;
 
     return $new;
   }
 
-  public function getParsedBody(): ?KeyedContainer<string, mixed> {
+  public function getParsedBody(): ?KeyedContainer<string, string> {
     return $this->parsedBody;
   }
 
   public function withParsedBody(
-    ?KeyedContainer<string, mixed> $parsedBody,
+    ?KeyedContainer<string, string> $parsedBody,
   ): this {
     $new = clone $this;
     $new->parsedBody = $parsedBody;

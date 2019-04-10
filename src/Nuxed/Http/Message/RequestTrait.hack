@@ -1,17 +1,16 @@
 namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\Regex;
-use type Nuxed\Contract\Http\Message\RequestInterface;
-use type Nuxed\Contract\Http\Message\UriInterface;
+use namespace Nuxed\Contract\Http\Message;
 
 trait RequestTrait {
-  require implements RequestInterface;
+  require implements Message\RequestInterface;
 
   protected string $method;
 
   protected ?string $requestTarget;
 
-  protected UriInterface $uri;
+  protected Message\UriInterface $uri;
 
   public function getRequestTarget(): string {
     if (null !== $this->requestTarget) {
@@ -52,11 +51,11 @@ trait RequestTrait {
     return $new;
   }
 
-  public function getUri(): UriInterface {
+  public function getUri(): Message\UriInterface {
     return $this->uri;
   }
 
-  public function withUri(UriInterface $uri, bool $preserveHost = false): this {
+  public function withUri(Message\UriInterface $uri, bool $preserveHost = false): this {
     if ($uri === $this->uri) {
       return $this;
     }
