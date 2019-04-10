@@ -29,13 +29,13 @@ final class DatePoint extends DateTimeImmutable {
       return new self(Str\format('@%d', $datepoint));
     }
 
-    return new self($datepoint);
+    return new self($datepoint as string);
   }
 
   <<__Override>>
   public static function createFromFormat(
     string $format,
-    mixed $datetime,
+    string $datetime,
     ?DateTimeZone $timezone = null,
   ): ?this {
     $datepoint = parent::createFromFormat($format, $datetime, $timezone);
