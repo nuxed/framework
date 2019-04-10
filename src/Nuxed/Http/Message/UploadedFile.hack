@@ -63,6 +63,10 @@ class UploadedFile implements Message\UploadedFileInterface {
       }
     }
 
+    if ($stream->isSeekable()) {
+      $stream->rewind();
+    }
+
     $this->moved = true;
   }
 
