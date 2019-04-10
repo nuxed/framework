@@ -182,19 +182,17 @@ final class Folder extends Node {
 
     // delete files first.
     $files = await $this->files(false, true);
-    await Asio\v(Vec\map($files, async ($file) ==> {
-      if ($file->exists()) {
-        return await $file->delete();
-      }
-    }));
+    await Asio\v(Vec\map(
+      $files,
+      ($node) ==> $node->exists() ? $node->delete() : async { return false; }
+    ));
 
     // delete rest of the nodes.
     $nodes = await $this->list(false, true, Node::class);
-    await Asio\v(Vec\map($nodes, async ($node) ==> {
-      if ($node->exists()) {
-        return await $node->delete();
-      }
-    }));
+    await Asio\v(Vec\map(
+      $nodes,
+      ($node) ==> $node->exists() ? $node->delete() : async { return false; }
+    ));
     return $this;
   }
 
