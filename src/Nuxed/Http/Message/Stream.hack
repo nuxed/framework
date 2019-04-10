@@ -143,6 +143,7 @@ class Stream implements Message\StreamInterface {
     if (!$this->isWritable()) {
       throw new Exception\UnwritableStreamException('Stream is unwritable.');
     }
+    $this->size = null;
 
     /* HH_IGNORE_ERROR[2049] __PHPStdLib */
     /* HH_IGNORE_ERROR[4107] __PHPStdLib */
@@ -157,6 +158,7 @@ class Stream implements Message\StreamInterface {
 
   final public function writeAsync(string $bytes): Awaitable<void> {
     return $this->queuedAsync(async () ==> {
+      $this->size = null;
       while (true) {
         $written = $this->rawWriteBlocking($bytes);
         $bytes = Str\slice($bytes, $written);
