@@ -10,7 +10,7 @@ interface ServerRequestFactoryInterface {
    *
    * @param string $method The HTTP method associated with the request.
    * @param UriInterface $uri The URI associated with the request.
-   * @param Map<string, mixed> $serverParams Map of SAPI parameters with which to seed
+   * @param KeyedContainer<string, mixed> $serverParams container of SAPI parameters with which to seed
    *     the generated request instance.
    *
    * @return ServerRequestInterface
@@ -18,6 +18,6 @@ interface ServerRequestFactoryInterface {
   public function createServerRequest(
     string $method,
     UriInterface $uri,
-    dict<string, mixed> $serverParams = dict[],
+    KeyedContainer<string, mixed> $serverParams = dict[],
   ): ServerRequestInterface;
 }
