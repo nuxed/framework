@@ -43,11 +43,14 @@ class MessageFactory
   public function createServerRequestFromGlobals(
   ): Message\ServerRequestInterface {
     /* HH_IGNORE_ERROR[2050] */
-    $server = (new _Private\ServerParametersMarshaler())->marshale($_SERVER);
+    $server = $_SERVER;
+    /* HH_IGNORE_ERROR[2050] */
+    $uploads = HttpNormalizer\normalize_files($_FILES);
+    /* HH_IGNORE_ERROR[2050] */
+    $cookies = HttpNormalizer\normalize($_COOKIE);
+    $protocol = (new _Private\ProtocolVersionMarshaler())->marshal($server);
     $headers = (new _Private\HeadersMarshaler())->marshal($server);
     $uri = (new _Private\UriMarshaler())->marshal($server, $headers);
-    $protocol = (new _Private\ProtocolVersionMarshaler())->marshal($server);
-
     $query = HttpNormalizer\parse($uri->getQuery());
     $method = Str\uppercase(($server['REQUEST_METHOD'] ?? 'GET') as string);
     $ct = $value ==> C\contains($headers['content-type'] ?? vec[], $value);
@@ -61,11 +64,6 @@ class MessageFactory
     } else {
       $body = null;
     }
-
-    /* HH_IGNORE_ERROR[2050] */
-    $uploads = HttpNormalizer\normalize_files($_FILES);
-    /* HH_IGNORE_ERROR[2050] */
-    $cookies = HttpNormalizer\normalize($_COOKIE);
 
     return new ServerRequest(
       $method, $uri, $headers, $this->createStreamFromFile('php://input', 'rb'), $protocol, $server
