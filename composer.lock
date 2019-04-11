@@ -159,16 +159,16 @@
         },
         {
             "name": "facebook/xhp-lib",
-            "version": "v2.9.3",
+            "version": "v2.9.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/xhp-lib.git",
-                "reference": "371cb242b7a910a45f4a3fed3599d6c4f9c1d25b"
+                "reference": "195861ec3f8142573c1f7fd2331d57757197a12c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/xhp-lib/zipball/371cb242b7a910a45f4a3fed3599d6c4f9c1d25b",
-                "reference": "371cb242b7a910a45f4a3fed3599d6c4f9c1d25b",
+                "url": "https://api.github.com/repos/hhvm/xhp-lib/zipball/195861ec3f8142573c1f7fd2331d57757197a12c",
+                "reference": "195861ec3f8142573c1f7fd2331d57757197a12c",
                 "shasum": ""
             },
             "require": {
@@ -198,7 +198,7 @@
                 "hhvm",
                 "xhp"
             ],
-            "time": "2019-03-26T20:49:03+00:00"
+            "time": "2019-04-10T16:47:10+00:00"
         },
         {
             "name": "hhvm/hhvm-autoload",
