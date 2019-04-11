@@ -180,8 +180,6 @@ interface MessageInterface {
    * new body stream.
    *
    * @param StreamInterface $body Body.
-   *
-   * @throws \InvalidArgumentException When the body is not valid.
    */
   public function withBody(StreamInterface $body): this;
 }

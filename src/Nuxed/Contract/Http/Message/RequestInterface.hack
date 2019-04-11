@@ -72,8 +72,6 @@ interface RequestInterface extends MessageInterface {
    * changed request method.
    *
    * @param string $method Case-sensitive method.
-   *
-   * @throws \InvalidArgumentException for invalid HTTP methods.
    */
   public function withMethod(string $method): this;
 
@@ -83,6 +81,7 @@ interface RequestInterface extends MessageInterface {
    * This method MUST return a UriInterface instance.
    *
    * @link http://tools.ietf.org/html/rfc3986#section-4.3
+   *
    * @return UriInterface Returns a UriInterface instance
    *     representing the URI of the request.
    */
@@ -114,6 +113,7 @@ interface RequestInterface extends MessageInterface {
    * new UriInterface instance.
    *
    * @link http://tools.ietf.org/html/rfc3986#section-4.3
+   *
    * @param UriInterface $uri New request URI to use.
    * @param bool $preserveHost Preserve the original state of the Host header.
    */
