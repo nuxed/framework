@@ -21,7 +21,7 @@ class MessageFactory
     int $code = 200,
     string $reasonPhrase = '',
   ): Message\ResponseInterface {
-    return (new Response())
+    return response()
       ->withStatus($code, $reasonPhrase);
   }
 
@@ -29,7 +29,7 @@ class MessageFactory
     string $method,
     Message\UriInterface $uri,
   ): Message\RequestInterface {
-    return new Request($method, $uri);
+    return request($method, $uri);
   }
 
   public function createServerRequest(
