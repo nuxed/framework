@@ -35,7 +35,7 @@ class MessageFactory
   public function createServerRequest(
     string $method,
     Message\UriInterface $uri,
-    dict<string, mixed> $serverParams = dict[],
+    KeyedContainer<string, mixed> $serverParams = dict[],
   ): Message\ServerRequestInterface {
     return new ServerRequest($method, $uri, dict[], null, '1.1', $serverParams);
   }
