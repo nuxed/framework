@@ -32,7 +32,7 @@ class UrlPackage extends Package {
   private ?UrlPackage $sslPackage;
 
   /**
-   * @param string|string[]          $baseUrls        Base asset URLs
+   * @param Container<string>        $baseUrls        Base asset URLs
    * @param VersionStrategyInterface $versionStrategy The version strategy
    * @param ContextInterface|null    $context         Context
    */
