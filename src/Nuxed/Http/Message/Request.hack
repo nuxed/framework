@@ -30,7 +30,8 @@ class Request implements Message\RequestInterface {
   }
 
   protected function updateHostFromUri(): void {
-    if ('' === $host = $this->uri->getHost()) {
+    $host = $this->uri->getHost();
+    if ('' === $host) {
       return;
     }
 

@@ -17,11 +17,14 @@ trait RequestTrait {
       return $this->requestTarget;
     }
 
-    if ('' === $target = $this->uri->getPath()) {
+    $target = $this->uri->getPath();
+    if ('' === $target) {
       $target = '/';
     }
-    if ('' !== $this->uri->getQuery()) {
-      $target .= '?'.$this->uri->getQuery();
+
+    $query = $this->uri->getQuery();
+    if ('' !== $query) {
+      $target .= '?'.$query;
     }
 
     return $target;
