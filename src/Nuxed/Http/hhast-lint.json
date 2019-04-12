@@ -15,7 +15,8 @@
     {
       "patterns": [
         "Message/Stream.hack",
-        "Message/UploadedFile.hack"
+        "Message/UploadedFile.hack",
+        "Emitter/SapiStreamEmitter.hack"
       ],
       "disabledLinters": [
         "Facebook\\HHAST\\Linters\\DontAwaitInALoopLinter"
