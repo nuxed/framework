@@ -17,12 +17,9 @@ final class Emitter implements Emitter\EmitterInterface {
 
   public async function emit(Message\ResponseInterface $response): Awaitable<bool> {
     $this->assertNoPreviousOutput();
-
     $response = $this->renderCookiesIntoHeader($response);
-
     $this->emitHeaders($response);
     $this->emitStatusLine($response);
-
     $stream = $response->getBody();
     $stream->rewind();
     $content = await $stream->readAsync();
@@ -44,6 +41,7 @@ final class Emitter implements Emitter\EmitterInterface {
     if (\headers_sent()) {
       throw Exception\EmitterException::forHeadersSent();
     }
+
     if (\ob_get_level() > 0 && \ob_get_length() > 0) {
       throw Exception\EmitterException::forOutputSent();
     }
@@ -102,6 +100,7 @@ final class Emitter implements Emitter\EmitterInterface {
   private function filterHeader(string $header): string {
     $filtered = Str\replace($header, '-', ' ');
     $filtered = Str\capitalize_words($filtered);
+
     return Str\replace($filtered, ' ', '-');
   }
 
@@ -118,6 +117,7 @@ final class Emitter implements Emitter\EmitterInterface {
     if (0 === C\count($cookies)) {
       return $response;
     }
+
     return $response->withAddedHeader(static::SET_COOKIE_HEADER, $cookies);
   }
 
@@ -129,24 +129,29 @@ final class Emitter implements Emitter\EmitterInterface {
       vec[\urlencode($name).'='.\urlencode($cookie->getValue())];
 
     $domain = $cookie->getDomain();
-    if (null !== $domain) {
+    if ($domain is nonnull) {
       $cookieStringParts[] = Str\format('Domain=%s', $domain);
     }
+
     $path = $cookie->getPath();
-    if (null !== $path) {
+    if ($path is nonnull) {
       $cookieStringParts[] = Str\format('Path=%s', $path);
     }
+
     $expires = $cookie->getExpires();
-    if (null !== $expires) {
+    if ($expires is nonnull) {
       $cookieStringParts[] =
         Str\format('Expires=%s', $expires->format('D, d M Y H:i:s T'));
     }
+
     if ($cookie->isSecure()) {
       $cookieStringParts[] = 'Secure';
     }
+
     if ($cookie->isHttpOnly()) {
       $cookieStringParts[] = 'HttpOnly';
     }
+
     $sameSite = $cookie->getSameSite();
     if ($sameSite is nonnull) {
       $cookieStringParts[] = Str\format('SameSite=%s', $sameSite as string);
