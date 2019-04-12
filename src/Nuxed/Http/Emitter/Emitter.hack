@@ -88,7 +88,7 @@ final class Emitter implements Emitter\EmitterInterface {
     $statusCode = $response->getStatusCode();
     foreach ($response->getHeaders() as $header => $values) {
       $name = $this->filterHeader($header);
-      $first = $name === 'Set-Cookie' ? false : true;
+      $first = $name === static::SET_COOKIE_HEADER ? false : true;
       foreach ($values as $value) {
         \header(Str\format('%s: %s', $name, $value), $first, $statusCode);
         $first = false;
