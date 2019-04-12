@@ -3,14 +3,8 @@ namespace Nuxed\Http\Emitter;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Http\Emitter\Exception;
-use type Nuxed\Contract\Http\Emitter\EmitterInterface;
-use type Nuxed\Contract\Http\Message\CookieInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use function ob_get_level;
-use function ob_get_length;
-use function header;
-use function headers_sent;
-use function urlencode;
+use namespace Nuxed\Contract\Http\Emitter;
+use namespace Nuxed\Contract\Http\Message;
 
 /**
  * Logic largely refactored from the Zend-HttpHandleRunner Zend\HttpHandlerRunner\Emitter\SapiEmitter class.
@@ -18,10 +12,10 @@ use function urlencode;
  * @copyright Copyright (c) 2018 Zend Technologies USA Inc. (https://www.zend.com)
  * @license   https://github.com/zendframework/zend-httphandlerrunner/blob/master/LICENSE.md New BSD License
  */
-class Emitter implements EmitterInterface {
+final class Emitter implements Emitter\EmitterInterface {
   const SET_COOKIE_HEADER = 'Set-Cookie';
 
-  public async function emit(ResponseInterface $response): Awaitable<bool> {
+  public async function emit(Message\ResponseInterface $response): Awaitable<bool> {
     $this->assertNoPreviousOutput();
 
     $response = $this->renderCookiesIntoHeader($response);
@@ -47,10 +41,10 @@ class Emitter implements EmitterInterface {
    * @throws EmitterException if output is present in the output buffer.
    */
   private function assertNoPreviousOutput(): void {
-    if (headers_sent()) {
+    if (\headers_sent()) {
       throw Exception\EmitterException::forHeadersSent();
     }
-    if (ob_get_level() > 0 && ob_get_length() > 0) {
+    if (\ob_get_level() > 0 && \ob_get_length() > 0) {
       throw Exception\EmitterException::forOutputSent();
     }
   }
@@ -67,10 +61,10 @@ class Emitter implements EmitterInterface {
    *
    * @see emitHeaders()
    */
-  private function emitStatusLine(ResponseInterface $response): void {
+  private function emitStatusLine(Message\ResponseInterface $response): void {
     $reasonPhrase = $response->getReasonPhrase();
     $statusCode = $response->getStatusCode();
-    header(
+    \header(
       Str\format(
         'HTTP/%s %d%s',
         $response->getProtocolVersion(),
@@ -90,13 +84,13 @@ class Emitter implements EmitterInterface {
    * in such a way as to create aggregate headers (instead of replace
    * the previous).
    */
-  private function emitHeaders(ResponseInterface $response): void {
+  private function emitHeaders(Message\ResponseInterface $response): void {
     $statusCode = $response->getStatusCode();
     foreach ($response->getHeaders() as $header => $values) {
       $name = $this->filterHeader($header);
       $first = $name === 'Set-Cookie' ? false : true;
       foreach ($values as $value) {
-        header(Str\format('%s: %s', $name, $value), $first, $statusCode);
+        \header(Str\format('%s: %s', $name, $value), $first, $statusCode);
         $first = false;
       }
     }
@@ -112,8 +106,8 @@ class Emitter implements EmitterInterface {
   }
 
   private function renderCookiesIntoHeader(
-    ResponseInterface $response,
-  ): ResponseInterface {
+    Message\ResponseInterface $response,
+  ): Message\ResponseInterface {
     $response = $response->withoutHeader(static::SET_COOKIE_HEADER);
     $cookies = vec[];
 
@@ -129,10 +123,10 @@ class Emitter implements EmitterInterface {
 
   private function convertCookieIntoString(
     string $name,
-    CookieInterface $cookie,
+    Message\CookieInterface $cookie,
   ): string {
     $cookieStringParts =
-      vec[urlencode($name).'='.urlencode($cookie->getValue())];
+      vec[\urlencode($name).'='.\urlencode($cookie->getValue())];
 
     $domain = $cookie->getDomain();
     if (null !== $domain) {
