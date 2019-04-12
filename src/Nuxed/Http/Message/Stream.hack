@@ -89,8 +89,6 @@ class Stream implements Message\StreamInterface {
       );
     }
 
-    await $this->flushAsync();
-
     $data = '';
     while (($max_bytes === null || $max_bytes > 0) && !$this->isEndOfFile()) {
       $chunk = $this->rawReadBlocking($max_bytes);
