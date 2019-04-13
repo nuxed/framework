@@ -49,12 +49,12 @@ interface FlashMessagesInterface {
   public function get(string $name, mixed $default = null): mixed;
 
   /**
-   * Retrieve all flash values.
+   * Retrieve all flash items.
    *
-   * Will return all values was set in a previous request, or if `now()`
+   * Will return all items was set in a previous request, or if `now()`
    * was called in this request.
    */
-  public function all(): KeyedContainer<string, mixed>;
+  public function items(): KeyedContainer<string, mixed>;
 
   /**
    * Clear all flash values.
