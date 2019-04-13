@@ -6,7 +6,7 @@ use namespace Nuxed\Contract\Http;
 use namespace Facebook\TypeAssert;
 
 class FlashMessages implements Http\Flash\FlashMessagesInterface {
-  const type TMessages = dict<string, shape(
+  const type TMessages = KeyedContainer<string, shape(
     'value' => mixed,
     'hops' => int,
     ...
@@ -43,7 +43,7 @@ class FlashMessages implements Http\Flash\FlashMessagesInterface {
       ));
     }
 
-    $messages = $this->messages();
+    $messages = dict($this->messages());
     $messages[$name] = shape(
       'value' => $value,
       'hops' => $hops,
@@ -99,7 +99,7 @@ class FlashMessages implements Http\Flash\FlashMessagesInterface {
       return;
     }
 
-    $messages = $this->messages();
+    $messages = dict($this->messages());
     $current = dict[];
 
     foreach ($messages as $key => $data) {
