@@ -67,9 +67,9 @@ class FlashMessages implements Http\Flash\FlashMessagesInterface {
   }
 
   /**
-   * Retrieve all flash values.
+   * Retrieve all flash items.
    */
-  public function all(): KeyedContainer<string, mixed> {
+  public function items(): KeyedContainer<string, mixed> {
     return $this->current;
   }
 
