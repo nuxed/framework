@@ -2,14 +2,20 @@ namespace Nuxed\Http\Flash;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
-use type Nuxed\Contract\Http\Flash\FlashMessagesInterface;
-use type Nuxed\Contract\Http\Session\SessionInterface;
+use namespace Nuxed\Contract\Http;
+use namespace Facebook\TypeAssert;
 
-class FlashMessages implements FlashMessagesInterface {
+class FlashMessages implements Http\Flash\FlashMessagesInterface {
+  const type TMessages = dict<string, shape(
+    'value' => mixed,
+    'hops' => int,
+    ...
+  )>;
+
   private dict<string, mixed> $current = dict[];
 
   public function __construct(
-    private SessionInterface $session,
+    private Http\Session\SessionInterface $session,
     private string $key,
   ) {
     $this->prepare();
@@ -19,9 +25,9 @@ class FlashMessages implements FlashMessagesInterface {
    * Create an instance from a session container.
    */
   public static function create(
-    SessionInterface $session,
+    Http\Session\SessionInterface $session,
     string $sessionKey = self::FLASH_NEXT,
-  ): FlashMessagesInterface {
+  ): Http\Flash\FlashMessagesInterface {
     return new FlashMessages($session, $sessionKey);
   }
 
@@ -38,10 +44,10 @@ class FlashMessages implements FlashMessagesInterface {
     }
 
     $messages = $this->messages();
-    $messages[$name] = dict[
+    $messages[$name] = shape(
       'value' => $value,
       'hops' => $hops,
-    ];
+    );
     $this->session->set($this->key, $messages);
   }
 
@@ -95,6 +101,7 @@ class FlashMessages implements FlashMessagesInterface {
 
     $messages = $this->messages();
     $current = dict[];
+
     foreach ($messages as $key => $data) {
       $current[$key] = $data['value'];
 
@@ -116,8 +123,10 @@ class FlashMessages implements FlashMessagesInterface {
     $this->current = $current;
   }
 
-  private function messages(): dict<string, dict<string, arraykey>> {
-    // UNSAFE
-    return $this->session->get($this->key, dict[]);
+  private function messages(): this::TMessages {
+    return TypeAssert\matches_type_structure(
+      \type_structure($this, 'TMessages'),
+      $this->session->get($this->key, dict[]),
+    );
   }
 }
