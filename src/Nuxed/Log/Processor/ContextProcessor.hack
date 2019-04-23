@@ -17,8 +17,11 @@ class ContextProcessor implements ProcessorInterface {
         continue;
       }
 
-      $record['message'] =
-        Str\replace($record['message'], $placeholder, Util\stringify($value));
+      $record['message'] = Str\replace(
+        $record['message'],
+        $placeholder,
+        Util\stringify($value),
+      );
     }
 
     return $record;

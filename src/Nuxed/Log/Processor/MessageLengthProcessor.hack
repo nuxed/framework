@@ -12,8 +12,8 @@ class MessageLengthProcessor implements ProcessorInterface {
       return $record;
     }
 
-    $record['message'] =
-      Str\slice($record['message'], 0, $this->maxLength).'[...]';
+    $record['message'] = Str\slice($record['message'], 0, $this->maxLength).
+      '[...]';
 
     return $record;
   }

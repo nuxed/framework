@@ -103,8 +103,10 @@ class LineFormatter implements FormatterInterface {
       return $str;
     }
 
-    return
-      \strtr($str, Dict\associate(vec["\r\n", "\r", "\n"], vec[' ', ' ', ' ']));
+    return \strtr(
+      $str,
+      Dict\associate(vec["\r\n", "\r", "\n"], vec[' ', ' ', ' ']),
+    );
   }
 
 }
