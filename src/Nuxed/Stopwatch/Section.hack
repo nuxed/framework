@@ -93,8 +93,8 @@ class Section {
    * @param string $name The event name
    */
   public function isEventStarted(string $name): bool {
-    return
-      C\contains_key($this->events, $name) && $this->events[$name]->isStarted();
+    return C\contains_key($this->events, $name) &&
+      $this->events[$name]->isStarted();
   }
 
   /**

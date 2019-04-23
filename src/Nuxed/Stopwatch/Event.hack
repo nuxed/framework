@@ -76,8 +76,11 @@ class Event {
     }
 
     $this->started = Vec\take($this->started, C\count($this->started) - 1);
-    $this->periods[] =
-      new Period($started, $this->getNow(), $this->morePrecision);
+    $this->periods[] = new Period(
+      $started,
+      $this->getNow(),
+      $this->morePrecision,
+    );
 
     return $this;
   }

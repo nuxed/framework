@@ -54,13 +54,16 @@ class Stopwatch implements ResetInterface {
     $this->stop('__section__');
 
     if (1 === C\count($this->activeSections)) {
-      throw
-        new Exception\LogicException('There is no started section to stop.');
+      throw new Exception\LogicException(
+        'There is no started section to stop.',
+      );
     }
 
     $section = C\last($this->activeSections) as Section;
-    $this->activeSections =
-      Vec\take($this->activeSections, C\count($this->activeSections) - 1);
+    $this->activeSections = Vec\take(
+      $this->activeSections,
+      C\count($this->activeSections) - 1,
+    );
     $this->sections[$id] = $section->setId($id);
     $this->stop('__section__.child');
   }
@@ -72,8 +75,10 @@ class Stopwatch implements ResetInterface {
    * @param string|null $category The event category
    */
   public function start(string $name, ?string $category = null): Event {
-    return
-      C\last($this->activeSections) as Section->startEvent($name, $category);
+    return C\last($this->activeSections) as Section->startEvent(
+      $name,
+      $category,
+    );
   }
 
   /**
