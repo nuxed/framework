@@ -38,8 +38,9 @@ final class Kernel implements KernelInterface {
   }
 
   public function subscribe(EventSubscriberInterface $subscriber): void {
-    $event =
-      Asio\join($this->events->dispatch(new Event\SubscribeEvent($subscriber)));
+    $event = Asio\join(
+      $this->events->dispatch(new Event\SubscribeEvent($subscriber)),
+    );
     $this->events->subscribe($event->subscriber);
   }
 

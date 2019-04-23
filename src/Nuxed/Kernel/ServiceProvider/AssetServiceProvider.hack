@@ -72,8 +72,10 @@ class AssetServiceProvider implements Container\ServiceProviderInterface {
             $path = $package['path'] ?? null;
 
             if ($path is nonnull) {
-              $packages[$package['name']] =
-                new Asset\PathPackage($path, $versionStartegy);
+              $packages[$package['name']] = new Asset\PathPackage(
+                $path,
+                $versionStartegy,
+              );
             } else {
               $packages[$package['name']] = new Asset\UrlPackage(
                 $package['urls'] ?? vec[],

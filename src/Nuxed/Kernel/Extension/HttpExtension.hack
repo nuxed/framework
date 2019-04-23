@@ -9,8 +9,8 @@ use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
 class HttpExtension extends AbstractExtension {
   <<__Override>>
   public function pipe(MiddlewarePipeInterface $pipe): void {
-    $preparem =
-      ($middleware) ==> Server\lm(() ==> $this->container->get($middleware));
+    $preparem = ($middleware) ==>
+      Server\lm(() ==> $this->container->get($middleware));
     $prepareh = ($middleware) ==>
       Server\hm(Server\lh(() ==> $this->container->get($middleware)));
 

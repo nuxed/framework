@@ -27,8 +27,7 @@ class ErrorHandler implements ErrorHandlerInterface {
     Throwable $error,
     ServerRequestInterface $request,
   ): Awaitable<ResponseInterface> {
-    $event =
-      $this->events->dispatch(new ErrorEvent($error, $request)) as ErrorEvent;
+    $event = await $this->events->dispatch(new ErrorEvent($error, $request));
 
     if ($event->response is nonnull) {
       return $event->response;
