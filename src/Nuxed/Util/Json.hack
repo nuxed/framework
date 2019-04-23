@@ -56,8 +56,10 @@ final abstract class Json {
 
       return $value;
     } catch (Throwable $e) {
-      throw
-        new Exception\JsonDecodeException($e->getMessage(), (int)$e->getCode());
+      throw new Exception\JsonDecodeException(
+        $e->getMessage(),
+        (int)$e->getCode(),
+      );
     }
   }
 
@@ -66,11 +68,16 @@ final abstract class Json {
     TypeStructure<T> $structure,
   ): T {
     try {
-      return
-        TypeAssert\matches_type_structure($structure, static::decode($json));
+      return TypeAssert\matches_type_structure(
+        $structure,
+        static::decode($json),
+      );
     } catch (TypeAssert\IncorrectTypeException $e) {
-      throw
-        new Exception\JsonDecodeException($e->getMessage(), $e->getCode(), $e);
+      throw new Exception\JsonDecodeException(
+        $e->getMessage(),
+        $e->getCode(),
+        $e,
+      );
     }
   }
 }
