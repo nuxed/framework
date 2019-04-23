@@ -27,27 +27,39 @@ class Crypto implements CryptoInterface {
 
       throw new Exception\EncryptionException('Failed to encrypt raw message');
     } catch (Exception $e) {
-      throw
-        new Exception\EncryptionException($e->getMessage(), $e->getCode(), $e);
+      throw new Exception\EncryptionException(
+        $e->getMessage(),
+        $e->getCode(),
+        $e,
+      );
     }
   }
 
   public function decrypt(string $data): string {
     try {
-      list($nonce, $ciphertext) =
-        Str\split($data, static::NONCE_MESSAGE_SEPARATOR, 2);
+      list($nonce, $ciphertext) = Str\split(
+        $data,
+        static::NONCE_MESSAGE_SEPARATOR,
+        2,
+      );
       $nonce = sodium_hex2bin($nonce);
       $ciphertext = sodium_hex2bin($ciphertext);
-      $message =
-        sodium_crypto_secretbox_open($ciphertext, $nonce, $this->secret);
+      $message = sodium_crypto_secretbox_open(
+        $ciphertext,
+        $nonce,
+        $this->secret,
+      );
       if ($message is string) {
         return $message;
       }
 
       throw new Exception\DecryptionException('Failed to decrpyt ciphertext');
     } catch (Exception $e) {
-      throw
-        new Exception\DecryptionException($e->getMessage(), $e->getCode(), $e);
+      throw new Exception\DecryptionException(
+        $e->getMessage(),
+        $e->getCode(),
+        $e,
+      );
     }
   }
 }
