@@ -115,11 +115,17 @@ abstract class Store implements StoreInterface {
   public async function clear(): Awaitable<bool> {
     $this->deferred = dict[];
     if ($cleared = $this->versioningIsEnabled) {
-      $namespaceVersion =
-        Str\splice(base64_encode(pack('V', SecureRandom\int())), ':', 5);
+      $namespaceVersion = Str\splice(
+        base64_encode(pack('V', SecureRandom\int())),
+        ':',
+        5,
+      );
       try {
-        $cleared =
-          await $this->store('/'.$this->namespace, $namespaceVersion, 0);
+        $cleared = await $this->store(
+          '/'.$this->namespace,
+          $namespaceVersion,
+          0,
+        );
       } catch (\Exception $e) {
         $cleared = false;
       }
@@ -189,8 +195,11 @@ abstract class Store implements StoreInterface {
         $namespaceVersion = await $this->doGet('/'.$this->namespace);
         $this->namespaceVersion = $namespaceVersion as string;
         if ('1:' === $this->namespaceVersion) {
-          $this->namespaceVersion =
-            Str\splice(base64_encode(pack('V', time())), ':', 5);
+          $this->namespaceVersion = Str\splice(
+            base64_encode(pack('V', time())),
+            ':',
+            5,
+          );
           await $this->doStore(
             '@'.$this->namespace,
             $this->namespaceVersion,
