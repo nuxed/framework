@@ -76,8 +76,11 @@ final class DatePoint extends DateTimeImmutable {
    *  - the duration is equal to 1 minute
    */
   public function getMinute(): Period {
-    $datepoint =
-      $this->setTime((int)$this->format('H'), (int)$this->format('i'), 0);
+    $datepoint = $this->setTime(
+      (int)$this->format('H'),
+      (int)$this->format('i'),
+      0,
+    );
 
     return new Period($datepoint, $datepoint->add(new DateInterval('PT1M')));
   }

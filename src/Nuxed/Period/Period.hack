@@ -588,8 +588,11 @@ final class Period implements JsonSerializable, Jsonable {
         $endDate = $this->endDate;
       }
 
-      $result[] =
-        new self(DatePoint::create($startDate), $endDate, $this->boundaryType);
+      $result[] = new self(
+        DatePoint::create($startDate),
+        $endDate,
+        $this->boundaryType,
+      );
     }
     return $result;
   }
@@ -823,8 +826,9 @@ final class Period implements JsonSerializable, Jsonable {
    * an instance that contains the specified starting datepoint.
    */
   public function moveStartDate(mixed $duration): this {
-    return
-      $this->startingOn($this->startDate->add(Duration::create($duration)));
+    return $this->startingOn(
+      $this->startDate->add(Duration::create($duration)),
+    );
   }
 
   /**
