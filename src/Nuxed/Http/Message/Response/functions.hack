@@ -11,7 +11,7 @@ use namespace Nuxed\Http\Message;
  * status of 200.
  */
 function text(
-  string $text,
+  \Stringish $text,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
 ): Contract\ResponseInterface {
@@ -32,7 +32,7 @@ function text(
  * status of 200.
  */
 function html(
-  string $html,
+  \Stringish $html,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
 ): Contract\ResponseInterface {
@@ -53,7 +53,7 @@ function html(
  * status of 200.
  */
 function xml(
-  string $xml,
+  \Stringish $xml,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
 ): Contract\ResponseInterface {

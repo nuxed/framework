@@ -42,9 +42,9 @@ function response(
   return new Response($status, $headers, $body, $version, $reason);
 }
 
-function stream(string $content): Contract\StreamInterface {
+function stream(\Stringish $content): Contract\StreamInterface {
   $handle = \fopen('php://memory', 'wb+');
-  \fwrite($handle, $content);
+  \fwrite($handle, (string) $content);
   $stream = new Stream($handle);
   $stream->rewind();
   return $stream;
