@@ -179,8 +179,10 @@ abstract class AbstractSessionPersistence
       return $headers;
     }
 
-    $lastModified =
-      strftime(static::HTTP_DATE_FORMAT, filemtime($this->pathTranslated));
+    $lastModified = strftime(
+      static::HTTP_DATE_FORMAT,
+      filemtime($this->pathTranslated),
+    );
     $headers['Last-Modified'] = vec[$lastModified];
     return $headers;
   }

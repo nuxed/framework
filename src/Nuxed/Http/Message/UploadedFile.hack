@@ -26,7 +26,9 @@ class UploadedFile implements Message\UploadedFileInterface {
    */
   private function validateActive(): void {
     if (false === $this->isOk()) {
-      throw new Exception\UploadedFileErrorException('Cannot retrieve stream due to upload error.');
+      throw new Exception\UploadedFileErrorException(
+        'Cannot retrieve stream due to upload error.',
+      );
     }
 
     if ($this->moved) {
@@ -55,7 +57,10 @@ class UploadedFile implements Message\UploadedFileInterface {
     }
 
     await using (
-      $handle = Filesystem\open_write_only($targetPath, Filesystem\FileWriteMode::OPEN_OR_CREATE)
+      $handle = Filesystem\open_write_only(
+        $targetPath,
+        Filesystem\FileWriteMode::OPEN_OR_CREATE,
+      )
     ) {
       while (!$stream->isEndOfFile()) {
         $content = await $stream->readAsync(1048576);

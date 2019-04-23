@@ -28,8 +28,9 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
   public async function initialize(
     ServerRequestInterface $request,
   ): Awaitable<SessionInterface> {
-    $this->pathTranslated =
-      (string)($request->getServerParams()['PATH_TRANSLATED'] ?? '');
+    $this->pathTranslated = (string)(
+      $request->getServerParams()['PATH_TRANSLATED'] ?? ''
+    );
     $id = $this->getCookieFromRequest($request);
     $sessionData = dict[];
     if ($id !== '') {

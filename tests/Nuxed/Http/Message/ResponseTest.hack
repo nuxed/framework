@@ -153,7 +153,10 @@ class ResponseTest extends HackTest {
   }
 
   public function testWithoutHeaderThatExists(): void {
-    $r = new Message\Response(200, dict['Foo' => vec['Bar'], 'Baz' => vec['Bam']]);
+    $r = new Message\Response(
+      200,
+      dict['Foo' => vec['Bar'], 'Baz' => vec['Bam']],
+    );
     $r2 = $r->withoutHeader('foO');
     expect($r->hasHeader('foo'))->toBeTrue();
     expect($r->getHeaders())->toBePHPEqual(
@@ -179,8 +182,15 @@ class ResponseTest extends HackTest {
   public function trimmedHeaderValues(): Container<(Message\Response)> {
     return vec[
       tuple(new Message\Response(200, dict['OWS' => vec[" \t \tFoo\t \t "]])),
-      tuple((new Message\Response())->withHeader('OWS', vec[" \t \tFoo\t \t "])),
-      tuple((new Message\Response())->withAddedHeader('OWS', vec[" \t \tFoo\t \t "])),
+      tuple(
+        (new Message\Response())->withHeader('OWS', vec[" \t \tFoo\t \t "]),
+      ),
+      tuple(
+        (new Message\Response())->withAddedHeader(
+          'OWS',
+          vec[" \t \tFoo\t \t "],
+        ),
+      ),
     ];
   }
 

@@ -5,7 +5,8 @@ use type Facebook\HackTest\HackTest;
 use function Facebook\FBExpect\expect;
 
 class StreamTest extends HackTest {
-  public async function testConstructorInitializesProperties(): Awaitable<void> {
+  public async function testConstructorInitializesProperties(
+  ): Awaitable<void> {
     $handle = \fopen('php://temp', 'rb+');
     \fwrite($handle, 'data');
     $stream = new Stream($handle);

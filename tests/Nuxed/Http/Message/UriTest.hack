@@ -9,7 +9,9 @@ class UriTest extends HackTest {
   const string RFC3986_BASE = 'http://a/b/c/d;p?q';
 
   public function testParsesProvidedUri(): void {
-    $uri = new Message\Uri('https://user:pass@example.com:8080/path/123?q=abc#test');
+    $uri = new Message\Uri(
+      'https://user:pass@example.com:8080/path/123?q=abc#test',
+    );
     expect($uri->getScheme())->toBeSame('https');
     expect($uri->getAuthority())->toBeSame('user:pass@example.com:8080');
     expect($uri->getUserInfo())->toBeSame('user:pass');

@@ -13,14 +13,12 @@ use namespace Nuxed\Contract\Http\Message;
  * @copyright Copyright (c) 2018 Zend Technologies USA Inc. (https://www.zend.com)
  * @license   https://github.com/zendframework/zend-httphandlerrunner/blob/master/LICENSE.md New BSD License
  */
- <<__Sealed(
-   SapiStreamEmitter::class,
- )>>
+<<__Sealed(SapiStreamEmitter::class)>>
 class SapiEmitter implements Emitter\EmitterInterface {
   const SET_COOKIE_HEADER = 'Set-Cookie';
 
   public async function emit(
-    Message\ResponseInterface $response
+    Message\ResponseInterface $response,
   ): Awaitable<bool> {
     $this->assertNoPreviousOutput();
     $this->emitHeaders($response);
@@ -141,8 +139,9 @@ class SapiEmitter implements Emitter\EmitterInterface {
     string $name,
     Message\CookieInterface $cookie,
   ): string {
-    $cookieStringParts =
-      vec[\urlencode($name).'='.\urlencode($cookie->getValue())];
+    $cookieStringParts = vec[
+      \urlencode($name).'='.\urlencode($cookie->getValue()),
+    ];
 
     $domain = $cookie->getDomain();
     if ($domain is nonnull) {
@@ -156,8 +155,10 @@ class SapiEmitter implements Emitter\EmitterInterface {
 
     $expires = $cookie->getExpires();
     if ($expires is nonnull) {
-      $cookieStringParts[] =
-        Str\format('Expires=%s', $expires->format('D, d M Y H:i:s T'));
+      $cookieStringParts[] = Str\format(
+        'Expires=%s',
+        $expires->format('D, d M Y H:i:s T'),
+      );
     }
 
     if ($cookie->isSecure()) {

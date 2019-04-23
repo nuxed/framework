@@ -147,8 +147,9 @@ trait MessageTrait {
 
       if (C\contains_key($this->headerNames, $normalized)) {
         $header = $this->headerNames[$normalized];
-        $this->headers[$header] =
-          Vec\unique(Vec\concat($this->headers[$header], $value));
+        $this->headers[$header] = Vec\unique(
+          Vec\concat($this->headers[$header], $value),
+        );
       } else {
         $this->headerNames[$normalized] = $header;
         $this->headers[$header] = vec($value);

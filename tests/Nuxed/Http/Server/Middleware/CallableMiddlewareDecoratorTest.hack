@@ -14,7 +14,8 @@ class CallableMiddlewareDecoratorTest extends HackTest {
     $middleware = new Server\Middleware\CallableMiddlewareDecorator($call);
 
     $handler = Server\dh(async ($request, $response) ==> {
-      await $response->getBody()->writeAsync($request->getAttribute('foo') as string);
+      await $response->getBody()
+        ->writeAsync($request->getAttribute('foo') as string);
       return $response;
     });
 

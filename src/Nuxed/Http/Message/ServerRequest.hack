@@ -12,8 +12,8 @@ class ServerRequest extends Request implements Message\ServerRequestInterface {
 
   protected KeyedContainer<string, string> $queryParams = dict[];
 
-  protected KeyedContainer<string, Message\UploadedFileInterface> $uploadedFiles =
-    dict[];
+  protected KeyedContainer<string, Message\UploadedFileInterface>
+    $uploadedFiles = dict[];
 
   public function __construct(
     string $method,

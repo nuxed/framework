@@ -12,7 +12,7 @@ final class SapiStreamEmitter extends SapiEmitter {
    * @param int $maxBufferLength Maximum output buffering size for each iteration
    */
   public function __construct(
-    private MaxBufferLength $maxBufferLength = 8192
+    private MaxBufferLength $maxBufferLength = 8192,
   ) {}
 
   const type TContentRange = shape(
@@ -25,7 +25,7 @@ final class SapiStreamEmitter extends SapiEmitter {
 
   <<__Override>>
   public async function emit(
-    Message\ResponseInterface $response
+    Message\ResponseInterface $response,
   ): Awaitable<bool> {
     $this->assertNoPreviousOutput();
     $this->emitHeaders($response);
@@ -44,7 +44,7 @@ final class SapiStreamEmitter extends SapiEmitter {
 
   <<__Override>>
   protected async function emitBody(
-    Message\ResponseInterface $response
+    Message\ResponseInterface $response,
   ): Awaitable<void> {
     $stream = $response->getBody();
     if ($stream->isSeekable()) {
@@ -62,7 +62,7 @@ final class SapiStreamEmitter extends SapiEmitter {
 
   protected async function emitBodyRange(
     Message\ResponseInterface $response,
-    this::TContentRange $range
+    this::TContentRange $range,
   ): Awaitable<void> {
     $stream = $response->getBody();
     $length = $range['last'] - $range['first'] + 1;
@@ -88,9 +88,10 @@ final class SapiStreamEmitter extends SapiEmitter {
   }
 
   private function parseContentRageHeader(
-    string $header
+    string $header,
   ): ?this::TContentRange {
-    $pattern = re"/(?P<unit>[\w]+)\s+(?P<first>\d+)-(?P<last>\d+)\/(?P<length>\d+|\*)/";
+    $pattern =
+      re"/(?P<unit>[\w]+)\s+(?P<first>\d+)-(?P<last>\d+)\/(?P<length>\d+|\*)/";
 
     if (!Regex\matches($header, $pattern)) {
       return null;
@@ -99,9 +100,9 @@ final class SapiStreamEmitter extends SapiEmitter {
     $matches = Regex\first_match($header, $pattern) as nonnull;
     return shape(
       'unit' => $matches['unit'],
-      'first' => (int) $matches['first'],
-      'last' => (int) $matches['last'],
-      'length' => $matches['length'] === '*' ? null : (int) $matches['length']
+      'first' => (int)$matches['first'],
+      'last' => (int)$matches['last'],
+      'length' => $matches['length'] === '*' ? null : (int)$matches['length'],
     );
   }
 }

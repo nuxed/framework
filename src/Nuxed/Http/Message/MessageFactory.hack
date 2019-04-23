@@ -55,10 +55,10 @@ class MessageFactory
     $method = Str\uppercase(($server['REQUEST_METHOD'] ?? 'GET') as string);
     $ct = $value ==> C\contains($headers['content-type'] ?? vec[], $value);
 
-    if ('POST' === $method && (
-      $ct('application/x-www-form-urlencoded') ||
-      $ct('multipart/form-data')
-    )) {
+    if (
+      'POST' === $method &&
+      ($ct('application/x-www-form-urlencoded') || $ct('multipart/form-data'))
+    ) {
       /* HH_IGNORE_ERROR[2050] */
       $body = HttpNormalizer\normalize($_POST);
     } else {
@@ -66,37 +66,42 @@ class MessageFactory
     }
 
     return new ServerRequest(
-      $method, $uri, $headers, $this->createStreamFromFile('php://input', 'rb'), $protocol, $server
+      $method,
+      $uri,
+      $headers,
+      $this->createStreamFromFile('php://input', 'rb'),
+      $protocol,
+      $server,
     )
-      |> $$->withCookieParams(Dict\pull(
-        $cookies,
-        $value ==> $value[1],
-        $value ==> $value[0],
-      ))
-      |> $$->withQueryParams(Dict\pull(
-        $query,
-        $value ==> $value[1],
-        $value ==> $value[0],
-      ))
-      |> $body is nonnull ? $$->withParsedBody(Dict\pull(
-        $body,
-        $value ==> $value[1],
-        $value ==> $value[0],
-      )) : $$
-      |> $$->withUploadedFiles(
-        Dict\pull(Vec\map($uploads, ($value) ==> tuple(
-          $value[0],
-          $this->createUploadedFile(
-            $this->createStreamFromFile($value[1]['tmp_name'], 'rb'),
-            $value[1]['size'],
-            Message\UploadedFileError::assert($value[1]['error']),
-            $value[1]['name'] ?? null,
-            $value[1]['type'] ?? null,
-          )
-        )),
-        $value ==> $value[1],
-        $value ==> $value[0],
+      |> $$->withCookieParams(
+        Dict\pull($cookies, $value ==> $value[1], $value ==> $value[0]),
+      )
+      |> $$->withQueryParams(
+        Dict\pull($query, $value ==> $value[1], $value ==> $value[0]),
+      )
+      |> $body is nonnull
+        ? $$->withParsedBody(
+          Dict\pull($body, $value ==> $value[1], $value ==> $value[0]),
         )
+        : $$
+      |> $$->withUploadedFiles(
+        Dict\pull(
+          Vec\map(
+            $uploads,
+            ($value) ==> tuple(
+              $value[0],
+              $this->createUploadedFile(
+                $this->createStreamFromFile($value[1]['tmp_name'], 'rb'),
+                $value[1]['size'],
+                Message\UploadedFileError::assert($value[1]['error']),
+                $value[1]['name'] ?? null,
+                $value[1]['type'] ?? null,
+              ),
+            ),
+          ),
+          $value ==> $value[1],
+          $value ==> $value[0],
+        ),
       );
   }
 

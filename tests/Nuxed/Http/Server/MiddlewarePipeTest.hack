@@ -32,7 +32,8 @@ class MiddlewarePipeTest extends HackTest {
     );
     $request = $this->request()->withAttribute('foo', 'bar');
     $response = await $middleware->handle($request);
-        $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('bar');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('bar');
   }
 
   public async function testProcess(): Awaitable<void> {
@@ -82,7 +83,8 @@ class MiddlewarePipeTest extends HackTest {
         async ($r) ==> $this->response($r->getAttribute('test') as string),
       ),
     );
-        $content = await $response->getBody()->readAsync();     expect($content)->toBeSame('abcde');
+    $content = await $response->getBody()->readAsync();
+    expect($content)->toBeSame('abcde');
   }
 
   public function testDeepClone(): void {

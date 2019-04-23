@@ -12,7 +12,9 @@ use function Facebook\FBExpect\expect;
 class MessageFactoryTest extends HackTest\HackTest {
   <<HackTest\DataProvider('provideCreateResponseData')>>
   public function testCreateResponse(
-    int $code, string $reasonPhrase, string $expected
+    int $code,
+    string $reasonPhrase,
+    string $expected,
   ): void {
     $factory = new Message\MessageFactory();
     $response = $factory->createResponse($code, $reasonPhrase);
@@ -21,7 +23,8 @@ class MessageFactoryTest extends HackTest\HackTest {
     expect($response->getReasonPhrase())->toBeSame($expected);
   }
 
-  public function provideCreateResponseData(): Container<(int, string, string)> {
+  public function provideCreateResponseData(
+  ): Container<(int, string, string)> {
     return vec[
       tuple(100, '', 'Continue'),
       tuple(101, '', 'Switching Protocols'),
@@ -48,7 +51,11 @@ class MessageFactoryTest extends HackTest\HackTest {
       tuple(402, 'Payment Required', 'Payment Required'),
       tuple(403, 'Forbidden', 'Forbidden'),
       tuple(406, 'Not Acceptable', 'Not Acceptable'),
-      tuple(407, 'Proxy Authentication Required', 'Proxy Authentication Required'),
+      tuple(
+        407,
+        'Proxy Authentication Required',
+        'Proxy Authentication Required',
+      ),
       tuple(408, 'Request Time-out', 'Request Time-out'),
       tuple(409, 'Conflict', 'Conflict'),
       tuple(410, 'Gone', 'Gone'),
@@ -60,7 +67,7 @@ class MessageFactoryTest extends HackTest\HackTest {
   <<HackTest\DataProvider('provideCreateRequestData')>>
   public function testCreateRequest(
     string $method,
-    Http\Message\UriInterface $uri
+    Http\Message\UriInterface $uri,
   ): void {
     $factory = new Message\MessageFactory();
     $request = $factory->createRequest($method, $uri);
@@ -68,9 +75,8 @@ class MessageFactoryTest extends HackTest\HackTest {
     expect($request->getUri())->toBeSame($uri);
   }
 
-  public function provideCreateRequestData(): Container<(
-    string, Http\Message\UriInterface
-  )> {
+  public function provideCreateRequestData(
+  ): Container<(string, Http\Message\UriInterface)> {
     return vec[
       tuple('GET', Message\uri('https://nuxed.org/')),
       tuple('GET', Message\uri('/api/users')),
@@ -81,7 +87,7 @@ class MessageFactoryTest extends HackTest\HackTest {
       tuple('PUT', Message\uri('/api/users/123/settings')),
       tuple('PUT', Message\uri('/api/photos/123')),
       tuple('DELETE', Message\uri('/api/photos/123')),
-      tuple('FOOBAR', Message\uri('/foo/bar/baz'))
+      tuple('FOOBAR', Message\uri('/foo/bar/baz')),
     ];
   }
 
@@ -89,7 +95,7 @@ class MessageFactoryTest extends HackTest\HackTest {
   public function testCreateServerRequest(
     string $method,
     Http\Message\UriInterface $uri,
-    KeyedContainer<string, mixed> $parameters
+    KeyedContainer<string, mixed> $parameters,
   ): void {
     $factory = new Message\MessageFactory();
     $request = $factory->createServerRequest($method, $uri, $parameters);
@@ -98,20 +104,33 @@ class MessageFactoryTest extends HackTest\HackTest {
     expect($request->getUri())->toBeSame($uri);
   }
 
-  public function provideCreateServerRequestData(): Container<(
-    string, Http\Message\UriInterface, KeyedContainer<string, mixed>
-  )> {
+  public function provideCreateServerRequestData(
+  ): Container<
+    (string, Http\Message\UriInterface, KeyedContainer<string, mixed>),
+  > {
     return vec[
       tuple('GET', Message\uri('https://example.com'), dict[]),
       tuple('POST', Message\uri('https://example.com'), dict[]),
       tuple('UNSUBSCRIBE', Message\uri('https://example.com'), dict[]),
-      tuple('PATCH', Message\uri('https://example.com'), dict['foo' => dict['baz' => 'qux']]),
-      tuple('POST', Message\uri('/bar/baz?foo=baz'), dict['foo' => dict['bar' => dict['qux' => 'dux']]]),
+      tuple(
+        'PATCH',
+        Message\uri('https://example.com'),
+        dict['foo' => dict['baz' => 'qux']],
+      ),
+      tuple(
+        'POST',
+        Message\uri('/bar/baz?foo=baz'),
+        dict['foo' => dict['bar' => dict['qux' => 'dux']]],
+      ),
       tuple('POST', Message\uri('/baz/qux'), dict['bix' => 'foo']),
-      tuple('FOOBAR', Message\uri('https://nuxed.org/foobar'), dict[
-        'foo' => 'bar',
-        'baz' => 'qux'
-      ]),
+      tuple(
+        'FOOBAR',
+        Message\uri('https://nuxed.org/foobar'),
+        dict[
+          'foo' => 'bar',
+          'baz' => 'qux',
+        ],
+      ),
     ];
   }
 
@@ -137,7 +156,7 @@ class MessageFactoryTest extends HackTest\HackTest {
 
   <<HackTest\DataProvider('provideCreateStreamFromFileData')>>
   public async function testCreateStreamFromFile(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     $content = await $file->read();
 
@@ -149,17 +168,20 @@ class MessageFactoryTest extends HackTest\HackTest {
 
   <<HackTest\DataProvider('provideCreateStreamFromFileData')>>
   public async function testCreateStreamFromResources(
-    Io\File $file
+    Io\File $file,
   ): Awaitable<void> {
     $content = await $file->read();
 
     $factory = new Message\MessageFactory();
-    $stream = $factory->createStreamFromResource(\fopen($file->path()->toString(), 'r'));
+    $stream = $factory->createStreamFromResource(
+      \fopen($file->path()->toString(), 'r'),
+    );
     $data = await $stream->readAsync();
     expect($data)->toBeSame($content);
   }
 
-  public async function provideCreateStreamFromFileData(): Awaitable<Container<(Io\File)>> {
+  public async function provideCreateStreamFromFileData(
+  ): Awaitable<Container<(Io\File)>> {
     $files = await Asio\v(vec[
       Io\File::temporary('nuxed-http-create-stream-from-file-test'),
       Io\File::temporary('nuxed-http-create-stream-from-file-test'),
@@ -199,9 +221,7 @@ class MessageFactoryTest extends HackTest\HackTest {
   <<HackTest\DataProvider('provideCreateUriData')>>
   public function testCreateUri(string $uri): void {
     $factory = new Message\MessageFactory();
-    expect(
-      $factory->createUri($uri)->toString()
-    )->toBeSame($uri);
+    expect($factory->createUri($uri)->toString())->toBeSame($uri);
   }
 
   public function provideCreateUriData(): Container<(string)> {
@@ -212,7 +232,7 @@ class MessageFactoryTest extends HackTest\HackTest {
       tuple('https://foo.nuxed.org/foo/bar?baz=qux#dux'),
       tuple('/foo?bar=baz#qux'),
       tuple('/foo#baz'),
-      tuple('https://username:password@dashboard.nuxed.org/foo?bar=baz#dux')
+      tuple('https://username:password@dashboard.nuxed.org/foo?bar=baz#dux'),
     ];
   }
 }

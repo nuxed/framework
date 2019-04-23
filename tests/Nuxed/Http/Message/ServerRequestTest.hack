@@ -21,8 +21,14 @@ class ServerRequestTest extends HackTest {
 
   public function testServerParams(): void {
     $params = dict['name' => 'value'];
-    $request =
-      new Message\ServerRequest('GET', Message\uri('/'), dict[], null, '1.1', $params);
+    $request = new Message\ServerRequest(
+      'GET',
+      Message\uri('/'),
+      dict[],
+      null,
+      '1.1',
+      $params,
+    );
     expect($request->getServerParams())->toBeSame($params);
   }
 
@@ -78,8 +84,9 @@ class ServerRequestTest extends HackTest {
   }
 
   public function testNullAttribute(): void {
-    $request =
-      (new Message\ServerRequest('GET', Message\uri('/')))->withAttribute('name', null);
+    $request = (
+      new Message\ServerRequest('GET', Message\uri('/'))
+    )->withAttribute('name', null);
     expect($request->getAttributes())->toBeSame(dict['name' => null]);
     expect($request->getAttribute('name', 'different-default'))->toBeNull();
     $requestWithoutAttribute = $request->withoutAttribute('name');

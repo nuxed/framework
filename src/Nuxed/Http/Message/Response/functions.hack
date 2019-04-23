@@ -84,11 +84,7 @@ function redirect(
   $headers['location'] = vec[
     $uri->toString(),
   ];
-  return new Message\Response(
-    $status,
-    $headers,
-    Message\stream(''),
-  );
+  return new Message\Response($status, $headers, Message\stream(''));
 }
 
 /**

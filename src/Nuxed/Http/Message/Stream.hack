@@ -234,8 +234,9 @@ class Stream implements Message\StreamInterface {
     $retval = @\fseek($this->impl, $offset, $whence as int);
 
     if ($retval === -1) {
-      throw
-        new Exception\UnseekableStreamException('Error seeking within stream');
+      throw new Exception\UnseekableStreamException(
+        'Error seeking within stream',
+      );
     }
   }
 
@@ -251,7 +252,7 @@ class Stream implements Message\StreamInterface {
     $stats = @\fstat($this->impl);
 
     if ($stats !== false && C\contains_key($stats, 'size')) {
-      $this->size = (int) $stats['size'];
+      $this->size = (int)$stats['size'];
       return $this->size;
     }
 
@@ -262,7 +263,9 @@ class Stream implements Message\StreamInterface {
     $result = @\ftell($this->impl);
 
     if (false === $result) {
-      throw new Exception\UntellableStreamException('Error occurred during tell operation');
+      throw new Exception\UntellableStreamException(
+        'Error occurred during tell operation',
+      );
     }
 
     return $result;

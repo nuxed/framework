@@ -131,7 +131,8 @@ class Response implements Message\ResponseInterface {
     }
   }
 
-  public function getCookies(): KeyedContainer<string, Message\CookieInterface> {
+  public function getCookies(
+  ): KeyedContainer<string, Message\CookieInterface> {
     return $this->cookies;
   }
 
@@ -139,7 +140,10 @@ class Response implements Message\ResponseInterface {
     return $this->cookies[$name] ?? null;
   }
 
-  public function withCookie(string $name, Message\CookieInterface $cookie): this {
+  public function withCookie(
+    string $name,
+    Message\CookieInterface $cookie,
+  ): this {
     $new = clone $this;
     $new->cookies[$name] = $cookie;
     return $new;

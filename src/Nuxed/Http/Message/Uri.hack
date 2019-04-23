@@ -35,8 +35,9 @@ final class Uri implements UriInterface {
       $parts = parse_url($uri);
 
       if (false === $parts) {
-        throw
-          new Exception\InvalidArgumentException("Unable to parse URI: ".$uri);
+        throw new Exception\InvalidArgumentException(
+          "Unable to parse URI: ".$uri,
+        );
       }
 
       $this->applyParts(dict($parts));

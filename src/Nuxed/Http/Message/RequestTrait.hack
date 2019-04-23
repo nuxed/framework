@@ -58,7 +58,10 @@ trait RequestTrait {
     return $this->uri;
   }
 
-  public function withUri(Message\UriInterface $uri, bool $preserveHost = false): this {
+  public function withUri(
+    Message\UriInterface $uri,
+    bool $preserveHost = false,
+  ): this {
     if ($uri === $this->uri) {
       return $this;
     }

@@ -32,8 +32,10 @@ final class JsonResponse extends Message\Response {
     $json = static::encode($data, $encodingOptions);
     $body = Message\stream($json);
 
-    $headers =
-      _Private\inject_content_type_in_headers('application/json', $headers);
+    $headers = _Private\inject_content_type_in_headers(
+      'application/json',
+      $headers,
+    );
 
     parent::__construct($status, $headers, $body);
   }

@@ -50,7 +50,12 @@ class CookieTest extends HackTest {
   }
 
   public function testWithDomain(): void {
-    $cookie = new Message\Cookie('waffle', new \DateTime(), '/', 'thefacebook.com');
+    $cookie = new Message\Cookie(
+      'waffle',
+      new \DateTime(),
+      '/',
+      'thefacebook.com',
+    );
     $cookie2 = $cookie->withDomain('facebook.com');
     expect($cookie2)->toNotBeSame($cookie);
     expect($cookie2->getDomain())->toBeSame('facebook.com');
@@ -77,7 +82,15 @@ class CookieTest extends HackTest {
   }
 
   public function testWithSameSite(): void {
-    $cookie = new Message\Cookie('waffle', null, null, null, false, false, null);
+    $cookie = new Message\Cookie(
+      'waffle',
+      null,
+      null,
+      null,
+      false,
+      false,
+      null,
+    );
     $sss = CookieSameSite::STRICT;
     $ssl = CookieSameSite::LAX;
     expect($cookie->getSameSite())->toBeNull();

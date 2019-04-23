@@ -114,7 +114,10 @@ class RequestTest extends HackTest {
   }
 
   public function testOverridesHostWithUri(): void {
-    $r = new Message\Request('GET', Message\uri('https://docs.hhvm.com/hack?bar=bam'));
+    $r = new Message\Request(
+      'GET',
+      Message\uri('https://docs.hhvm.com/hack?bar=bam'),
+    );
     expect($r->getHeaders())->toBeSame(dict['Host' => vec['docs.hhvm.com']]);
     $r2 = $r->withUri(Message\uri('https://hacklang.org/tutorial.html'));
     expect($r2->getHeaderLine('Host'))->toBeSame('hacklang.org');

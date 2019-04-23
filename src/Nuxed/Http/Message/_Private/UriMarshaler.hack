@@ -156,7 +156,7 @@ final class UriMarshaler {
 
     $host = $server['SERVER_NAME'] as string;
     $port = C\contains_key($server, 'SERVER_PORT')
-      ? (int) $server['SERVER_PORT']
+      ? (int)$server['SERVER_PORT']
       : null;
 
     if (

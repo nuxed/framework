@@ -27,8 +27,11 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     ?Session\CacheLimiter $limiter,
     int $expiry,
   ): Awaitable<void> {
-    $persistence =
-      await $this->createSessionPersistence($cookie, $limiter, $expiry);
+    $persistence = await $this->createSessionPersistence(
+      $cookie,
+      $limiter,
+      $expiry,
+    );
     $request = new Message\ServerRequest('GET', new Message\Uri());
     $session = await $persistence->initialize($request);
     expect($session->items())->toBeEmpty();
@@ -69,10 +72,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     $session = await $persistence->initialize($request);
     expect($session->getId())->toBeSame('foo');
     $session->set('a', 'b');
-    $response = await $persistence->persist(
-      $session,
-      Message\Response\empty(),
-    );
+    $response = await $persistence->persist($session, Message\Response\empty());
     $httpCookie = $response->getCookie($cookie['name']);
     expect($httpCookie)->toNotBeNull();
     $httpCookie as nonnull;
@@ -89,8 +89,11 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     ?Session\CacheLimiter $limiter,
     int $expiry,
   ): Awaitable<void> {
-    $persistence =
-      await $this->createSessionPersistence($cookie, $limiter, $expiry);
+    $persistence = await $this->createSessionPersistence(
+      $cookie,
+      $limiter,
+      $expiry,
+    );
     $request = new Message\ServerRequest('GET', new Message\Uri());
     $session = await $persistence->initialize($request);
     $originalResponse = Message\Response\empty();

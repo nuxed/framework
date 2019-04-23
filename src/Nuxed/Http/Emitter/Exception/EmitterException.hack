@@ -9,7 +9,8 @@ class EmitterException extends RuntimeException implements ExceptionInterface {
   }
 
   public static function forOutputSent(): this {
-    return
-      new static('Output has been emitted previously; cannot emit response');
+    return new static(
+      'Output has been emitted previously; cannot emit response',
+    );
   }
 }

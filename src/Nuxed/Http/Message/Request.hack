@@ -48,7 +48,10 @@ class Request implements Message\RequestInterface {
       $this->headerNames['host'] = 'Host';
     }
 
-    $this->headers = Util\Dict::union(dict[$header => vec[$host]], $this->headers);
+    $this->headers = Util\Dict::union(
+      dict[$header => vec[$host]],
+      $this->headers,
+    );
   }
 
   public function __clone(): void {

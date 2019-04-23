@@ -11,8 +11,15 @@ function cookie(
   bool $httpOnly = false,
   ?Contract\CookieSameSite $sameSite = null,
 ): Contract\CookieInterface {
-  return
-    new Cookie($value, $expires, $path, $domain, $secure, $httpOnly, $sameSite);
+  return new Cookie(
+    $value,
+    $expires,
+    $path,
+    $domain,
+    $secure,
+    $httpOnly,
+    $sameSite,
+  );
 }
 
 function request(
