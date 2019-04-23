@@ -43,8 +43,9 @@ class ServiceDefinitionTest extends HackTest\HackTest {
   }
 
   public function testSettersAndGetters(): void {
-    $factory =
-      Container\factory(($container) ==> Map {'container' => $container});
+    $factory = Container\factory(
+      ($container) ==> Map {'container' => $container},
+    );
     $definition = new Container\ServiceDefinition(Map::class, $factory, false);
 
     expect($definition->getId())->toBeSame(Map::class);
