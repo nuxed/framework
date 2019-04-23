@@ -214,8 +214,10 @@ class UrlPackageTest extends HackTest {
       '',
       'https://cdn.com/bar/main.css',
     );
-    $package =
-      new Asset\UrlPackage(vec['https://example.com'], $versionStrategy);
+    $package = new Asset\UrlPackage(
+      vec['https://example.com'],
+      $versionStrategy,
+    );
     expect($package->getUrl('main.css'))->toBeSame(
       'https://cdn.com/bar/main.css',
     );
