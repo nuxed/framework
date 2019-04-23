@@ -184,14 +184,22 @@ final class Folder extends Node {
     $files = await $this->files(false, true);
     await Asio\v(Vec\map(
       $files,
-      ($node) ==> $node->exists() ? $node->delete() : async { return false; }
+      ($node) ==> $node->exists()
+        ? $node->delete()
+        : async {
+            return false;
+          },
     ));
 
     // delete rest of the nodes.
     $nodes = await $this->list(false, true, Node::class);
     await Asio\v(Vec\map(
       $nodes,
-      ($node) ==> $node->exists() ? $node->delete() : async { return false; }
+      ($node) ==> $node->exists()
+        ? $node->delete()
+        : async {
+            return false;
+          },
     ));
     return $this;
   }
@@ -211,8 +219,10 @@ final class Folder extends Node {
       $flags = FilesystemIterator::SKIP_DOTS |
         FilesystemIterator::UNIX_PATHS |
         FilesystemIterator::NEW_CURRENT_AND_KEY;
-      $iterator =
-        new GlobIterator(Path::standard($directory, true).$pattern, $flags);
+      $iterator = new GlobIterator(
+        Path::standard($directory, true).$pattern,
+        $flags,
+      );
     } catch (Exception $e) {
       throw new Exception\ReadErrorException(
         Str\format(

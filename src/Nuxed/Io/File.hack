@@ -95,8 +95,10 @@ final class File extends Node {
     if (!$folder->exists()) {
       await $folder->create();
     }
-    return
-      new self(Path::create(tempnam($directory->toString(), $perfix)), true);
+    return new self(
+      Path::create(tempnam($directory->toString(), $perfix)),
+      true,
+    );
   }
 
   /**

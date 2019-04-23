@@ -88,8 +88,10 @@ class FolderTest extends HackTest {
     $copy = await $folder->copy($target->path(), Io\OperationType::OVERWRITE);
     expect($copy->exists())->toBeTrue();
     $copy as Io\Folder;
-    list($folderSize, $copySize) =
-      await Tuple\from_async($folder->size(), $copy->size());
+    list($folderSize, $copySize) = await Tuple\from_async(
+      $folder->size(),
+      $copy->size(),
+    );
     expect($copySize)->toNotBeSame($targetSize);
     expect($copySize)->toBeSame($folderSize);
   }
@@ -106,15 +108,19 @@ class FolderTest extends HackTest {
     $baz = await $target->touch('foo.txt');
     await $baz->write('baz');
 
-    list($folderSize, $targetSize) =
-      await Tuple\from_async($folder->size(), $target->size());
+    list($folderSize, $targetSize) = await Tuple\from_async(
+      $folder->size(),
+      $target->size(),
+    );
     expect($folderSize)->toBeSame(2);
     expect($targetSize)->toBeSame(1);
 
     $copy = await $folder->copy($target->path(), Io\OperationType::SKIP);
 
-    list($folderSize, $copySize) =
-      await Tuple\from_async($folder->size(), $copy->size());
+    list($folderSize, $copySize) = await Tuple\from_async(
+      $folder->size(),
+      $copy->size(),
+    );
     expect($copySize)->toNotBeSame($targetSize);
     expect($copySize)->toBeSame($folderSize);
 
@@ -140,15 +146,19 @@ class FolderTest extends HackTest {
     $baz = await $target->touch('foo.txt');
     await $baz->write('baz');
 
-    list($folderSize, $targetSize) =
-      await Tuple\from_async($folder->size(), $target->size());
+    list($folderSize, $targetSize) = await Tuple\from_async(
+      $folder->size(),
+      $target->size(),
+    );
     expect($folderSize)->toBeSame(2);
     expect($targetSize)->toBeSame(3);
 
     $copy = await $folder->copy($target->path(), Io\OperationType::MERGE);
 
-    list($folderSize, $copySize) =
-      await Tuple\from_async($folder->size(), $copy->size());
+    list($folderSize, $copySize) = await Tuple\from_async(
+      $folder->size(),
+      $copy->size(),
+    );
     expect($copySize)->toNotBeSame($targetSize);
     expect($copySize)->toBeSame(4);
 
