@@ -5,7 +5,6 @@ use namespace HH\Lib\Vec;
 use namespace HH\Lib\C;
 use type Nuxed\Contract\Http\Server\MiddlewareInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
-use type Nuxed\Contract\Http\Router\RouterInterface;
 use type Nuxed\Contract\Http\Router\RouteInterface;
 
 /**

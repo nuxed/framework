@@ -7,7 +7,6 @@ use namespace HH\Lib\Dict;
 use namespace Nuxed\Util;
 use namespace Facebook\HackRouter;
 use namespace Facebook\HackRouter\PatternParser;
-use namespace Facebook\HackRouter\PrefixMatching;
 use type Nuxed\Contract\Http\Router\RouterInterface;
 use type Nuxed\Contract\Http\Router\RouteInterface;
 use type Nuxed\Contract\Http\Router\RouteResultInterface;
@@ -23,9 +22,7 @@ final class Router implements RouterInterface {
   private ?HackRouter\IResolver<RouteInterface> $resolver;
   protected vec<RouteInterface> $routes;
 
-  public function __construct(
-    Container<RouteInterface> $routes = vec[],
-  ) {
+  public function __construct(Container<RouteInterface> $routes = vec[]) {
     $this->routes = vec($routes);
   }
 
@@ -219,7 +216,7 @@ final class Router implements RouterInterface {
 
     if ($routes is null) {
       $routes = _Private\map($this->routes);
-      
+
       if (!is_dev()) {
         \apc_store(__FILE__.'/cache', $routes);
       }

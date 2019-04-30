@@ -6,10 +6,10 @@ use namespace Facebook\HackRouter;
 use namespace Nuxed\Contract\Http\Router;
 
 function map(
-  Container<Router\RouteInterface> $routes
+  Container<Router\RouteInterface> $routes,
 ): KeyedContainer<
   HackRouter\HttpMethod,
-  HackRouter\PrefixMatching\PrefixMap<Router\RouteInterface>
+  HackRouter\PrefixMatching\PrefixMap<Router\RouteInterface>,
 > {
   $result = new Ref(dict[]);
   Vec\map($routes, ($route) ==> {
