@@ -5,6 +5,7 @@ use type Nuxed\Contract\Event\EventDispatcherInterface;
 use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
 use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
 
+<<__ConsistentConstruct>>
 interface ExtensionInterface {
   public function __construct(ContainerInterface $container);
 
