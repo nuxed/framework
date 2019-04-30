@@ -44,7 +44,7 @@ function response(
 
 function stream(\Stringish $content): Contract\StreamInterface {
   $handle = \fopen('php://memory', 'wb+');
-  \fwrite($handle, (string) $content);
+  \fwrite($handle, (string)$content);
   $stream = new Stream($handle);
   $stream->rewind();
   return $stream;
