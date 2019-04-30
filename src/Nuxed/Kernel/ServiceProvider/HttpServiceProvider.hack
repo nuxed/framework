@@ -91,12 +91,6 @@ class HttpServiceProvider implements Container\ServiceProviderInterface {
     );
 
     $builder->add(
-      RouteCollectorInterface::class,
-      new Http\Router\RouteCollectorFactory(),
-      true,
-    );
-
-    $builder->add(
       Http\Router\Middleware\DispatchMiddleware::class,
       new Http\Router\Middleware\DispatchMiddlewareFactory(),
       true,
