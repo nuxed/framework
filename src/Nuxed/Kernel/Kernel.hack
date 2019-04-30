@@ -1,31 +1,27 @@
 namespace Nuxed\Kernel;
 
 use namespace HH\Asio;
-use type His\Container\ContainerInterface;
-use type Nuxed\Contract\Event\EventDispatcherInterface;
-use type Nuxed\Contract\Kernel\KernelInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Emitter\EmitterInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Router\RouteInterface;
-use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
-use type Nuxed\Contract\Log\LoggerAwareTrait;
-use type Nuxed\Contract\Event\EventSubscriberInterface;
-use type Nuxed\Contract\Event\EventInterface;
-use type Nuxed\Http\Message\ServerRequest;
+use namespace Nuxed\Kernel;
+use namespace His\Container;
+use namespace Nuxed\Contract;
+use namespace Nuxed\Contract\Http\Message;
+use namespace Nuxed\Contract\Http\Emitter;
+use namespace Nuxed\Contract\Http\Server;
+use namespace Nuxed\Contract\Http\Router;
+use namespace Nuxed\Contract\Log;
+use namespace Nuxed\Contract\Event;
+use namespace Nuxed\Http;
 
-final class Kernel implements KernelInterface {
-  use LoggerAwareTrait;
+final class Kernel implements Contract\Kernel\KernelInterface {
+  use Http\Router\RouteCollectorTrait;
+  use Log\LoggerAwareTrait;
 
   public function __construct(
-    private ContainerInterface $container,
-    private MiddlewarePipeInterface $pipe,
-    private EmitterInterface $emitter,
-    private EventDispatcherInterface $events,
-    private RouteCollectorInterface $collector,
+    private Container\ContainerInterface $container,
+    private Server\MiddlewarePipeInterface $pipe,
+    private Emitter\EmitterInterface $emitter,
+    private Event\EventDispatcherInterface $events,
+    private Router\RouterInterface $router,
   ) {}
 
   public function use(
@@ -37,14 +33,14 @@ final class Kernel implements KernelInterface {
     $extension->subscribe($this->events);
   }
 
-  public function subscribe(EventSubscriberInterface $subscriber): void {
+  public function subscribe(Event\EventSubscriberInterface $subscriber): void {
     $event = Asio\join(
-      $this->events->dispatch(new Event\SubscribeEvent($subscriber)),
+      $this->events->dispatch(new Kernel\Event\SubscribeEvent($subscriber)),
     );
     $this->events->subscribe($event->subscriber);
   }
 
-  public function on<TEvent as EventInterface>(
+  public function on<TEvent as Event\EventInterface>(
     classname<TEvent> $event,
     (function(TEvent): Awaitable<void>) $listener,
     int $priority = 0,
@@ -56,12 +52,12 @@ final class Kernel implements KernelInterface {
    * Pipe middleware like unix pipes.
    */
   public function pipe(
-    MiddlewareInterface $middleware,
+    Server\MiddlewareInterface $middleware,
     int $priority = 0,
   ): void {
     $event = Asio\join(
       $this->events
-        ->dispatch(new Event\PipeEvent($middleware, $priority)),
+        ->dispatch(new Kernel\Event\PipeEvent($middleware, $priority)),
     );
     $this->pipe->pipe($event->middleware, $event->priority);
   }
@@ -71,11 +67,11 @@ final class Kernel implements KernelInterface {
    * response creation to a handler.
    */
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequestInterface $request,
+    Server\RequestHandlerInterface $handler,
+  ): Awaitable<Message\ResponseInterface> {
     $event = await $this->events
-      ->dispatch(new Event\ProcessEvent($request, $handler));
+      ->dispatch(new Kernel\Event\ProcessEvent($request, $handler));
 
     return await $this->pipe->process($event->request, $event->handler);
   }
@@ -84,9 +80,9 @@ final class Kernel implements KernelInterface {
    * Handle the request and return a response.
    */
   public async function handle(
-    ServerRequestInterface $request,
-  ): Awaitable<ResponseInterface> {
-    $event = await $this->events->dispatch(new Event\HandleEvent($request));
+    Message\ServerRequestInterface $request,
+  ): Awaitable<Message\ResponseInterface> {
+    $event = await $this->events->dispatch(new Kernel\Event\HandleEvent($request));
 
     return await $this->pipe->handle($event->request);
   }
@@ -97,8 +93,8 @@ final class Kernel implements KernelInterface {
    * Emits a response, including status line, headers, and the message body,
    * according to the environment.
    */
-  public async function emit(ResponseInterface $response): Awaitable<bool> {
-    $event = await $this->events->dispatch(new Event\EmitEvent($response));
+  public async function emit(Message\ResponseInterface $response): Awaitable<bool> {
+    $event = await $this->events->dispatch(new Kernel\Event\EmitEvent($response));
 
     return await $this->emitter->emit($event->response);
   }
@@ -114,99 +110,36 @@ final class Kernel implements KernelInterface {
    */
   public function route(
     string $path,
-    MiddlewareInterface $middleware,
+    Server\MiddlewareInterface $middleware,
     ?Container<string> $methods = null,
     ?string $name = null,
-  ): RouteInterface {
-    return $this->collector->route($path, $middleware, $methods, $name);
+  ): Router\RouteInterface {
+    return $this->router->route($path, $middleware, $methods, $name);
+  }
+
+  /**
+   * Retrieve all directly registered routes with the application.
+   */
+  public function getRoutes(): Container<Router\RouteInterface> {
+    return $this->router->getRoutes();
   }
 
   /**
    * Register fallback middleware.
    */
-  public function fallback(MiddlewareInterface $middleware): void {
+  public function fallback(Server\MiddlewareInterface $middleware): void {
     $this->pipe($middleware, -0x9950);
-  }
-
-  /**
-   * @param null|string $name The name of the route.
-   */
-  public function get(
-    string $path,
-    MiddlewareInterface $middleware,
-    ?string $name = null,
-  ): RouteInterface {
-    return $this->route($path, $middleware, vec['GET'], $name);
-  }
-
-  /**
-   * @param null|string $name The name of the route.
-   */
-  public function post(
-    string $path,
-    MiddlewareInterface $middleware,
-    ?string $name = null,
-  ): RouteInterface {
-    return $this->route($path, $middleware, vec['POST'], $name);
-  }
-
-  /**
-   * @param null|string $name The name of the route.
-   */
-  public function put(
-    string $path,
-    MiddlewareInterface $middleware,
-    ?string $name = null,
-  ): RouteInterface {
-    return $this->route($path, $middleware, vec['PUT'], $name);
-  }
-
-  /**
-   * @param null|string $name The name of the route.
-   */
-  public function patch(
-    string $path,
-    MiddlewareInterface $middleware,
-    ?string $name = null,
-  ): RouteInterface {
-    return $this->route($path, $middleware, vec['PATCH'], $name);
-  }
-
-  /**
-   * @param null|string $name The name of the route.
-   */
-  public function delete(
-    string $path,
-    MiddlewareInterface $middleware,
-    ?string $name = null,
-  ): RouteInterface {
-    return $this->route($path, $middleware, vec['DELETE'], $name);
-  }
-
-  /**
-   * @param null|string $name The name of the route.
-   */
-  public function any(
-    string $path,
-    MiddlewareInterface $middleware,
-    ?string $name = null,
-  ): RouteInterface {
-    return $this->route($path, $middleware, null, $name);
-  }
-
-  public function getRoutes(): Container<RouteInterface> {
-    return $this->collector->getRoutes();
   }
 
   /**
    * Perform any final actions for the request lifecycle.
    */
   public async function terminate(
-    ServerRequestInterface $request,
-    ResponseInterface $response,
+    Message\ServerRequestInterface $request,
+    Message\ResponseInterface $response,
   ): Awaitable<void> {
     $event = await $this->events
-      ->dispatch(new Event\TerminateEvent($request, $response));
+      ->dispatch(new Kernel\Event\TerminateEvent($request, $response));
 
     await $event->request->getBody()->closeAsync();
     await $event->response->getBody()->closeAsync();
@@ -216,7 +149,7 @@ final class Kernel implements KernelInterface {
    * Run the Http Kernel.
    */
   public async function run(): Awaitable<noreturn> {
-    $request = ServerRequest::capture();
+    $request = Http\Message\ServerRequest::capture();
     $response = await $this->handle($request);
     $emitted = await $this->emit($response);
     if ($emitted) {
@@ -233,7 +166,7 @@ final class Kernel implements KernelInterface {
    * the exit status 255 is reserved by HHVM and shall not be used.
    * The status 0 is used to terminate the program successfully.
    */
-  private function getTerminationStatusCode(ResponseInterface $response): int {
+  private function getTerminationStatusCode(Message\ResponseInterface $response): int {
     $code = $response->getStatusCode();
     if ($code >= 200 && $code < 400) {
       return 0;
