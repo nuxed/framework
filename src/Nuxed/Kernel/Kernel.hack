@@ -82,7 +82,8 @@ final class Kernel implements Contract\Kernel\KernelInterface {
   public async function handle(
     Message\ServerRequestInterface $request,
   ): Awaitable<Message\ResponseInterface> {
-    $event = await $this->events->dispatch(new Kernel\Event\HandleEvent($request));
+    $event = await $this->events
+      ->dispatch(new Kernel\Event\HandleEvent($request));
 
     return await $this->pipe->handle($event->request);
   }
@@ -93,8 +94,11 @@ final class Kernel implements Contract\Kernel\KernelInterface {
    * Emits a response, including status line, headers, and the message body,
    * according to the environment.
    */
-  public async function emit(Message\ResponseInterface $response): Awaitable<bool> {
-    $event = await $this->events->dispatch(new Kernel\Event\EmitEvent($response));
+  public async function emit(
+    Message\ResponseInterface $response,
+  ): Awaitable<bool> {
+    $event = await $this->events
+      ->dispatch(new Kernel\Event\EmitEvent($response));
 
     return await $this->emitter->emit($event->response);
   }
@@ -166,7 +170,9 @@ final class Kernel implements Contract\Kernel\KernelInterface {
    * the exit status 255 is reserved by HHVM and shall not be used.
    * The status 0 is used to terminate the program successfully.
    */
-  private function getTerminationStatusCode(Message\ResponseInterface $response): int {
+  private function getTerminationStatusCode(
+    Message\ResponseInterface $response,
+  ): int {
     $code = $response->getStatusCode();
     if ($code >= 200 && $code < 400) {
       return 0;

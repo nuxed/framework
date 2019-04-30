@@ -6,7 +6,6 @@ use namespace Nuxed\Contract\Http\Server;
 use namespace Nuxed\Contract\Http\Emitter;
 use namespace Nuxed\Contract\Http\Message;
 use type Nuxed\Contract\Http\Router\RouterInterface;
-use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
 
 class HttpServiceProvider implements Container\ServiceProviderInterface {
   public function register(Container\ContainerBuilder $builder): void {
