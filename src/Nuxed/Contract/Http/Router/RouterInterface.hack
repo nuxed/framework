@@ -3,7 +3,7 @@ namespace Nuxed\Contract\Http\Router;
 use type Nuxed\Contract\Http\Message\RequestInterface;
 use type Nuxed\Contract\Http\Message\UriInterface;
 
-interface RouterInterface {
+interface RouterInterface extends RouteCollectorInterface {
   /**
    * Add a route.
    *
