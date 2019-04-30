@@ -29,8 +29,6 @@ use type Nuxed\Contract\Http\Router\RouteInterface;
  * collision occurs.
  */
 trait RouteCollectorTrait implements RouteCollectorInterface {
-  protected RouterInterface $router;
-
   /**
    * List of all routes registered directly with the application.
    */
@@ -41,7 +39,7 @@ trait RouteCollectorTrait implements RouteCollectorInterface {
    *
    * Accepts a combination of a path and middleware, and optionally the HTTP methods allowed.
    *
-   * @param null|Set<string> $methods HTTP method to accept; null indicates any.
+   * @param null|Container<string> $methods HTTP method to accept; null indicates any.
    * @param null|string $name The name of the route.
    * @throws Exception\DuplicateRouteException if specification represents an existing route.
    */
@@ -116,13 +114,6 @@ trait RouteCollectorTrait implements RouteCollectorInterface {
     ?string $name = null,
   ): RouteInterface {
     return $this->route($path, $middleware, null, $name);
-  }
-
-  /**
-   * Retrieve all directly registered routes with the application.
-   */
-  public function getRoutes(): Container<RouteInterface> {
-    return $this->routes;
   }
 
   /**

@@ -1,11 +1,11 @@
 namespace Nuxed\Http\Router;
 
+use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
-use namespace HH\Lib\C;
+use namespace HH\Lib\Regex;
 use type Nuxed\Contract\Http\Router\RouteInterface;
 use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use function preg_match;
 
 class Route implements RouteInterface {
   const HTTP_METHOD_SEPARATOR = ':';
@@ -95,8 +95,8 @@ class Route implements RouteInterface {
    *
    * Validates, and then normalizes to upper case.
    *
-   * @param Set<string> A Set of HTTP method names.
-   * @return string[]
+   * @param Container<string> A Container of HTTP method names.
+   *
    * @throws Exception\InvalidArgumentException for any invalid method names.
    */
   private function validateHttpMethods(
@@ -110,7 +110,7 @@ class Route implements RouteInterface {
 
     $valid = true;
     foreach ($methods as $method) {
-      if (!preg_match('/^[!#$%&\'*+.^_`\|~0-9a-z-]+$/i', $method)) {
+      if (!Regex\matches($method, re"/^[!#$%&'*+.^_`\|~0-9a-z-]+$/i")) {
         $valid = false;
       }
     }

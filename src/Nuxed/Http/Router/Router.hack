@@ -13,46 +13,106 @@ use type Nuxed\Contract\Http\Router\RouteInterface;
 use type Nuxed\Contract\Http\Router\RouteResultInterface;
 use type Nuxed\Contract\Http\Message\UriInterface;
 use type Nuxed\Contract\Http\Message\RequestInterface;
+use type Nuxed\Contract\Http\Server\MiddlewareInterface;
 use type Nuxed\Http\Message\Uri;
-use type Exception;
-use function preg_match;
-use function get_class;
+use function Facebook\AutoloadMap\Generated\is_dev;
 
-class Router implements RouterInterface {
+final class Router implements RouterInterface {
+  use RouteCollectorTrait;
+
+  private ?HackRouter\IResolver<RouteInterface> $resolver;
+  protected vec<RouteInterface> $routes;
+
   public function __construct(
-    private dict<string, RouteInterface> $routes = dict[],
-  ) {}
-
-  public function addRoute(RouteInterface $route): void {
-    $this->routes[$route->getName()] = $route;
+    Container<RouteInterface> $routes = vec[],
+  ) {
+    $this->routes = vec($routes);
   }
 
+  /**
+   * Add a route.
+   *
+   * This method adds a route against which the underlying implementation may
+   * match. Implementations MUST aggregate route instances, but MUST NOT use
+   * the details to inject the underlying router until `match()` and/or
+   * `generateUri()` is called.  This is required to allow consumers to
+   * modify route instances before matching (e.g., to provide route options,
+   * inject a name, etc.).
+   *
+   * The method MUST raise an Exception if called after either `match()`
+   * or `generateUri()` have already been called, to ensure integrity of the
+   * router between invocations of either of those methods.
+   */
+  public function addRoute(RouteInterface $route): void {
+    $this->routes[] = $route;
+  }
+
+  /**
+   * Add a route for the route middleware to match.
+   *
+   * Accepts a combination of a path and middleware, and optionally the HTTP methods allowed.
+   *
+   * @param null|Container<string> $methods HTTP method to accept; null indicates any.
+   * @param null|string $name The name of the route.
+   * @throws Exception\DuplicateRouteException if specification represents an existing route.
+   */
+  public function route(
+    string $path,
+    MiddlewareInterface $middleware,
+    ?Container<string> $methods = null,
+    ?string $name = null,
+  ): Route {
+    $this->checkForDuplicateRoute($path, $methods);
+
+    $route = new Route($path, $middleware, $methods, $name);
+    $this->addRoute($route);
+    return $route;
+  }
+
+  /**
+   * Retrieve all directly registered routes with the application.
+   */
+  public function getRoutes(): Container<RouteInterface> {
+    return $this->routes;
+  }
+
+  /**
+   * Match a request against the known routes.
+   *
+   * Implementations will aggregate required information from the provided
+   * request instance, and pass them to the underlying router implementation;
+   * when done, they will then marshal a `RouteResult` instance indicating
+   * the results of the matching operation and return it to the caller.
+   */
   public function match(RequestInterface $request): RouteResultInterface {
-    $method = $request->getMethod();
+    $method = HackRouter\HttpMethod::assert($request->getMethod());
     $path = $request->getUri()->getPath();
-    $routes = $this->marshalMethodRoutes($method);
-
-    if (0 !== C\count($routes)) {
-
-      try {
-        $prefixMap = PrefixMatching\PrefixMap::fromFlatMap(dict($routes));
-        list($route, $params) = $this->resolveWithMap($path, $prefixMap);
-
-        return RouteResult::fromRoute($route, $params);
-      } catch (HackRouter\NotFoundException $e) {
-      }
-    }
-
-    $allowedMethods = vec[];
-    $prefixMap =
-      PrefixMatching\PrefixMap::fromFlatMap(dict($this->map($this->routes)));
-
+    $resolver = $this->getResolver();
     try {
-      list($route, $params) = $this->resolveWithMap($path, $prefixMap);
-      $allowedMethods = $route->getAllowedMethods();
-      return RouteResult::fromRouteFailure($allowedMethods);
+      list($route, $data) = $resolver->resolve($method, $path);
+      $data = Dict\map($data, $value ==> \urldecode($value));
+      return RouteResult::fromRoute($route, $data);
     } catch (HackRouter\NotFoundException $e) {
-      return RouteResult::fromRouteFailure(null);
+      $allowed = vec[];
+      foreach (HackRouter\HttpMethod::getValues() as $next) {
+        if ($next === $method) {
+          continue;
+        }
+        try {
+          list($responder, $data) = $resolver->resolve($next, $path);
+          $allowed[] = $next;
+        } catch (HackRouter\NotFoundException $_) {
+          continue;
+        }
+      }
+
+      if (C\count($allowed) === 0) {
+        return RouteResult::fromRouteFailure([]);
+      }
+
+      return RouteResult::fromRouteFailure(
+        Vec\map($allowed, ($method) ==> (string)$method),
+      );
     }
   }
 
@@ -69,12 +129,15 @@ class Router implements RouterInterface {
     string $route,
     KeyedContainer<string, mixed> $substitutions = dict[],
   ): UriInterface {
-    if (!C\contains_key($this->routes, $route)) {
+    $routes = Dict\from_values($this->routes, ($route) ==> $route->getName());
+    if (!C\contains_key($routes, $route)) {
       $message = Str\format('Route %s doesn\'t exist', $route);
-      $alternatives = Util\alternatives($route, Vec\keys($this->routes));
+      $alternatives = Util\alternatives($route, Vec\keys($routes));
       if (0 !== C\count($alternatives)) {
-        $message .=
-          Str\format(', did you mean %s.', Str\join($alternatives, ', '));
+        $message .= Str\format(
+          ', did you mean %s.',
+          Str\join($alternatives, ', '),
+        );
       } else {
         $message .= '.';
       }
@@ -82,7 +145,7 @@ class Router implements RouterInterface {
     }
 
     try {
-      $route = $this->routes[$route];
+      $route = $routes[$route];
       $nodes = PatternParser\Parser::parse($route->getPath());
       $parts = vec[];
 
@@ -108,7 +171,7 @@ class Router implements RouterInterface {
             $parts[] = new HackRouter\IntRequestParameter($node->getName());
           } else {
             $parts[] = new HackRouter\EnumRequestParameter(
-              get_class($value),
+              \get_class($value),
               $node->getName(),
             );
           }
@@ -122,108 +185,48 @@ class Router implements RouterInterface {
         } elseif ($value is string) {
           $uriBuilder->setString($key, $value);
         } else {
-          $uriBuilder->setEnum(get_class($value), $key, $value);
+          $uriBuilder->setEnum(\get_class($value), $key, $value);
         }
       }
 
       return new Uri($uriBuilder->getPath());
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       if (!$e is Exception\ExceptionInterface) {
-        $e =
-          new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
+        $e = new Exception\RuntimeException(
+          $e->getMessage(),
+          $e->getCode(),
+          $e,
+        );
       }
+
       throw $e;
     }
   }
 
-  protected function marshalMethodRoutes(
-    string $method,
-  ): KeyedContainer<string, RouteInterface> {
-    $routes = dict[];
-    $method = Str\uppercase($method);
+  private function getResolver(): HackRouter\IResolver<RouteInterface> {
+    if ($this->resolver is nonnull) {
+      return $this->resolver;
+    }
 
-    $ret = vec[];
-    foreach ($this->routes as $route) {
-      $allowedMethods = $route->getAllowedMethods();
-
-      if (null === $allowedMethods || C\contains($allowedMethods, $method)) {
-        $ret[] = $route;
+    if (is_dev()) {
+      $routes = null;
+    } else {
+      $routes = \apc_fetch(__FILE__.'/cache');
+      if ($routes === false) {
+        $routes = null;
       }
     }
 
-    return $this->map($ret);
-  }
-
-  private function map(
-    Container<RouteInterface> $routes,
-  ): KeyedContainer<string, RouteInterface> {
-    $ret = dict[];
-    foreach ($routes as $route) {
-      $ret[$route->getPath()] = $route;
-    }
-    return $ret;
-  }
-
-  private function resolveWithMap(
-    string $path,
-    PrefixMatching\PrefixMap<RouteInterface> $map,
-  ): (RouteInterface, KeyedContainer<string, mixed>) {
-    $literals = $map->getLiterals();
-    if (C\contains_key($literals, $path)) {
-      return tuple($literals[$path], dict[]);
-    }
-
-    $prefixes = $map->getPrefixes();
-    if (0 !== C\count($prefixes)) {
-      $prefix_len = Str\length(C\first_keyx($prefixes));
-      $prefix = Str\slice($path, 0, $prefix_len);
-
-      if (C\contains_key($prefixes, $prefix)) {
-        return $this->resolveWithMap(
-          Str\strip_prefix($path, $prefix),
-          $prefixes[$prefix],
-        );
+    if ($routes is null) {
+      $routes = _Private\map($this->routes);
+      
+      if (!is_dev()) {
+        \apc_store(__FILE__.'/cache', $routes);
       }
     }
 
-    $regexps = $map->getRegexps();
+    $this->resolver = new HackRouter\PrefixMatchingResolver(dict($routes));
 
-    foreach ($regexps as $regexp => $sub_map) {
-      $pattern = '#^'.$regexp.'#';
-      $matches = [];
-
-      /**
-       * @todo [Http][Router] use hsl regex
-       * @body this is an issue with hack-router since it use string instead of regex pattern, its not possible to use hsl regex.
-       */
-      if (preg_match($pattern, $path, &$matches) !== 1) {
-        continue;
-      }
-
-      $matched = $matches[0];
-      $remaining = Str\strip_prefix($path, $matched);
-
-      $data = Dict\filter_keys($matches, ($key) ==> $key is string);
-      $sub = $regexps[$regexp];
-
-      if ($sub->isResponder()) {
-        if ($remaining === '') {
-          return tuple($sub->getResponder(), $data);
-        }
-
-        continue;
-      }
-
-      try {
-        list($responder, $sub_data) =
-          $this->resolveWithMap($remaining, $sub->getMap());
-      } catch (HackRouter\NotFoundException $_) {
-        continue;
-      }
-
-      return tuple($responder, Dict\merge($data, $sub_data));
-    }
-
-    throw new HackRouter\NotFoundException();
+    return $this->resolver;
   }
 }

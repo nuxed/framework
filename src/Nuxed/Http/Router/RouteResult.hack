@@ -93,7 +93,7 @@ final class RouteResult implements RouteResultInterface {
       return null;
     }
 
-    if (null === $this->matchedRouteName && $this->route) {
+    if (null === $this->matchedRouteName && $this->route is RouteInterface) {
       $this->matchedRouteName = $this->route->getName();
     }
 
@@ -113,7 +113,7 @@ final class RouteResult implements RouteResultInterface {
    * Is this a routing failure result?
    */
   public function isFailure(): bool {
-    return (!$this->success);
+    return !$this->success;
   }
 
   /**
@@ -130,7 +130,7 @@ final class RouteResult implements RouteResultInterface {
   /**
    * Retrieve the allowed methods for the route failure.
    *
-   * @return null|Set<string> HTTP methods allowed
+   * @return null|Container<string> HTTP methods allowed
    */
   public function getAllowedMethods(): ?Container<string> {
     if ($this->isSuccess()) {
