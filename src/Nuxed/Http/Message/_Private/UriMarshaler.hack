@@ -142,6 +142,10 @@ final class UriMarshaler {
     KeyedContainer<string, Container<string>> $headers,
     KeyedContainer<string, mixed> $server,
   ): shape('host' => string, 'port' => ?int, ...) {
+<<<<<<< HEAD:src/Nuxed/Http/Message/_Private/UriMarshaler.hack
+=======
+
+>>>>>>> b66a9e4743b09efa21f4adb1a7532797192322d7:src/Nuxed/Http/Message/__Private/UriMarshaler.hack
     $header = $this->getHeadersFromMap('host', $headers);
     if (null !== $header) {
       return shape(
@@ -151,7 +155,11 @@ final class UriMarshaler {
     }
 
     if (!C\contains_key($server, 'SERVER_NAME')) {
+<<<<<<< HEAD:src/Nuxed/Http/Message/_Private/UriMarshaler.hack
       return shape('host' => '', 'port' => null);
+=======
+      return shape('host' => '', 'port' => null);;
+>>>>>>> b66a9e4743b09efa21f4adb1a7532797192322d7:src/Nuxed/Http/Message/__Private/UriMarshaler.hack
     }
 
     $host = $server['SERVER_NAME'] as string;
