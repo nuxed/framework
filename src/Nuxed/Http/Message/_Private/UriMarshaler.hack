@@ -17,7 +17,7 @@ final class UriMarshaler {
     $scheme = 'http';
     if (C\contains_key($server, 'HTTPS')) {
       $https = $this->marshalHttpsValue($server['HTTPS']);
-    } elseif (C\contains_key($server, 'https')) {
+    } else if (C\contains_key($server, 'https')) {
       $https = $this->marshalHttpsValue($server['https']);
     } else {
       $https = false;

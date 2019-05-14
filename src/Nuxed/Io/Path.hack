@@ -103,9 +103,9 @@ final class Path implements Stringish {
     foreach ($clean as $path) {
       if ($path === '.' || $path === '') {
         continue;
-      } elseif ($path === '..') {
+      } else if ($path === '..') {
         $up++;
-      } elseif ($up > 0) {
+      } else if ($up > 0) {
         $up--;
       } else {
         $parts[] = $path;

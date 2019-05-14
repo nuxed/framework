@@ -12,15 +12,15 @@ use function gettype;
 function stringify(mixed $value): string {
   if ($value is bool) {
     $value = ($value ? 'true' : 'false');
-  } elseif ($value is string) {
+  } else if ($value is string) {
     $value = '"'.$value.'"';
-  } elseif ($value is num) {
+  } else if ($value is num) {
     $value = $value is int ? $value : Str\format_number($value, 1);
-  } elseif ($value is resource) {
+  } else if ($value is resource) {
     $value = 'resource['.get_resource_type($value).']';
-  } elseif (null === $value) {
+  } else if (null === $value) {
     $value = 'null';
-  } elseif (is_object($value) && !$value is Container<_>) {
+  } else if (is_object($value) && !$value is Container<_>) {
     if ($value is Throwable) {
       $value = get_class($value).
         '['.
@@ -37,12 +37,12 @@ function stringify(mixed $value): string {
         ', previous='.
         stringify($value->getPrevious()).
         ']';
-    } elseif ($value is DateTimeInterface) {
+    } else if ($value is DateTimeInterface) {
       $value = get_class($value).'['.$value->format("Y-m-d\TH:i:s.uP").']';
     } else {
       $value = 'object['.get_class($value).']';
     }
-  } elseif ($value is Container<_>) {
+  } else if ($value is Container<_>) {
     $value = Json::encode($value, false);
   } else {
     $value = '!'.gettype($value).Json::encode($value, false);

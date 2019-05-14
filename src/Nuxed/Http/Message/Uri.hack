@@ -261,7 +261,7 @@ final class Uri implements UriInterface {
           // If the path is rootless and an authority is present, the path MUST be prefixed by "/"
           $path = '/'.$path;
         }
-      } elseif (Str\length($path) > 1 && '/' === $path[1]) {
+      } else if (Str\length($path) > 1 && '/' === $path[1]) {
         if ('' === $authority) {
           // If the path is starting with more than one "/" and no authority is present, the
           // starting slashes MUST be reduced to one.

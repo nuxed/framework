@@ -198,7 +198,7 @@ final class File extends Node {
   public function mimeType(): string {
     $this->isAvailable();
     $info = finfo_open(FILEINFO_MIME_TYPE);
-    $type = finfo_file($info, $this->path);
+    $type = finfo_file($info, $this->path->toString());
     finfo_close($info);
     return $type as string;
   }

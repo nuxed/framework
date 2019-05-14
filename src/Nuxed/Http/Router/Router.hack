@@ -149,7 +149,7 @@ final class Router implements RouterInterface {
       foreach ($nodes->getChildren() as $node) {
         if ($node is PatternParser\LiteralNode) {
           $parts[] = new HackRouter\UriPatternLiteral($node->getText());
-        } elseif ($node is PatternParser\ParameterNode) {
+        } else if ($node is PatternParser\ParameterNode) {
           if (!C\contains_key($substitutions, $node->getName())) {
             throw new Exception\InvalidArgumentException(
               Str\format('Missing parameter %s', $node->getName()),
@@ -164,7 +164,7 @@ final class Router implements RouterInterface {
               $node->getName(),
             );
             $part->assert($value);
-          } elseif ($value is int) {
+          } else if ($value is int) {
             $parts[] = new HackRouter\IntRequestParameter($node->getName());
           } else {
             $parts[] = new HackRouter\EnumRequestParameter(
@@ -179,7 +179,7 @@ final class Router implements RouterInterface {
       foreach ($substitutions as $key => $value) {
         if ($value is int) {
           $uriBuilder->setInt($key, $value);
-        } elseif ($value is string) {
+        } else if ($value is string) {
           $uriBuilder->setString($key, $value);
         } else {
           $uriBuilder->setEnum(\get_class($value), $key, $value);

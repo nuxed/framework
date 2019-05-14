@@ -176,7 +176,7 @@ final class Kernel implements Contract\Kernel\KernelInterface {
     $code = $response->getStatusCode();
     if ($code >= 200 && $code < 400) {
       return 0;
-    } elseif ($code <= 255 && $code > 0) {
+    } else if ($code <= 255 && $code > 0) {
       // even that 0 is an error, we don't return it
       // otherwise the script exits successfully
       // and that's not true in this case

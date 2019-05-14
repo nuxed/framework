@@ -316,7 +316,7 @@ final class Folder extends Node {
         $node->isDir() && ($filter === Node::class || $filter === Folder::class)
       ) {
         $contents[] = new Folder(Path::create($node->getPathname()));
-      } elseif (
+      } else if (
         $node->isFile() && ($filter === Node::class || $filter === File::class)
       ) {
         $contents[] = new File(Path::create($node->getPathname()));
