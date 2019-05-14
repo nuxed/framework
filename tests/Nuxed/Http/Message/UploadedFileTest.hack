@@ -140,11 +140,13 @@ class UploadedFileTest extends HackTest {
     );
   }
 
+  public static ?MessageFactory $factory;
+
   private function createStream(string $data = ''): StreamInterface {
-    static $factory;
-    if (null === $factory) {
+    if (null === static::$factory) {
       $factory = new MessageFactory();
     }
-    return $factory->createStream($data);
+
+    return static::$factory as nonnull->createStream($data);
   }
 }

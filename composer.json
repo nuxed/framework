@@ -11,7 +11,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "azjezz",
+            "name": "Saif Eddin Gmati",
             "email": "azjezz@protonmail.com",
             "homepage": "https://azjezz.github.io"
         },
@@ -30,22 +30,6 @@
         "hhvm/hsl-experimental": "^4.0",
         "hhvm/type-assert": "^3.3",
         "his/container": "^0.1"
-    },
-    "replace": {
-        "nuxed/asset": "self.version",
-        "nuxed/cache": "self.version",
-        "nuxed/container": "self.version",
-        "nuxed/contract": "self.version",
-        "nuxed/crypto": "self.version",
-        "nuxed/event": "self.version",
-        "nuxed/http": "self.version",
-        "nuxed/io": "self.version",
-        "nuxed/kernel": "self.version",
-        "nuxed/log": "self.version",
-        "nuxed/markdown": "self.version",
-        "nuxed/period": "self.version",
-        "nuxed/stopwatch": "self.version",
-        "nuxed/util": "self.version"
     },
     "require-dev": {
         "facebook/fbexpect": "^2.4",

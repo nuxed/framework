@@ -150,7 +150,6 @@ class UriMarshaler {
     KeyedContainer<string, Container<string>> $headers,
     KeyedContainer<string, mixed> $server,
   ): shape('host' => string, 'port' => ?int, ...) {
-    static $defaults = shape('host' => '', 'port' => null);
 
     $header = $this->getHeadersFromMap('host', $headers);
     if (null !== $header) {
@@ -161,7 +160,7 @@ class UriMarshaler {
     }
 
     if (!C\contains_key($server, 'SERVER_NAME')) {
-      return $defaults;
+      return shape('host' => '', 'port' => null);;
     }
 
     $host = $server['SERVER_NAME'] as string;
