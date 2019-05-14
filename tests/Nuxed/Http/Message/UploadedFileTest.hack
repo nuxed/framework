@@ -107,17 +107,4 @@ class UploadedFileTest extends HackTest {
       'Cannot retrieve stream due to upload error',
     );
   }
-<<<<<<< HEAD
-=======
-
-  public static ?MessageFactory $factory;
-
-  private function createStream(string $data = ''): StreamInterface {
-    if (null === static::$factory) {
-      $factory = new MessageFactory();
-    }
-
-    return static::$factory as nonnull->createStream($data);
-  }
->>>>>>> b66a9e4743b09efa21f4adb1a7532797192322d7
 }
