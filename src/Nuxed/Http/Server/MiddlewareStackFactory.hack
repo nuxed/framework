@@ -1,8 +1,6 @@
 namespace Nuxed\Http\Server;
 
 use namespace Nuxed\Container;
-use namespace Nuxed\Contract;
-use namespace Nuxed\Contract\Http\Server;
 
 final class MiddlewareStackFactory
   implements Container\IFactory<MiddlewareStack> {

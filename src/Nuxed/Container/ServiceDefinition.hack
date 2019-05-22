@@ -1,6 +1,5 @@
 namespace Nuxed\Container;
 
-use namespace Nuxed\Contract;
 
 final class ServiceDefinition<T> {
   private vec<IInflector<T>> $inflectors = vec[];

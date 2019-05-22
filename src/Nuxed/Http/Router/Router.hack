@@ -9,7 +9,6 @@ use namespace Nuxed\Http\Server;
 use namespace Nuxed\Http\Message;
 use namespace Facebook\HackRouter;
 use namespace Facebook\HackRouter\PatternParser;
-use namespace Facebook\AutoloadMap\Generated;
 
 final class Router implements IRouter {
   use RouteCollectorTrait;

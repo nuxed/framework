@@ -3,7 +3,6 @@ namespace Nuxed\Kernel\Error;
 use namespace Facebook\AutoloadMap;
 use namespace Nuxed\Container;
 use namespace Nuxed\EventDispatcher;
-use namespace Nuxed\Contract;
 
 class ErrorHandlerFactory implements Container\IFactory<IErrorHandler> {
   public function create(

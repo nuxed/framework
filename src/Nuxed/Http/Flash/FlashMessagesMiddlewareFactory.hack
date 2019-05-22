@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Flash;
 
 use namespace Nuxed\Container;
-use namespace Nuxed\Contract;
 
 final class FlashMessagesMiddlewareFactory
   implements Container\IFactory<FlashMessagesMiddleware> {
