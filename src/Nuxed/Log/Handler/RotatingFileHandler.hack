@@ -1,8 +1,8 @@
 namespace Nuxed\Log\Handler;
 
 use namespace HH\Lib\{C, Str, Dict};
-use type Nuxed\Contract\Log\LogLevel;
-use type Nuxed\Log\Record;
+use type Nuxed\Log\LogLevel;
+use type Nuxed\Log\LogRecord;
 use type Nuxed\Log\Exception\InvalidArgumentException;
 
 class RotatingFileHandler extends StreamHandler {
@@ -93,7 +93,7 @@ class RotatingFileHandler extends StreamHandler {
   }
 
   <<__Override>>
-  protected function write(Record $record): void {
+  protected function write(LogRecord $record): void {
     // on the first record written, if the log is new, we should rotate (once per day)
     if (null === $this->mustRotate) {
       $this->mustRotate = !\file_exists($this->url);

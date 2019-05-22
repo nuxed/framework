@@ -1,15 +1,7 @@
 namespace Nuxed\Cache\Serializer;
 
-use type Throwable;
-use type Error;
-use type ErrorException;
-use type DomainException;
-use function serialize;
-use function unserialize;
-use function error_get_last;
-use const E_ERROR;
 
-class DefaultSerializer implements SerializerInterface {
+class DefaultSerializer implements ISerializer {
   /**
    * Serialize a value.
    *
@@ -18,8 +10,8 @@ class DefaultSerializer implements SerializerInterface {
    */
   public function serialize(mixed $value): ?string {
     try {
-      return serialize($value) as ?string;
-    } catch (Throwable $e) {
+      return \serialize($value) as ?string;
+    } catch (\Throwable $e) {
       return null;
     }
   }
@@ -37,22 +29,22 @@ class DefaultSerializer implements SerializerInterface {
     }
 
     try {
-      $unserialized = unserialize($value);
+      $unserialized = \unserialize($value);
 
       if (false !== $unserialized) {
         return $unserialized;
       }
 
-      $error = error_get_last();
+      $error = \error_get_last();
       $message = (false === $error) || ($error['message'] === null)
         ? 'Failed to unserialize values'
         : $error['message'] as string;
-      throw new DomainException($message);
-    } catch (Error $e) {
-      throw new ErrorException(
+      throw new \DomainException($message);
+    } catch (\Error $e) {
+      throw new \ErrorException(
         $e->getMessage(),
         (int)$e->getCode(),
-        E_ERROR,
+        \E_ERROR,
         $e->getFile(),
         $e->getLine(),
       );

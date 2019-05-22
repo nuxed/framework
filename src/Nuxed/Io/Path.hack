@@ -4,31 +4,25 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\Filesystem;
-use type Stringish;
-use function realpath;
-use function pathinfo;
-use const PATHINFO_FILENAME;
-use const PATH_SEPARATOR;
-use const DIRECTORY_SEPARATOR;
 
 /**
  * Provides convenience functions for inflecting notation paths and file system paths.
  */
-final class Path implements Stringish {
+final class Path implements \Stringish {
   /**
    * Directory separator.
    */
-  const string SEPARATOR = DIRECTORY_SEPARATOR;
+  const string SEPARATOR = \DIRECTORY_SEPARATOR;
 
   /**
    * Include path separator.
    */
-  const string DELIMITER = PATH_SEPARATOR;
+  const string DELIMITER = \PATH_SEPARATOR;
 
   public function __construct(private Filesystem\Path $path) {
   }
 
-  public static function create(Stringish $path): Path {
+  public static function create(\Stringish $path): Path {
     if ($path is Path) {
       return $path;
     }
@@ -132,7 +126,7 @@ final class Path implements Stringish {
    * if the path couldn't be normalized, null will be returned.
    */
   public static function normalize(string $path): ?string {
-    $normalized = realpath($path);
+    $normalized = \realpath($path);
     if ($normalized is string) {
       return $normalized;
     }
@@ -243,14 +237,14 @@ final class Path implements Stringish {
    * Return the file name without extension.
    */
   public function name(): string {
-    return pathinfo($this->toString(), PATHINFO_FILENAME);
+    return \pathinfo($this->toString(), \PATHINFO_FILENAME);
   }
 
   public function parts(): Container<string> {
     return $this->path->getParts();
   }
 
-  public function compare(Stringish $other): int {
+  public function compare(\Stringish $other): int {
     $other = static::standard((string)$other, false);
     $other = static::normalize($other) ?? $other;
     if (Str\ends_with($other, '/')) {

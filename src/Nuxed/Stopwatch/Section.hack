@@ -2,7 +2,6 @@ namespace Nuxed\Stopwatch;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
-use function microtime;
 
 class Section {
   private dict<string, Event> $events = dict[];
@@ -47,7 +46,7 @@ class Section {
     }
 
     if (null === $session) {
-      $session = new Section(microtime(true) * 1000, $this->morePrecision);
+      $session = new Section(\microtime(true) * 1000, $this->morePrecision);
       $this->children[] = $session;
     }
 
@@ -78,7 +77,7 @@ class Section {
   public function startEvent(string $name, ?string $category): Event {
     if (!C\contains_key($this->events, $name)) {
       $this->events[$name] = new Event(
-        $this->origin ?? microtime(true) * 1000,
+        $this->origin ?? \microtime(true) * 1000,
         $category,
         $this->morePrecision,
       );

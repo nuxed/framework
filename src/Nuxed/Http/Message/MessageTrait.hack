@@ -4,14 +4,11 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Regex;
-use type Nuxed\Contract\Http\Message\StreamInterface;
-use type Nuxed\Contract\Http\Message\MessageInterface;
 
 /**
  * Trait implementing functionality common to requests and responses.
  */
-trait MessageTrait {
-  require implements MessageInterface;
+abstract class Message {
 
   /** @var dict<string, vec<string>> Map of all registered headers, as original name => Set of values */
   protected dict<string, vec<string>> $headers = dict[];
@@ -21,7 +18,7 @@ trait MessageTrait {
 
   protected string $protocol = '1.1';
 
-  protected ?StreamInterface $stream;
+  protected ?IStream $stream;
 
   public function messageClone(): void {
     $this->stream = null === $this->stream ? null : (clone $this->stream);
@@ -118,7 +115,7 @@ trait MessageTrait {
     return $new;
   }
 
-  public function getBody(): StreamInterface {
+  public function getBody(): IStream {
     if (null === $this->stream) {
       $this->stream = stream('');
     }
@@ -126,7 +123,7 @@ trait MessageTrait {
     return $this->stream;
   }
 
-  public function withBody(StreamInterface $body): this {
+  public function withBody(IStream $body): this {
     if ($body === $this->stream) {
       return $this;
     }
@@ -137,7 +134,7 @@ trait MessageTrait {
     return $new;
   }
 
-  private function setHeaders(
+  protected function setHeaders(
     KeyedContainer<string, Container<string>> $headers,
   ): void {
     foreach ($headers as $header => $value) {
@@ -175,7 +172,7 @@ trait MessageTrait {
    *
    * @see https://tools.ietf.org/html/rfc7230#section-3.2.4
    */
-  private function validateAndTrimHeader(
+  protected function validateAndTrimHeader(
     string $header,
     Container<string> $values,
   ): Container<string> {

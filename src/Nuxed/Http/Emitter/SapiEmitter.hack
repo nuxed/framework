@@ -4,8 +4,7 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\IO;
 use namespace Nuxed\Http\Emitter\Exception;
-use namespace Nuxed\Contract\Http\Emitter;
-use namespace Nuxed\Contract\Http\Message;
+use namespace Nuxed\Http\Message;
 
 /**
  * Logic largely refactored from the Zend-HttpHandleRunner Zend\HttpHandlerRunner\Emitter\SapiEmitter class.
@@ -14,12 +13,10 @@ use namespace Nuxed\Contract\Http\Message;
  * @license   https://github.com/zendframework/zend-httphandlerrunner/blob/master/LICENSE.md New BSD License
  */
 <<__Sealed(SapiStreamEmitter::class)>>
-class SapiEmitter implements Emitter\EmitterInterface {
+class SapiEmitter implements IEmitter {
   const SET_COOKIE_HEADER = 'Set-Cookie';
 
-  public async function emit(
-    Message\ResponseInterface $response,
-  ): Awaitable<bool> {
+  public async function emit(Message\Response $response): Awaitable<bool> {
     $this->assertNoPreviousOutput();
     $this->emitHeaders($response);
     $this->emitStatusLine($response);
@@ -28,7 +25,7 @@ class SapiEmitter implements Emitter\EmitterInterface {
   }
 
   protected async function emitBody(
-    Message\ResponseInterface $response,
+    Message\Response $response,
   ): Awaitable<void> {
     $stream = $response->getBody();
     if ($stream->isSeekable()) {
@@ -72,7 +69,7 @@ class SapiEmitter implements Emitter\EmitterInterface {
    *
    * @see emitHeaders()
    */
-  protected function emitStatusLine(Message\ResponseInterface $response): void {
+  protected function emitStatusLine(Message\Response $response): void {
     $reasonPhrase = $response->getReasonPhrase();
     $statusCode = $response->getStatusCode();
     \header(
@@ -95,7 +92,7 @@ class SapiEmitter implements Emitter\EmitterInterface {
    * in such a way as to create aggregate headers (instead of replace
    * the previous).
    */
-  protected function emitHeaders(Message\ResponseInterface $response): void {
+  protected function emitHeaders(Message\Response $response): void {
     $response = $this->renderCookiesIntoHeader($response);
     $statusCode = $response->getStatusCode();
     foreach ($response->getHeaders() as $header => $values) {
@@ -119,8 +116,8 @@ class SapiEmitter implements Emitter\EmitterInterface {
   }
 
   private function renderCookiesIntoHeader(
-    Message\ResponseInterface $response,
-  ): Message\ResponseInterface {
+    Message\Response $response,
+  ): Message\Response {
     $response = $response->withoutHeader(static::SET_COOKIE_HEADER);
     $cookies = vec[];
 
@@ -137,7 +134,7 @@ class SapiEmitter implements Emitter\EmitterInterface {
 
   private function convertCookieIntoString(
     string $name,
-    Message\CookieInterface $cookie,
+    Message\Cookie $cookie,
   ): string {
     $cookieStringParts = vec[
       \urlencode($name).'='.\urlencode($cookie->getValue()),

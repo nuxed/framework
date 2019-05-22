@@ -2,7 +2,6 @@ namespace Nuxed\Util;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
-use function invariant;
 
 final abstract class Dict {
   public static function union<Tk as arraykey, Tv>(

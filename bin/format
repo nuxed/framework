@@ -21,11 +21,15 @@ async function main(): Awaitable<noreturn> {
     ]
       |> Vec\map($$, ($node) ==> $node->files(false, true)),
   );
-  await Vec\concat(...$files)
+
+  await (
+    Vec\concat(...$files)
     |> Vec\map($$, ($file) ==> format($file, $stdout, false))
     |> Asio\v(
       Vec\concat($$, vec[format(Io\Node::load(__FILE__), $stdout, true)]),
-    );
+    )
+  );
+
   await $stdout->writeAsync("\n");
   exit(0);
 }
@@ -44,12 +48,13 @@ async function format(
       $file->path()->toString(),
     );
 
-    await Asio\v(vec[
-      async {
+    concurrent {
+      await async {
         exec($command);
-      },
-      $stdout->writeAsync('.'),
-    ]);
+      };
+
+      await $stdout->writeAsync('.');
+    }
   } else {
     await $stdout->writeAsync('S');
   }

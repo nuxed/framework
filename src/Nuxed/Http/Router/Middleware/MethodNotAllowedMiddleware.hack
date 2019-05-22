@@ -1,12 +1,8 @@
 namespace Nuxed\Http\Router\Middleware;
 
-use type Nuxed\Http\Message\StatusCode;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ResponseFactoryInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Router\RouteResultInterface;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Router;
+use namespace Nuxed\Http\Message;
 
 /**
  * Emit a 405 Method Not Allowed response
@@ -19,26 +15,21 @@ use type Nuxed\Contract\Http\Router\RouteResultInterface;
  * If no route result is composed, and/or it's not the result of a method
  * failure, it passes handling to the provided handler.
  */
-class MethodNotAllowedMiddleware implements MiddlewareInterface {
-  public function __construct(
-    private ResponseFactoryInterface $responseFactory,
-  ) {}
-
+class MethodNotAllowedMiddleware implements Server\IMiddleware {
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
-    $routeResult = $request->getAttribute(RouteResultInterface::class);
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
+    $routeResult = $request->getAttribute(Router\RouteResult::class);
 
     if (
-      !$routeResult is RouteResultInterface || !$routeResult->isMethodFailure()
+      !$routeResult is Router\RouteResult || !$routeResult->isMethodFailure()
     ) {
       return await $handler->handle($request);
     }
 
-    return $this->responseFactory
-      ->createResponse()
-      ->withStatus(StatusCode::STATUS_METHOD_NOT_ALLOWED)
+    return Message\response()
+      ->withStatus(Message\StatusCode::STATUS_METHOD_NOT_ALLOWED)
       ->withHeader('Allow', $routeResult->getAllowedMethods() ?? vec[]);
   }
 }

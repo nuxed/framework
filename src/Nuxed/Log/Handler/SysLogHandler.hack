@@ -2,8 +2,8 @@ namespace Nuxed\Log\Handler;
 
 use namespace HH\Lib\Str;
 use namespace Nuxed\Log\Exception;
-use type Nuxed\Log\Record;
-use type Nuxed\Contract\Log\LogLevel;
+use type Nuxed\Log\LogRecord;
+use type Nuxed\Log\LogLevel;
 
 class SysLogHandler extends AbstractHandler {
   /**
@@ -35,7 +35,7 @@ class SysLogHandler extends AbstractHandler {
   }
 
   <<__Override>>
-  public function write(Record $record): void {
+  public function write(LogRecord $record): void {
     if (!\openlog($this->ident, $this->options, (int)$this->facility)) {
       throw new Exception\LogicException(Str\format(
         "Can't open syslog for ident %s and facility %d",

@@ -1,9 +1,6 @@
 namespace Nuxed\Http\Emitter\Exception;
 
-use type RuntimeException;
-
-<<__ConsistentConstruct>>
-class EmitterException extends RuntimeException implements ExceptionInterface {
+final class EmitterException extends \RuntimeException implements IException {
   public static function forHeadersSent(): this {
     return new static('Unable to emit response; headers already sent');
   }

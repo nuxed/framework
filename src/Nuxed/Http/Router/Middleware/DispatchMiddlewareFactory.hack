@@ -1,12 +1,12 @@
 namespace Nuxed\Http\Router\Middleware;
 
-use namespace His\Container;
-use namespace Nuxed\Contract\Service;
+use namespace Nuxed\Container;
+use namespace Nuxed\Contract;
 
 class DispatchMiddlewareFactory
-  implements Service\FactoryInterface<DispatchMiddleware> {
+  implements Container\IFactory<DispatchMiddleware> {
   public function create(
-    Container\ContainerInterface $_container,
+    Container\IServiceContainer $_container,
   ): DispatchMiddleware {
     return new DispatchMiddleware();
   }

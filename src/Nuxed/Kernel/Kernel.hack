@@ -1,65 +1,61 @@
 namespace Nuxed\Kernel;
 
-use namespace HH\Asio;
-use namespace Nuxed\Kernel;
-use namespace His\Container;
-use namespace Nuxed\Contract;
-use namespace Nuxed\Contract\Http\Message;
-use namespace Nuxed\Contract\Http\Emitter;
-use namespace Nuxed\Contract\Http\Server;
-use namespace Nuxed\Contract\Http\Router;
-use namespace Nuxed\Contract\Log;
-use namespace Nuxed\Contract\Event;
-use namespace Nuxed\Http;
+use namespace Nuxed\Container;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Emitter;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Router;
+use namespace Nuxed\EventDispatcher;
 
-final class Kernel implements Contract\Kernel\KernelInterface {
-  use Http\Router\RouteCollectorTrait;
-  use Log\LoggerAwareTrait;
+final class Kernel implements IKernel {
+  private ?Container\IServiceContainer $container;
+  private ?Emitter\IEmitter $emitter = null;
+  private ?EventDispatcher\IEventDispatcher $dispatcher = null;
+  private ?Server\MiddlewareStack $stack = null;
+  private ?Router\IRouter $router = null;
 
-  public function __construct(
-    private Container\ContainerInterface $container,
-    private Server\MiddlewarePipeInterface $pipe,
-    private Emitter\EmitterInterface $emitter,
-    private Event\EventDispatcherInterface $events,
-    private Router\RouterInterface $router,
-  ) {}
+  private vec<Extension\IExtension> $extensions = vec[];
 
-  public function use(
-    classname<Extension\ExtensionInterface> $extension,
-  ): void {
-    $extension = new $extension($this->container);
-    $extension->route($this);
-    $extension->pipe($this);
-    $extension->subscribe($this->events);
+  private bool $booted = false;
+
+  public function use(Extension\IExtension $extension): void {
+    if ($this->booted) {
+      throw new Exception\BootedKernelException(
+        'You cannot register more extensions. kernel has already been booted.',
+      );
+    }
+
+    $this->extensions[] = $extension;
   }
 
-  public function subscribe(Event\EventSubscriberInterface $subscriber): void {
-    $event = Asio\join(
-      $this->events->dispatch(new Kernel\Event\SubscribeEvent($subscriber)),
-    );
-    $this->events->subscribe($event->subscriber);
-  }
+  private function boot(): void {
+    if ($this->booted) {
+      return;
+    }
 
-  public function on<TEvent as Event\EventInterface>(
-    classname<TEvent> $event,
-    (function(TEvent): Awaitable<void>) $listener,
-    int $priority = 0,
-  ): void {
-    $this->events->on($event, $listener, $priority);
-  }
+    $builder = new Container\ContainerBuilder();
+    foreach ($this->extensions as $extension) {
+      $extension->register($builder);
+    }
 
-  /*
-   * Pipe middleware like unix pipes.
-   */
-  public function pipe(
-    Server\MiddlewareInterface $middleware,
-    int $priority = 0,
-  ): void {
-    $event = Asio\join(
-      $this->events
-        ->dispatch(new Kernel\Event\PipeEvent($middleware, $priority)),
-    );
-    $this->pipe->pipe($event->middleware, $event->priority);
+    $container = $builder->build();
+    $dispatcher = $container->get(EventDispatcher\IEventDispatcher::class);
+    $stack = $container->get(Server\MiddlewareStack::class);
+    $router = $container->get(Router\IRouter::class);
+
+    foreach ($this->extensions as $extension) {
+      $extension->subscribe($dispatcher, $container);
+      $extension->stack($stack, $container);
+      $extension->route($router, $container);
+    }
+
+    $this->container = $container;
+    $this->stack = $stack;
+    $this->dispatcher = $dispatcher;
+    $this->router = $router;
+    $this->emitter = $this->container->get(Emitter\IEmitter::class);
+
+    $this->booted = true;
   }
 
   /**
@@ -67,25 +63,32 @@ final class Kernel implements Contract\Kernel\KernelInterface {
    * response creation to a handler.
    */
   public async function process(
-    Message\ServerRequestInterface $request,
-    Server\RequestHandlerInterface $handler,
-  ): Awaitable<Message\ResponseInterface> {
-    $event = await $this->events
-      ->dispatch(new Kernel\Event\ProcessEvent($request, $handler));
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
+    $this->boot();
 
-    return await $this->pipe->process($event->request, $event->handler);
+    $event = await ($this->dispatcher as nonnull)
+      ->dispatch(new Event\ProcessEvent($request, $handler));
+
+    return await ($this->stack as nonnull)->process(
+      $event->request,
+      $event->handler,
+    );
   }
 
   /**
    * Handle the request and return a response.
    */
   public async function handle(
-    Message\ServerRequestInterface $request,
-  ): Awaitable<Message\ResponseInterface> {
-    $event = await $this->events
-      ->dispatch(new Kernel\Event\HandleEvent($request));
+    Message\ServerRequest $request,
+  ): Awaitable<Message\Response> {
+    $this->boot();
 
-    return await $this->pipe->handle($event->request);
+    $event = await ($this->dispatcher as nonnull)
+      ->dispatch(new Event\HandleEvent($request));
+
+    return await ($this->stack as nonnull)->handle($event->request);
   }
 
   /**
@@ -94,95 +97,26 @@ final class Kernel implements Contract\Kernel\KernelInterface {
    * Emits a response, including status line, headers, and the message body,
    * according to the environment.
    */
-  public async function emit(
-    Message\ResponseInterface $response,
-  ): Awaitable<bool> {
-    $event = await $this->events
-      ->dispatch(new Kernel\Event\EmitEvent($response));
+  public async function emit(Message\Response $response): Awaitable<bool> {
+    $this->boot();
 
-    return await $this->emitter->emit($event->response);
-  }
+    $event = await ($this->dispatcher as nonnull)
+      ->dispatch(new Event\EmitEvent($response));
 
-  /**
-   * Add a route for the route middleware to match.
-   *
-   * Accepts a combination of a path and middleware, and optionally the HTTP methods allowed.
-   *
-   * @param null|Set<string> $methods HTTP method to accept; null indicates any.
-   * @param null|string $name The name of the route.
-   * @throws Exception\DuplicateRouteException if specification represents an existing route.
-   */
-  public function route(
-    string $path,
-    Server\MiddlewareInterface $middleware,
-    ?Container<string> $methods = null,
-    ?string $name = null,
-  ): Router\RouteInterface {
-    return $this->router->route($path, $middleware, $methods, $name);
-  }
-
-  /**
-   * Retrieve all directly registered routes with the application.
-   */
-  public function getRoutes(): Container<Router\RouteInterface> {
-    return $this->router->getRoutes();
-  }
-
-  /**
-   * Register fallback middleware.
-   */
-  public function fallback(Server\MiddlewareInterface $middleware): void {
-    $this->pipe($middleware, -0x9950);
+    return await ($this->emitter as nonnull)->emit($event->response);
   }
 
   /**
    * Perform any final actions for the request lifecycle.
    */
   public async function terminate(
-    Message\ServerRequestInterface $request,
-    Message\ResponseInterface $response,
+    Message\ServerRequest $request,
+    Message\Response $response,
   ): Awaitable<void> {
-    $event = await $this->events
-      ->dispatch(new Kernel\Event\TerminateEvent($request, $response));
+    $event = await ($this->dispatcher as nonnull)
+      ->dispatch(new Event\TerminateEvent($request, $response));
 
     await $event->request->getBody()->closeAsync();
     await $event->response->getBody()->closeAsync();
-  }
-
-  /**
-   * Run the Http Kernel.
-   */
-  public async function run(): Awaitable<noreturn> {
-    $request = Http\Message\ServerRequest::capture();
-    $response = await $this->handle($request);
-    $emitted = await $this->emit($response);
-    if ($emitted) {
-      await $this->terminate($request, $response);
-    }
-
-    exit($emitted ? $this->getTerminationStatusCode($response) : 1);
-  }
-
-  /**
-   * Get the termination exit code.
-   *
-   * Exit statuses should be in the range 0 to 254,
-   * the exit status 255 is reserved by HHVM and shall not be used.
-   * The status 0 is used to terminate the program successfully.
-   */
-  private function getTerminationStatusCode(
-    Message\ResponseInterface $response,
-  ): int {
-    $code = $response->getStatusCode();
-    if ($code >= 200 && $code < 400) {
-      return 0;
-    } else if ($code <= 255 && $code > 0) {
-      // even that 0 is an error, we don't return it
-      // otherwise the script exits successfully
-      // and that's not true in this case
-      return $code;
-    } else {
-      return 1;
-    }
   }
 }

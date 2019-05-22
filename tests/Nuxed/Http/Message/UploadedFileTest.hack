@@ -2,9 +2,6 @@ namespace Nuxed\Test\Http\Message;
 
 use namespace Nuxed\Io;
 use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Message\Exception;
-use type Nuxed\Contract\Http\Message\StreamInterface;
-use type Nuxed\Contract\Http\Message\UploadedFileError;
 use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
@@ -12,7 +9,11 @@ use function Facebook\FBExpect\expect;
 class UploadedFileTest extends HackTest {
   public function testGetStreamReturnsOriginalStreamObject(): void {
     $stream = Message\stream('');
-    $upload = new Message\UploadedFile($stream, 0, UploadedFileError::ERROR_OK);
+    $upload = new Message\UploadedFile(
+      $stream,
+      0,
+      Message\UploadedFileError::ERROR_OK,
+    );
     expect($upload->getStream())->toBeSame($stream);
   }
 
@@ -21,7 +22,7 @@ class UploadedFileTest extends HackTest {
     $upload = new Message\UploadedFile(
       $stream,
       8,
-      UploadedFileError::ERROR_OK,
+      Message\UploadedFileError::ERROR_OK,
       'filename.txt',
       'text/plain',
     );
@@ -37,45 +38,53 @@ class UploadedFileTest extends HackTest {
 
   public async function testMoveCannotBeCalledMoreThanOnce(): Awaitable<void> {
     $stream = Message\stream('Foo bar!');
-    $upload = new Message\UploadedFile($stream, 0, UploadedFileError::ERROR_OK);
+    $upload = new Message\UploadedFile(
+      $stream,
+      0,
+      Message\UploadedFileError::ERROR_OK,
+    );
     $to = await Io\File::temporary('test');
     await $upload->moveTo($to->path()->toString());
     expect($to->exists())->toBeTrue();
     expect(() ==> $upload->moveTo($to->path()->toString()))
       ->toThrow(
-        Exception\UploadedFileAlreadyMovedException::class,
+        Message\Exception\UploadedFileAlreadyMovedException::class,
         'Cannot retrieve stream after it has already moved',
       );
   }
 
   public async function testCannotRetrieveStreamAfterMove(): Awaitable<void> {
     $stream = Message\stream('Foo bar!');
-    $upload = new Message\UploadedFile($stream, 0, UploadedFileError::ERROR_OK);
+    $upload = new Message\UploadedFile(
+      $stream,
+      0,
+      Message\UploadedFileError::ERROR_OK,
+    );
     $to = await Io\File::temporary('test');
     await $upload->moveTo($to->path()->toString());
     expect(() ==> {
       $upload->getStream();
     })->toThrow(
-      Exception\UploadedFileAlreadyMovedException::class,
+      Message\Exception\UploadedFileAlreadyMovedException::class,
       'Cannot retrieve stream after it has already moved',
     );
   }
 
-  public function nonOkErrorStatus(): Container<(UploadedFileError)> {
+  public function nonOkErrorStatus(): Container<(Message\UploadedFileError)> {
     return vec[
-      tuple(UploadedFileError::ERROR_EXCEEDS_MAX_INI_SIZE),
-      tuple(UploadedFileError::ERROR_EXCEEDS_MAX_FORM_SIZE),
-      tuple(UploadedFileError::ERROR_INCOMPLETE),
-      tuple(UploadedFileError::ERROR_NO_FILE),
-      tuple(UploadedFileError::ERROR_TMP_DIR_NOT_SPECIFIED),
-      tuple(UploadedFileError::ERROR_TMP_DIR_NOT_WRITEABLE),
-      tuple(UploadedFileError::ERROR_CANCELED_BY_EXTENSION),
+      tuple(Message\UploadedFileError::ERROR_EXCEEDS_MAX_INI_SIZE),
+      tuple(Message\UploadedFileError::ERROR_EXCEEDS_MAX_FORM_SIZE),
+      tuple(Message\UploadedFileError::ERROR_INCOMPLETE),
+      tuple(Message\UploadedFileError::ERROR_NO_FILE),
+      tuple(Message\UploadedFileError::ERROR_TMP_DIR_NOT_SPECIFIED),
+      tuple(Message\UploadedFileError::ERROR_TMP_DIR_NOT_WRITEABLE),
+      tuple(Message\UploadedFileError::ERROR_CANCELED_BY_EXTENSION),
     ];
   }
 
   <<DataProvider('nonOkErrorStatus')>>
   public function testConstructorDoesNotRaiseExceptionForInvalidStreamWhenErrorStatusPresent(
-    UploadedFileError $status,
+    Message\UploadedFileError $status,
   ): void {
     $uploadedFile = new Message\UploadedFile(Message\stream(''), 0, $status);
     expect($uploadedFile->getError())->toBeSame($status);
@@ -83,27 +92,27 @@ class UploadedFileTest extends HackTest {
 
   <<DataProvider('nonOkErrorStatus')>>
   public function testMoveToRaisesExceptionWhenErrorStatusPresent(
-    UploadedFileError $status,
+    Message\UploadedFileError $status,
   ): void {
     $uploadedFile = new Message\UploadedFile(Message\stream(''), 0, $status);
     expect(async () ==> {
       $to = await Io\File::temporary('test');
       await $uploadedFile->moveTo($to->path()->toString());
     })->toThrow(
-      Exception\UploadedFileErrorException::class,
+      Message\Exception\UploadedFileErrorException::class,
       'Cannot retrieve stream due to upload error',
     );
   }
 
   <<DataProvider('nonOkErrorStatus')>>
   public function testGetStreamRaisesExceptionWhenErrorStatusPresent(
-    UploadedFileError $status,
+    Message\UploadedFileError $status,
   ): void {
     $uploadedFile = new Message\UploadedFile(Message\stream(''), 0, $status);
     expect(() ==> {
       $stream = $uploadedFile->getStream();
     })->toThrow(
-      Exception\UploadedFileErrorException::class,
+      Message\Exception\UploadedFileErrorException::class,
       'Cannot retrieve stream due to upload error',
     );
   }

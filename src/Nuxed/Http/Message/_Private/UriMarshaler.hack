@@ -3,16 +3,15 @@ namespace Nuxed\Http\Message\_Private;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Regex;
+use namespace Nuxed\Http\Message;
 use namespace Nuxed\Http\Message\Exception;
-use type Nuxed\Contract\Http\Message\UriInterface;
-use type Nuxed\Http\Message\Uri;
 
 final class UriMarshaler {
   public function marshal(
     KeyedContainer<string, mixed> $server,
     KeyedContainer<string, Container<string>> $headers,
-  ): UriInterface {
-    $uri = new Uri('');
+  ): Message\Uri {
+    $uri = new Message\Uri('');
     // URI scheme
     $scheme = 'http';
     if (C\contains_key($server, 'HTTPS')) {
@@ -21,16 +20,6 @@ final class UriMarshaler {
       $https = $this->marshalHttpsValue($server['https']);
     } else {
       $https = false;
-    }
-
-    if (
-      $https ||
-      Str\lowercase(
-        $this->getHeadersFromMap('x-forwarded-proto', $headers, '') as string,
-      ) ===
-        'https'
-    ) {
-      $scheme = 'https';
     }
 
     $uri = $uri->withScheme($scheme);

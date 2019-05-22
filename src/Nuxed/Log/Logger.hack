@@ -1,15 +1,15 @@
 namespace Nuxed\Log;
 
-use type Nuxed\Contract\Log\LoggerInterface;
-use type Nuxed\Contract\Log\AbstractLogger;
-use type Nuxed\Contract\Log\LogLevel;
-use type Nuxed\Contract\Service\ResetInterface;
+use type Nuxed\Log\ILogger;
+use type Nuxed\Log\AbstractLogger;
+use type Nuxed\Log\LogLevel;
+use type Nuxed\Contract\IReset;
 use type DateTime;
 
-class Logger extends AbstractLogger implements LoggerInterface {
+class Logger extends AbstractLogger implements ILogger {
   public function __construct(
-    public Container<Handler\HandlerInterface> $handlers,
-    public Container<Processor\ProcessorInterface> $processors,
+    public Container<Handler\IHandler> $handlers,
+    public Container<Processor\IProcessor> $processors,
   ) {}
 
   <<__Override>>
@@ -70,13 +70,13 @@ class Logger extends AbstractLogger implements LoggerInterface {
   <<__Override>>
   public function reset(): void {
     foreach ($this->handlers as $handler) {
-      if ($handler is ResetInterface) {
+      if ($handler is IReset) {
         $handler->reset();
       }
     }
 
     foreach ($this->processors as $processor) {
-      if ($processor is ResetInterface) {
+      if ($processor is IReset) {
         $processor->reset();
       }
     }

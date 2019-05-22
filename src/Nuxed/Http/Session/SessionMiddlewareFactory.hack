@@ -1,15 +1,14 @@
 namespace Nuxed\Http\Session;
 
-use namespace His\Container;
-use namespace Nuxed\Contract\Service;
+use namespace Nuxed\Container;
 
 class SessionMiddlewareFactory
-  implements Service\FactoryInterface<SessionMiddleware> {
+  implements Container\IFactory<SessionMiddleware> {
   public function create(
-    Container\ContainerInterface $container,
+    Container\IServiceContainer $container,
   ): SessionMiddleware {
     return new SessionMiddleware(
-      $container->get(Persistence\SessionPersistenceInterface::class),
+      $container->get(Persistence\ISessionPersistence::class),
     );
   }
 }

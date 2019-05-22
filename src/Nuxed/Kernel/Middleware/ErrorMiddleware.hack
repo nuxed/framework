@@ -1,22 +1,19 @@
 namespace Nuxed\Kernel\Middleware;
 
-use type Nuxed\Kernel\Error\ErrorHandlerInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Throwable;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Kernel\Error;
 
-class ErrorMiddleware implements MiddlewareInterface {
-  public function __construct(private ErrorHandlerInterface $handler) {}
+class ErrorMiddleware implements Server\IMiddleware {
+  public function __construct(private Error\IErrorHandler $handler) {}
 
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
     try {
       return await $handler->handle($request);
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
       return await $this->handler->handle($e, $request);
     }
   }

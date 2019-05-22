@@ -1,10 +1,8 @@
 namespace Nuxed\Http\Router\Middleware;
 
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Router\RouteResultInterface;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Router;
 
 /**
  * Default dispatch middleware.
@@ -14,14 +12,14 @@ use type Nuxed\Contract\Http\Router\RouteResultInterface;
  *
  * Otherwise, it delegates processing to the route result.
  */
-class DispatchMiddleware implements MiddlewareInterface {
+class DispatchMiddleware implements Server\IMiddleware {
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
-    $routeResult = $request->getAttribute(RouteResultInterface::class);
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
+    $routeResult = $request->getAttribute(Router\RouteResult::class);
 
-    if ($routeResult is RouteResultInterface) {
+    if ($routeResult is Router\RouteResult) {
       $route = $routeResult->getMatchedRoute();
       if ($route is nonnull) {
         return await $route->getMiddleware()->process($request, $handler);

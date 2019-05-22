@@ -4,22 +4,19 @@ use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
-use type Nuxed\Cache\Serializer\SerializerInterface;
+use type Nuxed\Cache\Serializer\ISerializer;
 use type Nuxed\Cache\Serializer\DefaultSerializer;
 use type Nuxed\Cache\Exception\InvalidArgumentException;
-use type Redis;
-use function version_compare;
-use function preg_match;
 
 class RedisStore extends Store {
   public function __construct(
-    protected Redis $redis,
+    protected \Redis $redis,
     string $namespace = '',
     int $defaultTtl = 0,
-    protected SerializerInterface $serializer = new DefaultSerializer(),
+    protected ISerializer $serializer = new DefaultSerializer(),
   ) {
     $redis->ping();
-    if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace)) {
+    if (\preg_match('#[^-+_.A-Za-z0-9]#', $namespace)) {
       throw new InvalidArgumentException(
         'RedisStore namespace cannot contain any characters other than [-+_.A-Za-z0-9].',
       );
@@ -71,7 +68,7 @@ class RedisStore extends Store {
     $info = $this->redis->info('Server');
     $info = C\contains_key($info, 'Server') ? $info['Server'] : $info;
 
-    if (!version_compare($info['redis_version'], '2.8', '>=')) {
+    if (!\version_compare($info['redis_version'], '2.8', '>=')) {
       // As documented in Redis documentation (http://redis.io/commands/keys) using KEYS
       // can hang your server when it is executed against large databases (millions of items).
       // Whenever you hit this scale, you should really consider upgrading to Redis 2.8 or above.

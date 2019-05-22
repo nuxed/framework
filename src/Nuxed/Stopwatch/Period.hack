@@ -1,6 +1,5 @@
 namespace Nuxed\Stopwatch;
 
-use function memory_get_usage;
 
 class Period {
   private num $start;
@@ -19,7 +18,7 @@ class Period {
   ) {
     $this->start = $morePrecision ? (float)$start : (int)$start;
     $this->end = $morePrecision ? (float)$end : (int)$end;
-    $this->memory = memory_get_usage(true);
+    $this->memory = \memory_get_usage(true);
   }
 
   /**

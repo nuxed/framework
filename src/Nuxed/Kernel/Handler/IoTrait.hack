@@ -1,10 +1,10 @@
 namespace Nuxed\Kernel\Handler;
 
 use namespace Nuxed\Io;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
+use namespace Nuxed\Http\Server;
 
 trait IoTrait {
-  require implements RequestHandlerInterface;
+  require implements Server\IRequestHandler;
 
   protected function file(
     string $path,

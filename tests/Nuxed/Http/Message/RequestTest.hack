@@ -3,7 +3,6 @@ namespace Nuxed\Test\Http\Message;
 use namespace Nuxed\Http\Message;
 use namespace Nuxed\Http\Message\Exception;
 use type Facebook\HackTest\HackTest;
-use type Nuxed\Contract\Http\Message\StreamInterface;
 use function Facebook\FBExpect\expect;
 
 class RequestTest extends HackTest {
@@ -15,7 +14,7 @@ class RequestTest extends HackTest {
 
   public async function testNullBody(): Awaitable<void> {
     $r = new Message\Request('GET', Message\uri('/'), dict[], null);
-    expect($r->getBody())->toBeInstanceOf(StreamInterface::class);
+    expect($r->getBody())->toBeInstanceOf(Message\IStream::class);
     $body = await $r->getBody()->readAsync();
     expect($body)->toBeSame('');
   }

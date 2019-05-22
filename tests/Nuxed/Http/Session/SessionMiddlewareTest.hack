@@ -1,6 +1,6 @@
 namespace Nuxed\Test\Http\Session;
 
-use namespace Nuxed\Contract\Http;
+use namespace Nuxed\Http;
 use namespace Nuxed\Http\Session;
 use namespace Nuxed\Http\Server;
 use namespace Nuxed\Http\Message;
@@ -13,9 +13,8 @@ class SessionMiddlewareTest extends HackTest {
     $middleware = new Session\SessionMiddleware($persistence);
     $handler = Server\dh(
       async ($request, $response) ==> {
-        $session = $request->getAttribute('session');
-        expect($session)->toBeInstanceOf(Http\Session\SessionInterface::class);
-        $session as Http\Session\SessionInterface;
+        expect($request->hasSession())->toBeTrue();
+        $session = $request->getSession();
         expect($session->get('foo'))->toBeSame('bar');
         return $response->withAddedHeader('foo', vec['bar']);
       },
@@ -33,21 +32,19 @@ class SessionMiddlewareTest extends HackTest {
     expect($content)->toBeSame('foo');
     expect($resposne->getHeaderLine('foo'))->toBeSame('bar');
   }
-
 }
 
-class DummyPersistence
-  implements Session\Persistence\SessionPersistenceInterface {
+class DummyPersistence implements Session\Persistence\ISessionPersistence {
   public async function initialize(
-    Http\Message\ServerRequestInterface $request,
-  ): Awaitable<Http\Session\SessionInterface> {
+    Message\ServerRequest $request,
+  ): Awaitable<Session\Session> {
     return new Session\Session(dict['foo' => 'bar']);
   }
 
   public async function persist(
-    Http\Session\SessionInterface $session,
-    Http\Message\ResponseInterface $response,
-  ): Awaitable<Http\Message\ResponseInterface> {
+    Session\Session $session,
+    Message\Response $response,
+  ): Awaitable<Message\Response> {
     await $response->getBody()->writeAsync('foo');
     return $response;
   }

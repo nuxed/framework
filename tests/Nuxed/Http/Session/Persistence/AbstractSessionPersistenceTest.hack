@@ -5,9 +5,7 @@ use namespace Nuxed\Http\Session;
 use namespace Nuxed\Http\Message;
 use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
-use type Nuxed\Contract\Http\Message\CookieSameSite;
 use function Facebook\FBExpect\expect;
-use function time;
 
 type TCookieOptions = shape(
   'name' => string,
@@ -16,7 +14,7 @@ type TCookieOptions = shape(
   'domain' => string,
   'secure' => bool,
   'http_only' => bool,
-  'same_site' => CookieSameSite,
+  'same_site' => Message\CookieSameSite,
   ...
 );
 
@@ -79,7 +77,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     expect($httpCookie->getValue())->toNotBeSame('foo');
     if ($cookie['lifetime'] > 0) {
       expect($httpCookie->getExpires()?->getTimestamp() as int)
-        ->toBeLessThanOrEqualTo(time() + $cookie['lifetime']);
+        ->toBeLessThanOrEqualTo(\time() + $cookie['lifetime']);
     }
   }
 
@@ -126,7 +124,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     expect($httpCookie)->toNotBeNull();
     expect($httpCookie?->getExpires())->toNotBeNull();
     expect($httpCookie?->getExpires()?->getTimestamp() as num)->toBeLessThan(
-      time(),
+      \time(),
     );
   }
 
@@ -188,7 +186,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     TCookieOptions $cookie,
     ?Session\CacheLimiter $limiter,
     int $expiry,
-  ): Awaitable<Session\Persistence\SessionPersistenceInterface>;
+  ): Awaitable<Session\Persistence\ISessionPersistence>;
 
   abstract public function createSessionPersistenceWithPreviousData(
     TCookieOptions $cookie,
@@ -196,7 +194,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     int $expiry,
     string $id,
     KeyedContainer<string, mixed> $data,
-  ): Awaitable<Session\Persistence\SessionPersistenceInterface>;
+  ): Awaitable<Session\Persistence\ISessionPersistence>;
 
   public function providePersistenceConfigData(
   ): Container<(TCookieOptions, ?Session\CacheLimiter, int)> {
@@ -209,7 +207,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
           'domain' => 'example.com',
           'secure' => true,
           'http_only' => false,
-          'same_site' => CookieSameSite::STRICT,
+          'same_site' => Message\CookieSameSite::STRICT,
         ),
         null,
         120,
@@ -222,7 +220,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
           'domain' => 'example.com',
           'secure' => false,
           'http_only' => true,
-          'same_site' => CookieSameSite::LAX,
+          'same_site' => Message\CookieSameSite::LAX,
         ),
         null,
         0,
@@ -235,7 +233,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
           'domain' => 'example.com',
           'secure' => true,
           'http_only' => true,
-          'same_site' => CookieSameSite::STRICT,
+          'same_site' => Message\CookieSameSite::STRICT,
         ),
         Session\CacheLimiter::PUBLIC,
         120,
@@ -248,7 +246,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
           'domain' => 'example.com',
           'secure' => true,
           'http_only' => false,
-          'same_site' => CookieSameSite::STRICT,
+          'same_site' => Message\CookieSameSite::STRICT,
         ),
         Session\CacheLimiter::PRIVATE_NO_EXPIRE,
         120,
@@ -261,7 +259,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
           'domain' => 'example.com',
           'secure' => false,
           'http_only' => false,
-          'same_site' => CookieSameSite::STRICT,
+          'same_site' => Message\CookieSameSite::STRICT,
         ),
         Session\CacheLimiter::PRIVATE,
         120,
@@ -274,7 +272,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
           'domain' => 'example.com',
           'secure' => false,
           'http_only' => true,
-          'same_site' => CookieSameSite::LAX,
+          'same_site' => Message\CookieSameSite::LAX,
         ),
         Session\CacheLimiter::NOCACHE,
         120,

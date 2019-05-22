@@ -1,7 +1,6 @@
 namespace Nuxed\Test\Http\Server\Middleware;
 
 use namespace Nuxed\Http\Server;
-use namespace Nuxed\Contract\Http\Server as Contract;
 use type Facebook\HackTest\HackTest;
 use function Facebook\FBExpect\expect;
 
@@ -18,10 +17,8 @@ class RequestHandlerMiddlewareDecoratorTest extends HackTest {
       $handler,
     );
 
-    expect($middleware)->toBeInstanceOf(Contract\MiddlewareInterface::class);
-    expect($middleware)->toBeInstanceOf(
-      Contract\RequestHandlerInterface::class,
-    );
+    expect($middleware)->toBeInstanceOf(Server\IMiddleware::class);
+    expect($middleware)->toBeInstanceOf(Server\IRequestHandler::class);
 
     $response = await $middleware->process(
       $this->request('/'),

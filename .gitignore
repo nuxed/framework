@@ -1,2 +1,9 @@
+
+# Local folder
 local/
+
+# Composer vendor folder
 vendor/
+
+# HHAST parser cache files
+*.hhast.parser-cache

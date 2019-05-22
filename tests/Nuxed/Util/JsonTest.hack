@@ -97,7 +97,7 @@ class JsonTest extends HackTest {
 
   public function testEncodeThrowsWithMalformedUtf8(): void {
     expect(() ==> {
-      Json::encode(["bad utf\xFF"]);
+      Json::encode(vec["bad utf\xFF"]);
     })->toThrow(
       Exception\JsonEncodeException::class,
       'Malformed UTF-8 characters, possibly incorrectly encoded',
@@ -133,8 +133,8 @@ class JsonTest extends HackTest {
       ->toBeSame(
         "\"/I\u{F1}t\u{EB}rn\u{E2}ti\u{F4}n\u{E0}liz\u{E6}ti\u{F8}n\"",
       );
-    // Known issue.
-    // expect(Json::encode("\u{2028}\u{2029}"))->toBeSame('"\u2028\u2029"');
+
+    expect(Json::encode("\u{2028}\u{2029}"))->toBeSame("\"\u{2028}\u{2029}\"");
   }
 
   public function testDecodeThrowsWithInvalidSyntax(): void {

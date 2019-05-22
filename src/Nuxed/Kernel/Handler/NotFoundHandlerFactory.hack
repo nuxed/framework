@@ -1,12 +1,11 @@
 namespace Nuxed\Kernel\Handler;
 
-use namespace His\Container;
-use namespace Nuxed\Contract\Service;
+use namespace Nuxed\Container;
+use namespace Nuxed\Contract;
 
-class NotFoundHandlerFactory
-  implements Service\FactoryInterface<NotFoundHandler> {
+class NotFoundHandlerFactory implements Container\IFactory<NotFoundHandler> {
   public function create(
-    Container\ContainerInterface $_container,
+    Container\IServiceContainer $_container,
   ): NotFoundHandler {
     return new NotFoundHandler();
   }

@@ -1,11 +1,10 @@
 namespace Nuxed\Log\Handler;
 
-use type Nuxed\Log\Record;
-use type Nuxed\Contract\Log\LogLevel;
-use type Nuxed\Contract\Service\ResetInterface;
+use type Nuxed\Log\LogRecord;
+use type Nuxed\Log\LogLevel;
+use type Nuxed\Contract\IReset;
 
-abstract class AbstractHandler
-  implements FormattableHandlerInterface, ResetInterface {
+abstract class AbstractHandler implements IFormattableHandler, IReset {
   use FormattableHandlerTrait;
 
   const dict<LogLevel, int> LEVELS = dict[
@@ -28,14 +27,14 @@ abstract class AbstractHandler
     public bool $bubble = true,
   ) {}
 
-  public function isHandling(Record $record): bool {
+  public function isHandling(LogRecord $record): bool {
     $minimum = static::LEVELS[$this->level];
     $level = static::LEVELS[$record['level']];
 
     return $level >= $minimum;
   }
 
-  public function handle(Record $record): bool {
+  public function handle(LogRecord $record): bool {
     if (!$this->isHandling($record)) {
       return false;
     }
@@ -50,13 +49,13 @@ abstract class AbstractHandler
   /**
    * Writes the record down to the log of the implementing handler
    */
-  abstract protected function write(Record $record): void;
+  abstract protected function write(LogRecord $record): void;
 
   public function close(): void {
   }
 
   public function reset(): void {
-    if ($this->formatter is ResetInterface) {
+    if ($this->formatter is IReset) {
       $this->formatter->reset();
     }
   }

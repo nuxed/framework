@@ -1,17 +1,14 @@
 namespace Nuxed\Kernel\Error;
 
-use namespace Nuxed\Http\Message\Response;
+use namespace Nuxed\Kernel\Event;
 use namespace Nuxed\Http\Message;
-use namespace Nuxed\Contract\Event;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Kernel\Event\ErrorEvent;
-use type Throwable;
+use namespace Nuxed\EventDispatcher;
+use namespace Nuxed\Http\Message\Response;
 
-class ErrorHandler implements ErrorHandlerInterface {
+class ErrorHandler implements IErrorHandler {
   public function __construct(
     protected bool $debug,
-    protected Event\EventDispatcherInterface $events,
+    protected EventDispatcher\IEventDispatcher $events,
   ) {}
 
   /**
@@ -24,10 +21,11 @@ class ErrorHandler implements ErrorHandlerInterface {
    * @link https://labs.omniti.com/labs/jsend
    */
   public async function handle(
-    Throwable $error,
-    ServerRequestInterface $request,
-  ): Awaitable<ResponseInterface> {
-    $event = await $this->events->dispatch(new ErrorEvent($error, $request));
+    \Throwable $error,
+    Message\ServerRequest $request,
+  ): Awaitable<Message\Response> {
+    $event = await $this->events
+      ->dispatch(new Event\ErrorEvent($error, $request));
 
     if ($event->response is nonnull) {
       return $event->response;

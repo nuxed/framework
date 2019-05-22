@@ -87,9 +87,7 @@ class PathPackageTest extends HackTest {
     );
   }
 
-  private function getContext(
-    string $basePath,
-  ): Asset\Context\ContextInterface {
+  private function getContext(string $basePath): Asset\Context\IContext {
     return new Asset\Context\Context($basePath, false);
   }
 }

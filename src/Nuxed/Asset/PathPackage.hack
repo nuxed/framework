@@ -1,8 +1,8 @@
 namespace Nuxed\Asset;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Asset\Context\ContextInterface;
-use type Nuxed\Asset\VersionStrategy\VersionStrategyInterface;
+use type Nuxed\Asset\Context\IContext;
+use type Nuxed\Asset\VersionStrategy\IVersionStrategy;
 
 /**
  * Package that adds a base path to asset URLs in addition to a version.
@@ -17,13 +17,13 @@ class PathPackage extends Package {
 
   /**
    * @param string                   $basePath        The base path to be prepended to relative paths
-   * @param VersionStrategyInterface $versionStrategy The version strategy
-   * @param ContextInterface|null    $context         The context
+   * @param IVersionStrategy $versionStrategy The version strategy
+   * @param IContext|null    $context         The context
    */
   public function __construct(
     string $basePath,
-    VersionStrategyInterface $versionStrategy,
-    ContextInterface $context = new Context\NullContext(),
+    IVersionStrategy $versionStrategy,
+    IContext $context = new Context\NullContext(),
   ) {
     parent::__construct($versionStrategy, $context);
 

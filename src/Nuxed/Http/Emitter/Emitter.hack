@@ -1,18 +1,17 @@
 namespace Nuxed\Http\Emitter;
 
-use namespace Nuxed\Contract\Http\Emitter;
-use namespace Nuxed\Contract\Http\Message;
+use namespace Nuxed\Http\Message;
 
-final class Emitter implements Emitter\EmitterInterface {
-  private Emitter\EmitterInterface $sapi;
-  private Emitter\EmitterInterface $stream;
+final class Emitter implements IEmitter {
+  private IEmitter $sapi;
+  private IEmitter $stream;
 
   public function __construct(MaxBufferLength $length = 8192) {
     $this->sapi = new SapiEmitter();
     $this->stream = new SapiStreamEmitter($length);
   }
 
-  public function emit(Message\ResponseInterface $response): Awaitable<bool> {
+  public function emit(Message\Response $response): Awaitable<bool> {
     if (
       !$response->hasHeader('Content-Disposition') &&
       !$response->hasHeader('Content-Range')

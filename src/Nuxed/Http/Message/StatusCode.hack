@@ -22,7 +22,7 @@ namespace Nuxed\Http\Message;
  * @see https://tools.ietf.org/html/rfc8297#section-2
  * @see https://tools.ietf.org/html/rfc8470#section-7
  */
-final class StatusCode {
+final abstract class StatusCode {
   // Informational 1xx
   const STATUS_CONTINUE = 100;
   const STATUS_SWITCHING_PROTOCOLS = 101;
@@ -91,6 +91,4 @@ final class StatusCode {
   const STATUS_LOOP_DETECTED = 508;
   const STATUS_NOT_EXTENDED = 510;
   const STATUS_NETWORK_AUTHENTICATION_REQUIRED = 511;
-
-  private function __construct() {}
 }

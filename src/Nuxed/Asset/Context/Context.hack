@@ -1,6 +1,6 @@
 namespace Nuxed\Asset\Context;
 
-class Context implements ContextInterface {
+class Context implements IContext {
   public function __construct(private string $basePath, private bool $secure) {}
 
   /**

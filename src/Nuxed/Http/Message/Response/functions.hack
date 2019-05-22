@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Message\Response;
 
 use namespace Nuxed\Http\Message\_Private;
-use namespace Nuxed\Contract\Http\Message as Contract;
 use namespace Nuxed\Http\Message;
 
 /**
@@ -14,7 +13,7 @@ function text(
   \Stringish $text,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
-): Contract\ResponseInterface {
+): Message\Response {
   return new Message\Response(
     $status,
     _Private\inject_content_type_in_headers(
@@ -35,7 +34,7 @@ function html(
   \Stringish $html,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
-): Contract\ResponseInterface {
+): Message\Response {
   return new Message\Response(
     $status,
     _Private\inject_content_type_in_headers(
@@ -56,7 +55,7 @@ function xml(
   \Stringish $xml,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
-): Contract\ResponseInterface {
+): Message\Response {
   return new Message\Response(
     $status,
     _Private\inject_content_type_in_headers(
@@ -76,10 +75,10 @@ function xml(
  * Note: this function overwrites the `location` $headers value.
  */
 function redirect(
-  Contract\UriInterface $uri,
+  Message\Uri $uri,
   int $status = 302,
   KeyedContainer<string, Container<string>> $headers = dict[],
-): Contract\ResponseInterface {
+): Message\Response {
   $headers = dict($headers);
   $headers['location'] = vec[
     $uri->toString(),
@@ -96,7 +95,7 @@ function redirect(
 function empty(
   int $status = 204,
   KeyedContainer<string, Container<string>> $headers = dict[],
-): Contract\ResponseInterface {
+): Message\Response {
   $body = new Message\Stream(\fopen('php://temp', 'rb+'));
   return new Message\Response($status, $headers, $body);
 }

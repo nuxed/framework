@@ -1,7 +1,5 @@
 namespace Nuxed\Http\Message;
 
-use namespace Nuxed\Contract\Http\Message as Contract;
-
 function cookie(
   string $value,
   ?\DateTimeInterface $expires = null,
@@ -9,8 +7,8 @@ function cookie(
   ?string $domain = null,
   bool $secure = false,
   bool $httpOnly = false,
-  ?Contract\CookieSameSite $sameSite = null,
-): Contract\CookieInterface {
+  ?CookieSameSite $sameSite = null,
+): Cookie {
   return new Cookie(
     $value,
     $expires,
@@ -24,25 +22,25 @@ function cookie(
 
 function request(
   string $method,
-  Contract\UriInterface $uri,
+  Uri $uri,
   KeyedContainer<string, Container<string>> $headers = dict[],
-  ?Contract\StreamInterface $body = null,
+  ?IStream $body = null,
   string $version = '1.1',
-): Contract\RequestInterface {
+): Request {
   return new Request($method, $uri, $headers, $body, $version);
 }
 
 function response(
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
-  ?Contract\StreamInterface $body = null,
+  ?IStream $body = null,
   string $version = '1.1',
   ?string $reason = null,
-): Contract\ResponseInterface {
+): Response {
   return new Response($status, $headers, $body, $version, $reason);
 }
 
-function stream(\Stringish $content): Contract\StreamInterface {
+function stream(\Stringish $content): IStream {
   $handle = \fopen('php://memory', 'wb+');
   \fwrite($handle, (string)$content);
   $stream = new Stream($handle);
@@ -50,6 +48,6 @@ function stream(\Stringish $content): Contract\StreamInterface {
   return $stream;
 }
 
-function uri(string $uri): Contract\UriInterface {
+function uri(string $uri): Uri {
   return new Uri($uri);
 }

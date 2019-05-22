@@ -17,7 +17,7 @@ use namespace Nuxed\Asset\Exception;
  *
  * You could then ask for the version of "main.js" or "css/styles.css".
  */
-class JsonManifestVersionStrategy implements VersionStrategyInterface {
+class JsonManifestVersionStrategy implements IVersionStrategy {
   const type TManifest = KeyedContainer<string, string>;
   private ?KeyedContainer<string, string> $manifestData;
 

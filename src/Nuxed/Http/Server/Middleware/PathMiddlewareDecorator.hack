@@ -1,26 +1,23 @@
 namespace Nuxed\Http\Server\Middleware;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Http\Server\RequestHandler\CallableRequestHandlerDecorator;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Message;
 
-final class PathMiddlewareDecorator implements MiddlewareInterface {
+final class PathMiddlewareDecorator implements Server\IMiddleware {
   private string $prefix;
 
   public function __construct(
     string $prefix,
-    private MiddlewareInterface $middleware,
+    private Server\IMiddleware $middleware,
   ) {
     $this->prefix = $this->normalizePrefix($prefix);
   }
 
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
     $path = $request->getUri()->getPath();
     $path = $path === '' ? '/' : $path;
 
@@ -67,8 +64,8 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
   }
 
   private function prepareRequestWithTruncatedPrefix(
-    ServerRequestInterface $request,
-  ): ServerRequestInterface {
+    Message\ServerRequest $request,
+  ): Message\ServerRequest {
     $uri = $request->getUri();
     $path = $this->getTruncatedPath($this->prefix, $uri->getPath());
     $new = $uri->withPath($path);
@@ -86,15 +83,15 @@ final class PathMiddlewareDecorator implements MiddlewareInterface {
   }
 
   private function prepareHandlerForOriginalRequest(
-    RequestHandlerInterface $handler,
-  ): RequestHandlerInterface {
+    Server\IRequestHandler $handler,
+  ): Server\IRequestHandler {
     $callable = async ($request) ==> {
       $uri = $request->getUri();
       $uri = $uri->withPath($this->prefix.$uri->getPath());
       return await $handler->handle($request->withUri($uri));
     };
 
-    return new CallableRequestHandlerDecorator($callable);
+    return new Server\RequestHandler\CallableRequestHandlerDecorator($callable);
   }
 
   /**

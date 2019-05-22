@@ -3,7 +3,7 @@ namespace Nuxed\Asset\VersionStrategy;
 /**
  * Disable version for all assets.
  */
-class EmptyVersionStrategy implements VersionStrategyInterface {
+class EmptyVersionStrategy implements IVersionStrategy {
   /**
    * {@inheritdoc}
    */

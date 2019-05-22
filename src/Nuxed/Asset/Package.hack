@@ -1,17 +1,17 @@
 namespace Nuxed\Asset;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Asset\Context\ContextInterface;
+use type Nuxed\Asset\Context\IContext;
 use type Nuxed\Asset\Context\NullContext;
-use type Nuxed\Asset\VersionStrategy\VersionStrategyInterface;
+use type Nuxed\Asset\VersionStrategy\IVersionStrategy;
 
 /**
  * Basic package that adds a version to asset URLs.
  */
-class Package implements PackageInterface {
+class Package implements IPackage {
   public function __construct(
-    private VersionStrategyInterface $versionStrategy,
-    private ContextInterface $context = new NullContext(),
+    private IVersionStrategy $versionStrategy,
+    private IContext $context = new NullContext(),
   ) {
   }
 
@@ -33,11 +33,11 @@ class Package implements PackageInterface {
     return $this->versionStrategy->applyVersion($path);
   }
 
-  protected function getContext(): ContextInterface {
+  protected function getContext(): IContext {
     return $this->context;
   }
 
-  protected function getVersionStrategy(): VersionStrategyInterface {
+  protected function getVersionStrategy(): IVersionStrategy {
     return $this->versionStrategy;
   }
 

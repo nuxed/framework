@@ -1,14 +1,12 @@
 namespace Nuxed\Kernel\Handler;
 
 use namespace Nuxed\Http\Message;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
+use namespace Nuxed\Http\Server;
 
-class NotFoundHandler implements RequestHandlerInterface {
+class NotFoundHandler implements Server\IRequestHandler {
   public async function handle(
-    ServerRequestInterface $_request,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $_,
+  ): Awaitable<Message\Response> {
     return new Message\Response\JsonResponse(
       dict[
         'status' => 'error',

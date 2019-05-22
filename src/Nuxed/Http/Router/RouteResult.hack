@@ -1,12 +1,9 @@
 namespace Nuxed\Http\Router;
 
-use type Nuxed\Contract\Http\Router\RouteResultInterface;
-use type Nuxed\Contract\Http\Router\RouteInterface;
-
 /**
  * Value object representing the results of routing.
  *
- * RouterInterface::match() is defined as returning a RouteResult instance,
+ * IRouter::match() is defined as returning a RouteResult instance,
  * which will contain the following state:
  *
  * - isSuccess()/isFailure() indicate whether routing succeeded or not.
@@ -23,14 +20,14 @@ use type Nuxed\Contract\Http\Router\RouteInterface;
  * RouteResult instances are consumed by the Application in the routing
  * middleware.
  */
-final class RouteResult implements RouteResultInterface {
+final class RouteResult {
   private ?Container<string> $allowedMethods = null;
 
   private KeyedContainer<string, mixed> $matchedParams = dict[];
 
   private ?string $matchedRouteName = null;
 
-  private ?RouteInterface $route = null;
+  private ?Route $route = null;
 
   private bool $success = false;
 
@@ -40,7 +37,7 @@ final class RouteResult implements RouteResultInterface {
    * @param dict $params Parameters associated with the matched route, if any.
    */
   public static function fromRoute(
-    RouteInterface $route,
+    Route $route,
     KeyedContainer<string, mixed> $params = dict[],
   ): this {
     $result = new static();
@@ -78,7 +75,7 @@ final class RouteResult implements RouteResultInterface {
    * @return null|Route null if representing a routing failure;
    *     null if not created via fromRoute(); Route instance otherwise.
    */
-  public function getMatchedRoute(): ?RouteInterface {
+  public function getMatchedRoute(): ?Route {
     return $this->isFailure() ? null : $this->route;
   }
 
@@ -93,7 +90,7 @@ final class RouteResult implements RouteResultInterface {
       return null;
     }
 
-    if (null === $this->matchedRouteName && $this->route is RouteInterface) {
+    if (null === $this->matchedRouteName && $this->route is Route) {
       $this->matchedRouteName = $this->route->getName();
     }
 

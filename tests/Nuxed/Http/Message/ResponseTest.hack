@@ -4,7 +4,6 @@ use namespace HH\Lib\C;
 use namespace Nuxed\Http\Message;
 use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
-use type Nuxed\Contract\Http\Message\StreamInterface;
 use function Facebook\FBExpect\expect;
 
 class ResponseTest extends HackTest {
@@ -14,7 +13,7 @@ class ResponseTest extends HackTest {
     expect($r->getProtocolVersion())->toBeSame('1.1');
     expect($r->getReasonPhrase())->toBeSame('OK');
     expect($r->getHeaders())->toBeEmpty();
-    expect($r->getBody())->toBeInstanceOf(StreamInterface::class);
+    expect($r->getBody())->toBeInstanceOf(Message\IStream::class);
     $content = await $r->getBody()->readAsync();
     expect($content)->toBeSame('');
   }
@@ -35,7 +34,7 @@ class ResponseTest extends HackTest {
   public async function testCanConstructWithBody(): Awaitable<void> {
     $r = new Message\Response(200, dict[], Message\stream('baz'));
     $b = $r->getBody();
-    expect($b)->toBeInstanceOf(StreamInterface::class);
+    expect($b)->toBeInstanceOf(Message\IStream::class);
     $content = await $b->readAsync();
     expect($content)->toBeSame('baz');
   }
@@ -43,7 +42,7 @@ class ResponseTest extends HackTest {
   public async function testNullBody(): Awaitable<void> {
     $r = new Message\Response(200, dict[], null);
     $b = $r->getBody();
-    expect($b)->toBeInstanceOf(StreamInterface::class);
+    expect($b)->toBeInstanceOf(Message\IStream::class);
     $content = await $b->readAsync();
     expect($content)->toBeSame('');
   }
@@ -89,7 +88,7 @@ class ResponseTest extends HackTest {
   public async function testWithBody(): Awaitable<void> {
     $b = Message\stream('0');
     $r = (new Message\Response())->withBody($b);
-    expect($r->getBody())->toBeInstanceOf(StreamInterface::class);
+    expect($r->getBody())->toBeInstanceOf(Message\IStream::class);
     expect($r->getBody())->toBeSame($b);
     $content = await $r->getBody()->readAsync();
     expect($content)->toBeSame('0');

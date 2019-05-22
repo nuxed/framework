@@ -1,15 +1,14 @@
 namespace Nuxed\Test\Event;
 
 use namespace HH\Asio;
-use namespace Nuxed\Event;
-use namespace Nuxed\Contract\Event as Contract;
+use namespace Nuxed\EventDispatcher;
 use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
 
 class EventDispatcherTest extends HackTest {
   public async function testDispatch(): Awaitable<void> {
-    $events = new Event\EventDispatcher();
+    $events = new EventDispatcher\EventDispatcher();
     $events->on(SillyEvent::class, async ($event) ==> {
       $event->value .= 'a';
     });
@@ -21,7 +20,7 @@ class EventDispatcherTest extends HackTest {
   }
 
   public async function testEventsPriorities(): Awaitable<void> {
-    $events = new Event\EventDispatcher();
+    $events = new EventDispatcher\EventDispatcher();
     $events->on(
       SillyEvent::class,
       async ($event) ==> {
@@ -41,7 +40,7 @@ class EventDispatcherTest extends HackTest {
   }
 
   public async function testDispatcherOrder(): Awaitable<void> {
-    $events = new Event\EventDispatcher();
+    $events = new EventDispatcher\EventDispatcher();
     $events->on(
       SillyEvent::class,
       async ($event) ==> {
@@ -69,7 +68,7 @@ class EventDispatcherTest extends HackTest {
   }
 
   public async function testForget(): Awaitable<void> {
-    $events = new Event\EventDispatcher();
+    $events = new EventDispatcher\EventDispatcher();
     $events->on(SillyEvent::class, async ($event) ==> {
       $event->value = 'called';
     });
@@ -79,7 +78,7 @@ class EventDispatcherTest extends HackTest {
   }
 
   public async function testStoppableEvent(): Awaitable<void> {
-    $events = new Event\EventDispatcher();
+    $events = new EventDispatcher\EventDispatcher();
     $events->on(StoppableSillyEvent::class, async ($event) ==> {
       $event->stopped = true;
     });
@@ -91,7 +90,7 @@ class EventDispatcherTest extends HackTest {
   }
 
   public async function testStoppableEventSleeps(): Awaitable<void> {
-    $events = new Event\EventDispatcher();
+    $events = new EventDispatcher\EventDispatcher();
     $events->on(StoppableSillyEvent::class, async ($event) ==> {
       await Asio\usleep(100);
       $event->stopped = true;
@@ -105,7 +104,7 @@ class EventDispatcherTest extends HackTest {
 
   public async function testListenersAreNotCalledIfEventIsAlreadyStopped(
   ): Awaitable<void> {
-    $events = new Event\EventDispatcher();
+    $events = new EventDispatcher\EventDispatcher();
     $events->on(StoppableSillyEvent::class, async ($event) ==> {
       $event->value = 'called';
     });
@@ -115,13 +114,13 @@ class EventDispatcherTest extends HackTest {
 }
 
 <<__Sealed(StoppableSillyEvent::class)>>
-class SillyEvent implements Contract\EventInterface {
+class SillyEvent implements EventDispatcher\IEvent {
   public string $value = '';
 }
 
 final class StoppableSillyEvent
   extends SillyEvent
-  implements Contract\StoppableEventInterface {
+  implements EventDispatcher\IStoppableEvent {
   public function __construct(public bool $stopped = false) {}
 
   public function isPropagationStopped(): bool {

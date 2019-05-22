@@ -1,6 +1,6 @@
 namespace Nuxed\Cache\Store;
 
-class NullStore implements StoreInterface {
+class NullStore implements IStore {
   /**
    * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
    */

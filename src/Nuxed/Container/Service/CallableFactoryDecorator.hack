@@ -1,14 +1,13 @@
 namespace Nuxed\Container\Service;
 
-use namespace Nuxed\Contract\Service;
-use type His\Container\ContainerInterface;
+use namespace Nuxed\Container;
 
-class CallableFactoryDecorator<T> implements Service\FactoryInterface<T> {
+class CallableFactoryDecorator<T> implements Container\IFactory<T> {
   public function __construct(
-    private (function(ContainerInterface): T) $call,
+    private (function(Container\IServiceContainer): T) $call,
   ) {}
 
-  public function create(ContainerInterface $container): T {
+  public function create(Container\IServiceContainer $container): T {
     $call = $this->call;
 
     return $call($container);

@@ -3,7 +3,6 @@ namespace Nuxed\Cache\Store;
 use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
-use function microtime;
 
 class ArrayStore extends Store {
   public function __construct(
@@ -25,7 +24,7 @@ class ArrayStore extends Store {
   ): Awaitable<bool> {
     $this->cache[$id] = shape(
       'value' => $value,
-      'expiry' => 0 === $ttl ? 0.0 : microtime(true) + $ttl,
+      'expiry' => 0 === $ttl ? 0.0 : \microtime(true) + $ttl,
     );
 
     return true;
@@ -43,7 +42,7 @@ class ArrayStore extends Store {
       return true;
     }
 
-    $expired = $expiry <= microtime(true);
+    $expired = $expiry <= \microtime(true);
 
     if ($expired) {
       unset($this->cache[$id]);

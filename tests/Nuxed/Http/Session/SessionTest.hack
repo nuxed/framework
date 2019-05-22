@@ -47,7 +47,7 @@ class SessionTest extends HackTest {
     expect($session->items())->toBeSame(dict['foo' => 'bar']);
   }
 
-  public function testRemove(): void {
+  public function testForget(): void {
     $session = new Session\Session(dict[
       'foo' => 'bar',
       'bar' => 'baz',
@@ -55,11 +55,11 @@ class SessionTest extends HackTest {
       'qux' => 'foo',
     ]);
     expect($session->contains('foo'))->toBeTrue();
-    $session->remove('foo');
+    $session->forget('foo');
     expect($session->contains('foo'))->toBeFalse();
     expect($session->changed())->toBeTrue();
     expect($session->contains('bar'))->toBeTrue();
-    $session->remove('bar');
+    $session->forget('bar');
     expect($session->contains('bar'))->toBeFalse();
     expect($session->items())->toBeSame(dict[
       'baz' => 'qux',
@@ -120,7 +120,7 @@ class SessionTest extends HackTest {
     expect($session->changed())->toBeFalse();
     $session->set('foo', 'bar');
     expect($session->changed())->toBeTrue();
-    $session->remove('foo');
+    $session->forget('foo');
     expect($session->changed())->toBeFalse();
   }
 

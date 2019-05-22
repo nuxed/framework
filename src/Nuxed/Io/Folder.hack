@@ -5,12 +5,6 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
 use type Nuxed\Io\Exception\InvalidPathException;
-use type Exception;
-use type GlobIterator;
-use type DirectoryIterator;
-use type FilesystemIterator;
-use function mkdir;
-use function rmdir;
 
 final class Folder extends Node {
   /**
@@ -77,7 +71,7 @@ final class Folder extends Node {
   private async function chop(
     (function(Node): Awaitable<bool>) $op,
   ): Awaitable<bool> {
-    $iterator = new DirectoryIterator($this->path->toString());
+    $iterator = new \DirectoryIterator($this->path->toString());
     $awaitables = vec[];
     foreach ($iterator as $node) {
       if ($node->isDot()) {
@@ -103,7 +97,7 @@ final class Folder extends Node {
       );
     }
 
-    $ret = @mkdir($this->path->toString(), $mode, true) as bool;
+    $ret = @\mkdir($this->path->toString(), $mode, true) as bool;
     $this->reset();
     return $ret;
   }
@@ -168,7 +162,7 @@ final class Folder extends Node {
   public async function delete(): Awaitable<bool> {
     $this->isAvailable();
     await $this->flush();
-    $deleted = @rmdir($this->path->toString()) as bool;
+    $deleted = @\rmdir($this->path->toString()) as bool;
     $this->reset();
     return $deleted;
   }
@@ -216,14 +210,14 @@ final class Folder extends Node {
 
     try {
       $directory = $this->path->toString();
-      $flags = FilesystemIterator::SKIP_DOTS |
-        FilesystemIterator::UNIX_PATHS |
-        FilesystemIterator::NEW_CURRENT_AND_KEY;
-      $iterator = new GlobIterator(
+      $flags = \FilesystemIterator::SKIP_DOTS |
+        \FilesystemIterator::UNIX_PATHS |
+        \FilesystemIterator::NEW_CURRENT_AND_KEY;
+      $iterator = new \GlobIterator(
         Path::standard($directory, true).$pattern,
         $flags,
       );
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       throw new Exception\ReadErrorException(
         Str\format(
           'Error while reading from folder (%s).',
@@ -289,12 +283,12 @@ final class Folder extends Node {
 
     try {
       $directory = $this->path->toString();
-      $flags = FilesystemIterator::SKIP_DOTS |
-        FilesystemIterator::UNIX_PATHS |
-        FilesystemIterator::NEW_CURRENT_AND_KEY;
+      $flags = \FilesystemIterator::SKIP_DOTS |
+        \FilesystemIterator::UNIX_PATHS |
+        \FilesystemIterator::NEW_CURRENT_AND_KEY;
 
-      $iterator = new FilesystemIterator($directory, $flags);
-    } catch (Exception $e) {
+      $iterator = new \FilesystemIterator($directory, $flags);
+    } catch (\Exception $e) {
       throw new Exception\ReadErrorException(
         Str\format(
           'Error while reading from folder (%s).',

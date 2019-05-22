@@ -1,13 +1,13 @@
 namespace Nuxed\Log\Processor;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Log\Record;
+use type Nuxed\Log\LogRecord;
 
 
-class MessageLengthProcessor implements ProcessorInterface {
+class MessageLengthProcessor implements IProcessor {
   public function __construct(protected int $maxLength = 1024) {}
 
-  public function process(Record $record): Record {
+  public function process(LogRecord $record): LogRecord {
     if (Str\length($record['message']) <= $this->maxLength) {
       return $record;
     }

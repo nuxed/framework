@@ -2,5 +2,5 @@ namespace Nuxed\Http\Message\Exception;
 
 final class UnrecognizedProtocolVersionException
   extends \UnexpectedValueException
-  implements ExceptionInterface {
+  implements IException {
 }

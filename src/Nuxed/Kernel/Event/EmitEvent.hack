@@ -1,8 +1,8 @@
 namespace Nuxed\Kernel\Event;
 
-use type Nuxed\Contract\Event\EventInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\EventDispatcher;
 
-class EmitEvent implements EventInterface {
-  public function __construct(public ResponseInterface $response) {}
+final class EmitEvent implements EventDispatcher\IEvent {
+  public function __construct(public Message\Response $response) {}
 }

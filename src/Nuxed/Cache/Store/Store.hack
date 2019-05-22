@@ -5,12 +5,8 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\SecureRandom;
 use namespace Nuxed\Cache\_Private;
-use function pack;
-use function base64_encode;
-use function time;
-use function hash;
 
-abstract class Store implements StoreInterface {
+abstract class Store implements IStore {
   protected dict<string, string> $ids = dict[];
   protected dict<string, shape('value' => mixed, 'ttl' => ?int, ...)>
     $deferred = dict[];
@@ -116,7 +112,7 @@ abstract class Store implements StoreInterface {
     $this->deferred = dict[];
     if ($cleared = $this->versioningIsEnabled) {
       $namespaceVersion = Str\splice(
-        base64_encode(pack('V', SecureRandom\int())),
+        \base64_encode(\pack('V', SecureRandom\int())),
         ':',
         5,
       );
@@ -196,7 +192,7 @@ abstract class Store implements StoreInterface {
         $this->namespaceVersion = $namespaceVersion as string;
         if ('1:' === $this->namespaceVersion) {
           $this->namespaceVersion = Str\splice(
-            base64_encode(pack('V', time())),
+            \base64_encode(\pack('V', \time())),
             ':',
             5,
           );
@@ -225,7 +221,7 @@ abstract class Store implements StoreInterface {
     if (Str\length($id) > $max) {
       // Use MD5 to favor speed over security, which is not an issue here
       $this->ids[$key] = $id = Str\splice(
-        base64_encode(hash('md5', $key, true)),
+        \base64_encode(\hash('md5', $key, true)),
         ':',
         -(Str\length($this->namespaceVersion) + 2),
       );

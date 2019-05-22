@@ -1,7 +1,6 @@
 namespace Nuxed\Test\Http\Message;
 
 use namespace Nuxed\Http\Message;
-use type Nuxed\Contract\Http\Message\CookieSameSite;
 use type Facebook\HackTest\HackTest;
 use function Facebook\FBExpect\expect;
 
@@ -14,7 +13,7 @@ class CookieTest extends HackTest {
       'www.facebook.com',
       true,
       true,
-      $s = CookieSameSite::STRICT,
+      $s = Message\CookieSameSite::STRICT,
     );
     expect($cookie->getValue())->toBeSame('hello');
     expect($cookie->getExpires())->toBeSame($e);
@@ -91,8 +90,8 @@ class CookieTest extends HackTest {
       false,
       null,
     );
-    $sss = CookieSameSite::STRICT;
-    $ssl = CookieSameSite::LAX;
+    $sss = Message\CookieSameSite::STRICT;
+    $ssl = Message\CookieSameSite::LAX;
     expect($cookie->getSameSite())->toBeNull();
     $cookie2 = $cookie->withSameSite($sss);
     expect($cookie2)->toNotBeSame($cookie);

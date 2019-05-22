@@ -3,12 +3,9 @@ namespace Nuxed\Http\Message;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Regex;
-use type Nuxed\Contract\Http\Message\UriInterface;
 use type Nuxed\Util\StringableTrait;
-use function parse_url;
-use function rawurlencode;
 
-final class Uri implements UriInterface {
+final class Uri {
   use StringableTrait;
 
   private static dict<string, int> $schemes = dict[
@@ -32,7 +29,7 @@ final class Uri implements UriInterface {
 
   public function __construct(string $uri = '') {
     if ('' !== $uri) {
-      $parts = parse_url($uri);
+      $parts = \parse_url($uri);
 
       if (false === $parts) {
         throw new Exception\InvalidArgumentException(
@@ -309,7 +306,7 @@ final class Uri implements UriInterface {
     return Regex\replace_with(
       $path,
       re"/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=%:@\/]++|%(?![A-Fa-f0-9]{2}))/",
-      ($match) ==> rawurlencode($match[0]),
+      ($match) ==> \rawurlencode($match[0]),
     );
   }
 
@@ -317,7 +314,7 @@ final class Uri implements UriInterface {
     return Regex\replace_with(
       $str,
       re"/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=%:@\/\?]++|%(?![A-Fa-f0-9]{2}))/",
-      ($match) ==> rawurlencode($match[0]),
+      ($match) ==> \rawurlencode($match[0]),
     );
   }
 }

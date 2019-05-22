@@ -1,24 +1,10 @@
 namespace Nuxed\Http\Session\Persistence;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Http\Session\CacheLimiter;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Session\SessionInterface;
-use type Nuxed\Contract\Http\Message\CookieSameSite;
-use type Nuxed\Http\Message\Cookie;
-use type Nuxed\Http\Session\Session;
-use type DateTimeImmutable;
-use type DateInterval;
-use function strftime;
-use function file_exists;
-use function filemtime;
-use function bin2hex;
-use function random_bytes;
-use function time;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Session;
 
-abstract class AbstractSessionPersistence
-  implements SessionPersistenceInterface {
+abstract class AbstractSessionPersistence implements ISessionPersistence {
   /**
    * This unusual past date value is taken from the hhvm source code and
    * used "as is" for consistency.
@@ -42,35 +28,35 @@ abstract class AbstractSessionPersistence
     'domain' => ?string,
     'secure' => bool,
     'http_only' => bool,
-    'same_site' => CookieSameSite,
+    'same_site' => Message\CookieSameSite,
     ...
   );
 
   protected this::TCookieOptions $cookieOptions;
-  protected ?CacheLimiter $cacheLimiter;
+  protected ?Session\CacheLimiter $cacheLimiter;
   protected int $cacheExpire;
   protected string $pathTranslated = '';
 
   protected function flush(
-    SessionInterface $_session,
-    ResponseInterface $response,
-  ): ResponseInterface {
+    Session\Session $_session,
+    Message\Response $response,
+  ): Message\Response {
     return $response->withCookie(
       $this->cookieOptions['name'],
-      (new Cookie(''))
-        ->withExpires(DateTimeImmutable::createFromFormat(
+      (new Message\Cookie(''))
+        ->withExpires(\DateTimeImmutable::createFromFormat(
           'D, d M Y H:i:s T',
           static::CACHE_PAST_DATE,
         )),
     );
   }
 
-  protected function createCookie(string $id, int $expires): Cookie {
-    return (new Cookie($id))
+  protected function createCookie(string $id, int $expires): Message\Cookie {
+    return (new Message\Cookie($id))
       ->withExpires(
         $expires > 0
-          ? (new DateTimeImmutable())->add(
-            new DateInterval(Str\format('PT%dS', $expires)),
+          ? (new \DateTimeImmutable())->add(
+            new \DateInterval(Str\format('PT%dS', $expires)),
           )
           : null,
       )
@@ -85,7 +71,7 @@ abstract class AbstractSessionPersistence
    * Generate a session identifier.
    */
   protected function generateSessionId(): string {
-    return bin2hex(random_bytes(24));
+    return \bin2hex(\random_bytes(24));
   }
 
   /**
@@ -95,14 +81,14 @@ abstract class AbstractSessionPersistence
    * new session identifier.
    */
   protected function getCookieFromRequest(
-    ServerRequestInterface $request,
+    Message\ServerRequest $request,
   ): string {
     return $request->getCookieParams()[$this->cookieOptions['name']] ?? '';
   }
 
   protected function withCacheHeaders(
-    ResponseInterface $response,
-  ): ResponseInterface {
+    Message\Response $response,
+  ): Message\Response {
     $cacheLimiter = $this->cacheLimiter;
 
     if (
@@ -122,7 +108,7 @@ abstract class AbstractSessionPersistence
   }
 
   private function responseAlreadyHasCacheHeaders(
-    ResponseInterface $response,
+    Message\Response $response,
   ): bool {
     return (
       $response->hasHeader('Expires') ||
@@ -133,29 +119,29 @@ abstract class AbstractSessionPersistence
   }
 
   private function generateCacheHeaders(
-    CacheLimiter $limiter,
+    Session\CacheLimiter $limiter,
   ): dict<string, ?vec<string>> {
     switch ($limiter) {
-      case CacheLimiter::NOCACHE:
+      case Session\CacheLimiter::NOCACHE:
         return dict[
           'Expires' => vec[self::CACHE_PAST_DATE],
           'Cache-Control' => vec['no-store', 'no-cache', 'must-revalidate'],
           'Pragma' => vec['no-cache'],
         ];
-      case CacheLimiter::PUBLIC:
+      case Session\CacheLimiter::PUBLIC:
         $maxAge = 60 * $this->cacheExpire;
         return $this->withLastModifiedAndMaxAge(dict[
           'Expires' => vec[
-            strftime(static::HTTP_DATE_FORMAT, time() + $maxAge),
+            \strftime(static::HTTP_DATE_FORMAT, \time() + $maxAge),
           ],
           'Cache-Control' => vec['public'],
         ]);
-      case CacheLimiter::PRIVATE:
+      case Session\CacheLimiter::PRIVATE:
         return $this->withLastModifiedAndMaxAge(dict[
           'Expires' => vec[static::CACHE_PAST_DATE],
           'Cache-Control' => vec['private'],
         ]);
-      case CacheLimiter::PRIVATE_NO_EXPIRE:
+      case Session\CacheLimiter::PRIVATE_NO_EXPIRE:
         return $this->withLastModifiedAndMaxAge(dict[
           'Cache-Control' => vec['private'],
         ]);
@@ -174,24 +160,25 @@ abstract class AbstractSessionPersistence
     $headers['Cache-Control'][] = Str\format('max-age=%d', $maxAge);
 
     if (
-      Str\is_empty($this->pathTranslated) || !file_exists($this->pathTranslated)
+      Str\is_empty($this->pathTranslated) ||
+      !\file_exists($this->pathTranslated)
     ) {
       return $headers;
     }
 
-    $lastModified = strftime(
+    $lastModified = \strftime(
       static::HTTP_DATE_FORMAT,
-      filemtime($this->pathTranslated),
+      \filemtime($this->pathTranslated),
     );
     $headers['Last-Modified'] = vec[$lastModified];
     return $headers;
   }
 
-  protected function getPersistenceDuration(SessionInterface $session): int {
+  protected function getPersistenceDuration(Session\Session $session): int {
     $duration = $this->cookieOptions['lifetime'] ?? 0;
     if (
-      $session instanceof Session &&
-      $session->contains(Session::SESSION_AGE_KEY)
+      $session instanceof Session\Session &&
+      $session->contains(Session\Session::SESSION_AGE_KEY)
     ) {
       $duration = $session->age();
     }

@@ -3,7 +3,7 @@ namespace Nuxed\Http\Message;
 /**
  * Defines constants for common HTTP request methods.
  */
-final class RequestMethod {
+final abstract class RequestMethod {
   const string METHOD_HEAD = 'HEAD';
   const string METHOD_GET = 'GET';
   const string METHOD_POST = 'POST';
@@ -23,5 +23,4 @@ final class RequestMethod {
   const string METHOD_NOTIFY = 'NOTIFY';
   const string METHOD_SUBSCRIBE = 'SUBSCRIBE';
   const string METHOD_UNSUBSCRIBE = 'UNSUBSCRIBE';
-  private function __construct() {}
 }

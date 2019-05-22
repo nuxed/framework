@@ -1,6 +1,6 @@
 namespace Nuxed\Asset\Context;
 
-class NullContext implements ContextInterface {
+class NullContext implements IContext {
   /**
    * {@inheritdoc}
    */

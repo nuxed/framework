@@ -1,20 +1,16 @@
 namespace Nuxed\Cache;
 
-use namespace Nuxed\Contract\Service;
-use namespace Nuxed\Contract\Cache;
-use namespace Nuxed\Contract\Log;
-use namespace His\Container;
+use namespace Nuxed\Container;
+use namespace Nuxed\Log;
 
-class CacheFactory implements Service\FactoryInterface<Cache\CacheInterface> {
-  public function create(
-    Container\ContainerInterface $container,
-  ): Cache\CacheInterface {
-    if ($container->has(Log\LoggerInterface::class)) {
-      $logger = $container->get(Log\LoggerInterface::class);
+class CacheFactory implements Container\IFactory<ICache> {
+  public function create(Container\IServiceContainer $container): ICache {
+    if ($container->has(Log\ILogger::class)) {
+      $logger = $container->get(Log\ILogger::class);
     } else {
       $logger = new Log\NullLogger();
     }
 
-    return new Cache($container->get(Store\StoreInterface::class), $logger);
+    return new Cache($container->get(Store\IStore::class), $logger);
   }
 }

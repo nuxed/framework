@@ -72,7 +72,7 @@ final class Environment<T> {
     $this->context->appendFilters(...$filters);
   }
 
-  public function use(Extension\ExtensionInterface $extension): void {
+  public function use(Extension\IExtension $extension): void {
     $this->getBlockContext()
       ->prependBlockTypes(...$extension->getBlockProducers());
     $this->getInlineContext()

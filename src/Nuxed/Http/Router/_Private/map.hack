@@ -3,13 +3,13 @@ namespace Nuxed\Http\Router\_Private;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Dict;
 use namespace Facebook\HackRouter;
-use namespace Nuxed\Contract\Http\Router;
+use namespace Nuxed\Http\Router;
 
 function map(
-  Container<Router\RouteInterface> $routes,
+  Container<Router\Route> $routes,
 ): KeyedContainer<
   HackRouter\HttpMethod,
-  HackRouter\PrefixMatching\PrefixMap<Router\RouteInterface>,
+  HackRouter\PrefixMatching\PrefixMap<Router\Route>,
 > {
   $result = new Ref(dict[]);
   Vec\map($routes, ($route) ==> {

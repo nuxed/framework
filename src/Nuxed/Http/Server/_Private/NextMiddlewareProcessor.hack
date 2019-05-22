@@ -1,24 +1,21 @@
 namespace Nuxed\Http\Server\_Private;
 
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type SplPriorityQueue;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Server;
 
-class NextMiddlewareProcessor implements RequestHandlerInterface {
-  private SplPriorityQueue<MiddlewareInterface> $queue;
+class NextMiddlewareProcessor implements Server\IRequestHandler {
+  private \SplPriorityQueue<Server\IMiddleware> $queue;
 
   public function __construct(
-    SplPriorityQueue<MiddlewareInterface> $queue,
-    private RequestHandlerInterface $handler,
+    \SplPriorityQueue<Server\IMiddleware> $queue,
+    private Server\IRequestHandler $handler,
   ) {
     $this->queue = clone $queue;
   }
 
   public async function handle(
-    ServerRequestInterface $request,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $request,
+  ): Awaitable<Message\Response> {
     if (0 === $this->queue->count()) {
       return await $this->handler->handle($request);
     }

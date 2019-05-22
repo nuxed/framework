@@ -1,11 +1,8 @@
 namespace Nuxed\Http\Router\Middleware;
 
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Router\RouteResultInterface;
-use type Nuxed\Contract\Http\Router\RouterInterface;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Router;
+use namespace Nuxed\Http\Message;
 
 /**
  * Default routing middleware.
@@ -17,17 +14,17 @@ use type Nuxed\Contract\Http\Router\RouterInterface;
  * If routing succeeds, injects the request passed to the handler with any
  * matched parameters as well.
  */
-class RouteMiddleware implements MiddlewareInterface {
-  public function __construct(protected RouterInterface $router) {}
+class RouteMiddleware implements Server\IMiddleware {
+  public function __construct(protected Router\Router $router) {}
 
   public function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
     $result = $this->router->match($request);
 
     // Inject the actual route result, as well as individual matched parameters.
-    $request = $request->withAttribute(RouteResultInterface::class, $result);
+    $request = $request->withAttribute(Router\RouteResult::class, $result);
 
     if ($result->isSuccess()) {
       foreach ($result->getMatchedParams() as $param => $value) {

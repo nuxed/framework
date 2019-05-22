@@ -1,17 +1,19 @@
 namespace Nuxed\Container;
 
+use namespace His;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
-use type His\Container\ContainerInterface;
-use type Exception;
 
-final class ServiceContainer implements ContainerInterface {
-  private vec<ContainerInterface> $delegates;
+type IServiceContainer = His\Container\ContainerInterface;
+
+
+final class ServiceContainer implements His\Container\ContainerInterface {
+  private vec<IServiceContainer> $delegates;
 
   public function __construct(
     private KeyedContainer<string, ServiceDefinition<mixed>> $definitions =
       dict[],
-    Container<ContainerInterface> $delegates = vec[],
+    Container<IServiceContainer> $delegates = vec[],
   ) {
     $this->delegates = vec($delegates);
   }
@@ -23,7 +25,7 @@ final class ServiceContainer implements ContainerInterface {
       try {
         // UNSAFE - we can't type hint the follwoing expression.
         return $def->resolve($this);
-      } catch (Exception $e) {
+      } catch (\Exception $e) {
         throw new Exception\ContainerException(
           Str\format(
             'Exception thrown while trying to create service (%s) : %s',
@@ -42,7 +44,7 @@ final class ServiceContainer implements ContainerInterface {
       if ($container->has($service)) {
         try {
           return $container->get($service);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
           throw new Exception\ContainerException(
             Str\format(
               'Exception thrown while resolving service (%s) from a delegate container : %s',
@@ -78,7 +80,7 @@ final class ServiceContainer implements ContainerInterface {
     return false;
   }
 
-  public function delegate(ContainerInterface $delegate): this {
+  public function delegate(IServiceContainer $delegate): this {
     $this->delegates[] = $delegate;
 
     return $this;

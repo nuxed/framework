@@ -5,23 +5,23 @@ use namespace HH\Lib\Str;
 use type Nuxed\Asset\Exception\InvalidArgumentException;
 use type Nuxed\Asset\Exception\LogicException;
 
-class Packages {
-  private dict<string, PackageInterface> $packages;
+class Packages implements IPackage {
+  private dict<string, IPackage> $packages;
 
   /**
-   * @param PackageInterface                          $defaultPackage
+   * @param IPackage                          $defaultPackage
    *                                                    The default package
-   * @param KeyedContainer<string, PackageInterface>  $packages
+   * @param KeyedContainer<string, IPackage>  $packages
    *                                                    Additional packages indexed by name
    */
   public function __construct(
-    private ?PackageInterface $defaultPackage = null,
-    KeyedContainer<string, PackageInterface> $packages = dict[],
+    private ?IPackage $defaultPackage = null,
+    KeyedContainer<string, IPackage> $packages = dict[],
   ) {
     $this->packages = dict($packages);
   }
 
-  public function setDefaultPackage(PackageInterface $defaultPackage): void {
+  public function setDefaultPackage(IPackage $defaultPackage): void {
     $this->defaultPackage = $defaultPackage;
   }
 
@@ -29,9 +29,9 @@ class Packages {
    * Adds a  package.
    *
    * @param string           $name    The package name
-   * @param PackageInterface $package The package
+   * @param IPackage $package The package
    */
-  public function addPackage(string $name, PackageInterface $package): void {
+  public function addPackage(string $name, IPackage $package): void {
     $this->packages[$name] = $package;
   }
 
@@ -40,12 +40,12 @@ class Packages {
    *
    * @param string $name The name of the package or null for the default package
    *
-   * @return PackageInterface An asset package
+   * @return IPackage An asset package
    *
    * @throws InvalidArgumentException If there is no package by that name
    * @throws LogicException           If no default package is defined
    */
-  public function getPackage(?string $name = null): PackageInterface {
+  public function getPackage(?string $name = null): IPackage {
     if (null === $name) {
       if (null === $this->defaultPackage) {
         throw new LogicException(

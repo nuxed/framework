@@ -1,9 +1,9 @@
 namespace Nuxed\Log;
 
-use type Nuxed\Contract\Log\LogLevel;
+use type Nuxed\Log\LogLevel;
 use type DateTime;
 
-type Record = shape(
+type LogRecord = shape(
   'level' => LogLevel,
   'message' => string,
   'context' => dict<string, mixed>,

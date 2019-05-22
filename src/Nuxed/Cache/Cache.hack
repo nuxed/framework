@@ -1,23 +1,19 @@
 namespace Nuxed\Cache;
 
 use namespace HH\Asio;
-use type Nuxed\Contract\Cache\CacheInterface;
-use type Nuxed\Contract\Cache\CacheExceptionInterface;
-use type Nuxed\Contract\Cache\CacheExceptionInterface;
-use type Nuxed\Contract\Cache\InvalidArgumentExceptionInterface;
-use type Nuxed\Contract\Log\LoggerInterface;
-use type Nuxed\Contract\Log\LoggerAwareInterface;
-use type Nuxed\Contract\Log\LogLevel;
-use type Nuxed\Contract\Log\NullLogger;
+use type Nuxed\Log\ILogger;
+use type Nuxed\Log\ILoggerAware;
+use type Nuxed\Log\LogLevel;
+use type Nuxed\Log\NullLogger;
 use type Exception;
 
-final class Cache implements CacheInterface, LoggerAwareInterface {
+final class Cache implements ICache, ILoggerAware {
   public function __construct(
-    protected Store\StoreInterface $store,
-    protected LoggerInterface $logger = new NullLogger(),
+    protected Store\IStore $store,
+    protected ILogger $logger = new NullLogger(),
   ) {}
 
-  public function setLogger(LoggerInterface $logger): void {
+  public function setLogger(ILogger $logger): void {
     $this->logger = $logger;
   }
 
@@ -36,7 +32,7 @@ final class Cache implements CacheInterface, LoggerAwareInterface {
   /**
    * Fetches a value from the cache.
    */
-  public function get(string $key, mixed $default = null): Awaitable<mixed> {
+  public function get(string $key, mixed $default = null): Awaitable<dynamic> {
     return $this->box(async () ==> {
       _Private\validate_key($key);
       $exist = await $this->store->contains($key);
@@ -51,7 +47,7 @@ final class Cache implements CacheInterface, LoggerAwareInterface {
   /**
    * Retrieve a value from the cache and delete it.
    */
-  public function pull(string $key, mixed $default = null): Awaitable<mixed> {
+  public function pull(string $key, mixed $default = null): Awaitable<dynamic> {
     return $this->box(async () ==> {
       $exist = await $this->contains($key);
       if (!$exist) {
@@ -127,13 +123,13 @@ final class Cache implements CacheInterface, LoggerAwareInterface {
   /**
    * Get an item from the cache, or execute the given Closure and store the result.
    */
-  public async function remember(
+  public async function remember<T>(
     string $key,
-    (function(): Awaitable<mixed>) $callback,
+    (function(): Awaitable<T>) $callback,
     ?int $ttl = null,
-  ): Awaitable<mixed> {
-    $exist = await $this->contains($key);
-    if ($exist) {
+  ): Awaitable<T> {
+    if (await $this->contains($key)) {
+      /* HH_IGNORE_ERROR[4110] */
       return await $this->get($key);
     }
 
@@ -145,12 +141,12 @@ final class Cache implements CacheInterface, LoggerAwareInterface {
   /**
    * Get an item from the cache, or execute the given Closure and store the result forever.
    */
-  public async function sear(
+  public async function sear<T>(
     string $key,
-    (function(): Awaitable<mixed>) $callback,
-  ): Awaitable<mixed> {
-    $exist = await $this->contains($key);
-    if ($exist) {
+    (function(): Awaitable<T>) $callback,
+  ): Awaitable<T> {
+    if (await $this->contains($key)) {
+      /* HH_IGNORE_ERROR[4110] */
       return await $this->get($key);
     }
 
@@ -205,11 +201,11 @@ final class Cache implements CacheInterface, LoggerAwareInterface {
     } catch (Exception $e) {
 
       $level = LogLevel::ALERT;
-      if ($e is InvalidArgumentExceptionInterface) {
+      if ($e is Exception\InvalidArgumentException) {
         $level = LogLevel::WARNING;
       }
 
-      if (!$e is CacheExceptionInterface) {
+      if (!$e is Exception\IException) {
         $e = new Exception\CacheException($e->getMessage(), $e->getCode(), $e);
       }
 
@@ -220,11 +216,5 @@ final class Cache implements CacheInterface, LoggerAwareInterface {
 
       throw $e;
     }
-  }
-
-  <<__Deprecated("To be removed in 0.2")>>
-  public static function validateKey(string $key): string {
-    _Private\validate_key($key);
-    return $key;
   }
 }

@@ -1,16 +1,15 @@
 namespace Nuxed\Kernel\Event;
 
-use namespace Nuxed\Contract\Http\Message;
-use type Nuxed\Contract\Event\EventInterface;
-use type Nuxed\Contract\Event\StoppableEventInterface;
-use type Throwable;
+use namespace Nuxed\EventDispatcher;
+use namespace Nuxed\Http\Message;
 
-class ErrorEvent implements EventInterface, StoppableEventInterface {
-  public ?Message\ResponseInterface $response;
+final class ErrorEvent
+  implements EventDispatcher\IEvent, EventDispatcher\IStoppableEvent {
+  public ?Message\Response $response;
 
   public function __construct(
-    public Throwable $error,
-    public Message\ServerRequestInterface $request,
+    public \Throwable $error,
+    public Message\ServerRequest $request,
   ) {}
 
   public function isPropagationStopped(): bool {

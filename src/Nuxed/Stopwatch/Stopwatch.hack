@@ -3,9 +3,9 @@ namespace Nuxed\Stopwatch;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
-use type Nuxed\Contract\Service\ResetInterface;
+use type Nuxed\Contract\IReset;
 
-class Stopwatch implements ResetInterface {
+class Stopwatch implements IReset {
   private dict<string, Section> $sections = dict[];
   private vec<Section> $activeSections = vec[];
 

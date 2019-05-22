@@ -249,7 +249,7 @@ class UrlPackageTest extends HackTest {
     ];
   }
 
-  private function getContext(bool $secure): Asset\Context\ContextInterface {
+  private function getContext(bool $secure): Asset\Context\IContext {
     return new Asset\Context\Context('', $secure);
   }
 }

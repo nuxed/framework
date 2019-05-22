@@ -1,18 +1,16 @@
 namespace Nuxed\Http\Server\RequestHandler;
 
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Server;
 
-final class CallableRequestHandlerDecorator implements RequestHandlerInterface {
+final class CallableRequestHandlerDecorator implements Server\IRequestHandler {
   public function __construct(
-    private (function(ServerRequestInterface): Awaitable<ResponseInterface>)
-      $callback,
+    private Server\CallableRequestHandler $callback,
   ) {}
 
   public function handle(
-    ServerRequestInterface $request,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $request,
+  ): Awaitable<Message\Response> {
     $fun = $this->callback;
     return $fun($request);
   }

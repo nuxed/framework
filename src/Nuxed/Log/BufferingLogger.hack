@@ -1,6 +1,6 @@
 namespace Nuxed\Log;
 
-use namespace Nuxed\Contract\Log;
+use namespace Nuxed\Log;
 
 /**
  * A buffering logger that stacks logs for later.

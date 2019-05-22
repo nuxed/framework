@@ -9,7 +9,7 @@ class CacheSessionPersistenceTest extends AbstractSessionPersistenceTest {
     TCookieOptions $cookie,
     ?Session\CacheLimiter $limiter,
     int $expiry,
-  ): Awaitable<Session\Persistence\SessionPersistenceInterface> {
+  ): Awaitable<Session\Persistence\ISessionPersistence> {
     $cache = new Cache\Cache(new Cache\Store\ArrayStore());
     $persistence = new Session\Persistence\CacheSessionPersistence(
       $cache,
@@ -26,7 +26,7 @@ class CacheSessionPersistenceTest extends AbstractSessionPersistenceTest {
     int $expiry,
     string $id,
     KeyedContainer<string, mixed> $data,
-  ): Awaitable<Session\Persistence\SessionPersistenceInterface> {
+  ): Awaitable<Session\Persistence\ISessionPersistence> {
     $cache = new Cache\Cache(new Cache\Store\ArrayStore());
     $persistence = new Session\Persistence\CacheSessionPersistence(
       $cache,

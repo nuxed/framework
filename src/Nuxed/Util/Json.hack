@@ -1,21 +1,24 @@
 namespace Nuxed\Util;
 
 use namespace Facebook\TypeAssert;
-use type Nuxed\Contract\Util\Jsonable;
-use type Throwable;
-use function json_encode;
-use function json_decode;
-use function json_last_error;
-use function json_last_error_msg;
-use const JSON_PRESERVE_ZERO_FRACTION;
-use const JSON_PRETTY_PRINT;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
-use const JSON_BIGINT_AS_STRING;
-use const JSON_ERROR_NONE;
-use const JSON_FB_HACK_ARRAYS;
+use type Nuxed\Util\Jsonable;
 
 final abstract class Json {
+
+  private static dict<int, string> $errors = dict[
+    \JSON_ERROR_NONE => 'No error',
+    \JSON_ERROR_DEPTH => 'Maximum stack depth exceeded',
+    \JSON_ERROR_STATE_MISMATCH => 'State mismatch (invalid or malformed JSON)',
+    \JSON_ERROR_CTRL_CHAR =>
+      'Control character error, possibly incorrectly encoded',
+    \JSON_ERROR_SYNTAX => 'Syntax error',
+    \JSON_ERROR_UTF8 =>
+      'Malformed UTF-8 characters, possibly incorrectly encoded',
+    \JSON_ERROR_INF_OR_NAN => 'Inf and NaN cannot be JSON encoded',
+    \JSON_ERROR_UNSUPPORTED_TYPE =>
+      'A value of a type that cannot be encoded was given',
+  ];
+
   public static function encode(
     mixed $value,
     bool $pretty = false,
@@ -25,17 +28,17 @@ final abstract class Json {
       return $value->toJson($pretty);
     }
 
-    $flags |= JSON_UNESCAPED_UNICODE |
-      JSON_UNESCAPED_SLASHES |
-      JSON_PRESERVE_ZERO_FRACTION;
+    $flags |= \JSON_UNESCAPED_UNICODE |
+      \JSON_UNESCAPED_SLASHES |
+      \JSON_PRESERVE_ZERO_FRACTION;
     if ($pretty) {
-      $flags |= JSON_PRETTY_PRINT;
+      $flags |= \JSON_PRETTY_PRINT;
     }
 
-    $json = json_encode($value, $flags);
-    $error = json_last_error();
-    if (JSON_ERROR_NONE !== $error) {
-      throw new Exception\JsonEncodeException(json_last_error_msg(), $error);
+    $json = \json_encode($value, $flags);
+    $error = \json_last_error();
+    if (\JSON_ERROR_NONE !== $error) {
+      throw new Exception\JsonEncodeException(static::$errors[$error], $error);
     }
 
     return $json;
@@ -43,19 +46,22 @@ final abstract class Json {
 
   public static function decode(string $json, bool $assoc = true): mixed {
     try {
-      $value = json_decode(
+      $value = \json_decode(
         $json,
         $assoc,
         512,
-        JSON_BIGINT_AS_STRING | JSON_FB_HACK_ARRAYS,
+        \JSON_BIGINT_AS_STRING | \JSON_FB_HACK_ARRAYS,
       );
-      $error = json_last_error();
-      if (JSON_ERROR_NONE !== $error) {
-        throw new Exception\JsonDecodeException(json_last_error_msg(), $error);
+      $error = \json_last_error();
+      if (\JSON_ERROR_NONE !== $error) {
+        throw new Exception\JsonDecodeException(
+          static::$errors[$error],
+          $error,
+        );
       }
 
       return $value;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
       throw new Exception\JsonDecodeException(
         $e->getMessage(),
         (int)$e->getCode(),

@@ -1,7 +1,7 @@
 namespace Nuxed\Kernel\Handler;
 
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
+use namespace Nuxed\Http\Server;
 
-abstract class AbstractHandler implements RequestHandlerInterface {
+abstract class AbstractHandler implements Server\IRequestHandler {
   use HandlerTrait;
 }

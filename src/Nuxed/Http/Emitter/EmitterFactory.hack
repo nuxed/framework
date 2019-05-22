@@ -1,12 +1,10 @@
 namespace Nuxed\Http\Emitter;
 
-use namespace His\Container;
-use namespace Nuxed\Contract\Service;
-use namespace Nuxed\Contract\Http\Emitter;
+use namespace Nuxed\Container;
+use namespace Nuxed\Contract;
 
-final class EmitterFactory
-  implements Service\FactoryInterface<Emitter\EmitterInterface> {
-  public function create(Container\ContainerInterface $container): Emitter {
+final class EmitterFactory implements Container\IFactory<IEmitter> {
+  public function create(Container\IServiceContainer $container): Emitter {
     if ($container->has(MaxBufferLength::class)) {
       return new Emitter($container->get(MaxBufferLength::class));
     }

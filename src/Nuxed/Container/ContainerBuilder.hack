@@ -3,14 +3,12 @@ namespace Nuxed\Container;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
-use namespace Nuxed\Contract\Service;
-use type His\Container\ContainerInterface;
 
 final class ContainerBuilder {
 
   private dict<string, mixed> $definitions = dict[];
 
-  public function register(ServiceProviderInterface $provider): this {
+  public function register(IServiceProvider $provider): this {
     $provider->register($this);
 
     return $this;
@@ -18,7 +16,7 @@ final class ContainerBuilder {
 
   public function add<T>(
     typename<T> $service,
-    Service\FactoryInterface<T> $factory,
+    IFactory<T> $factory,
     bool $shared = true,
   ): this {
     $definition = new ServiceDefinition($service, $factory, $shared);
@@ -28,7 +26,7 @@ final class ContainerBuilder {
 
   public function inflect<T>(
     typename<T> $service,
-    Service\InflectorInterface<T> $inflector,
+    IInflector<T> $inflector,
   ): this {
     $definition = $this->getDefinition($service);
     $definition->inflect($inflector);
@@ -55,7 +53,7 @@ final class ContainerBuilder {
   }
 
   public function build(
-    Container<ContainerInterface> $delegates = vec[],
+    Container<IServiceContainer> $delegates = vec[],
   ): ServiceContainer {
     $definitions = Dict\map(
       $this->definitions,

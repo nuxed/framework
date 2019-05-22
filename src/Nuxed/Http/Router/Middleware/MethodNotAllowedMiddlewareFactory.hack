@@ -1,16 +1,13 @@
 namespace Nuxed\Http\Router\Middleware;
 
-use namespace His\Container;
-use namespace Nuxed\Contract\Service;
-use namespace Nuxed\Contract\Http\Message;
+use namespace Nuxed\Container;
+use namespace Nuxed\Contract;
 
 class MethodNotAllowedMiddlewareFactory
-  implements Service\FactoryInterface<MethodNotAllowedMiddleware> {
+  implements Container\IFactory<MethodNotAllowedMiddleware> {
   public function create(
-    Container\ContainerInterface $container,
+    Container\IServiceContainer $_container,
   ): MethodNotAllowedMiddleware {
-    return new MethodNotAllowedMiddleware(
-      $container->get(Message\ResponseFactoryInterface::class),
-    );
+    return new MethodNotAllowedMiddleware();
   }
 }

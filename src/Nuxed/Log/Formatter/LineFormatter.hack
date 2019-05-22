@@ -6,7 +6,7 @@ use namespace HH\Lib\Dict;
 use namespace Nuxed\Util;
 use namespace Nuxed\Log;
 
-class LineFormatter implements FormatterInterface {
+class LineFormatter implements IFormatter {
   const string SIMPLE_DATE = "Y-m-d\TH:i:s.uP";
   const string SIMPLE_FORMAT =
     "[%time%][%level%]: %message% %context% %extra%\n";
@@ -43,7 +43,7 @@ class LineFormatter implements FormatterInterface {
     $this->allowInlineLineBreaks = $allow;
   }
 
-  public function format(Log\Record $record): Log\Record {
+  public function format(Log\LogRecord $record): Log\LogRecord {
     $output = $this->format;
 
     foreach ($record['extra'] as $var => $val) {

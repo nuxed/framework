@@ -1,14 +1,16 @@
 namespace Nuxed\Container\Service;
 
-use namespace Nuxed\Contract\Service;
-use type His\Container\ContainerInterface;
+use namespace Nuxed\Container;
 
-class CallableInflectorDecorator<T> implements Service\InflectorInterface<T> {
+class CallableInflectorDecorator<T> implements Container\IInflector<T> {
   public function __construct(
-    private (function(T, ContainerInterface): T) $call,
+    private (function(T, Container\IServiceContainer): T) $call,
   ) {}
 
-  public function inflect(T $service, ContainerInterface $container): T {
+  public function inflect(
+    T $service,
+    Container\IServiceContainer $container,
+  ): T {
     $call = $this->call;
 
     return $call($service, $container);

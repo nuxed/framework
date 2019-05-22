@@ -1,13 +1,12 @@
 namespace Nuxed\Kernel\Middleware;
 
-use namespace His\Container;
+use namespace Nuxed\Container;
 use namespace Nuxed\Kernel\Error;
-use namespace Nuxed\Contract\Service;
+use namespace Nuxed\Contract;
 
-class ErrorMiddlewareFactory
-  implements Service\FactoryInterface<ErrorMiddleware> {
+class ErrorMiddlewareFactory implements Container\IFactory<ErrorMiddleware> {
   public function create(
-    Container\ContainerInterface $container,
+    Container\IServiceContainer $container,
   ): ErrorMiddleware {
     return new ErrorMiddleware($container->get(Error\ErrorHandler::class));
   }

@@ -2,7 +2,6 @@ namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
-use namespace Nuxed\Contract\Http\Message;
 
 /**
  * Logic largely refactored from the Hsl Experimental HH\Lib\_Private\NativeHandler class.
@@ -13,7 +12,7 @@ use namespace Nuxed\Contract\Http\Message;
  */
 
 <<__ConsistentConstruct>>
-class Stream implements Message\StreamInterface {
+class Stream implements IStream {
   private ?Awaitable<mixed> $lastOperation;
   private bool $isAwaitable = true;
   private ?int $size;
@@ -225,7 +224,7 @@ class Stream implements Message\StreamInterface {
 
   public function seek(
     int $offset,
-    Message\StreamSeekWhence $whence = Message\StreamSeekWhence::SET,
+    StreamSeekWhence $whence = StreamSeekWhence::SET,
   ): void {
     if (!$this->isSeekable()) {
       throw new Exception\UnseekableStreamException('Stream is not seekable');

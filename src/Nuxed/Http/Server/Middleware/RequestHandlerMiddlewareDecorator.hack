@@ -1,9 +1,7 @@
 namespace Nuxed\Http\Server\Middleware;
 
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Server;
 
 /**
  * Decorate a request handler as middleware.
@@ -17,15 +15,15 @@ use type Nuxed\Contract\Http\Message\ResponseInterface;
  * decorated handler, which will return a response.
  */
 final class RequestHandlerMiddlewareDecorator
-  implements MiddlewareInterface, RequestHandlerInterface {
-  public function __construct(private RequestHandlerInterface $handler) {}
+  implements Server\IMiddleware, Server\IRequestHandler {
+  public function __construct(private Server\IRequestHandler $handler) {}
 
   /**
    * Proxies to decorated handler to handle the request.
    */
   public function handle(
-    ServerRequestInterface $request,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $request,
+  ): Awaitable<Message\Response> {
     return $this->handler->handle($request);
   }
 
@@ -33,9 +31,9 @@ final class RequestHandlerMiddlewareDecorator
    * Proxies to decorated handler to handle the request.
    */
   public function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $_,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $request,
+    Server\IRequestHandler $_,
+  ): Awaitable<Message\Response> {
     return $this->handler->handle($request);
   }
 }

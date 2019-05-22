@@ -1,13 +1,9 @@
 namespace Nuxed\Http\Router\Middleware;
 
-use type Nuxed\Http\Message\RequestMethod;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\StreamFactoryInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Router\RouteResultInterface;
-use type Nuxed\Contract\Http\Router\RouterInterface;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Router;
+
 
 /**
  * Handle implicit HEAD requests.
@@ -34,13 +30,10 @@ use type Nuxed\Contract\Http\Router\RouterInterface;
  * the next layer, but alters the request passed to use the GET method;
  * it then provides an empty response body to the returned response.
  */
-class ImplicitHeadMiddleware implements MiddlewareInterface {
+class ImplicitHeadMiddleware implements Server\IMiddleware {
   const string FORWARDED_HTTP_METHOD_ATTRIBUTE = 'FORWARDED_HTTP_METHOD';
 
-  public function __construct(
-    private RouterInterface $router,
-    private StreamFactoryInterface $streamFactory,
-  ) {}
+  public function __construct(private Router\Router $router) {}
 
   /**
    * Handle an implicit HEAD request.
@@ -50,16 +43,16 @@ class ImplicitHeadMiddleware implements MiddlewareInterface {
    * response.
    */
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
-    if ($request->getMethod() !== RequestMethod::METHOD_HEAD) {
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
+    if ($request->getMethod() !== Message\RequestMethod::METHOD_HEAD) {
       return await $handler->handle($request);
     }
 
-    $result = $request->getAttribute(RouteResultInterface::class);
+    $result = $request->getAttribute(Router\RouteResult::class);
 
-    if (!$result is RouteResultInterface) {
+    if (!$result is Router\RouteResult) {
       return await $handler->handle($request);
     }
 
@@ -68,7 +61,7 @@ class ImplicitHeadMiddleware implements MiddlewareInterface {
     }
 
     $routeResult = $this->router
-      ->match($request->withMethod(RequestMethod::METHOD_GET));
+      ->match($request->withMethod(Message\RequestMethod::METHOD_GET));
 
     if ($routeResult->isFailure()) {
       return await $handler->handle($request);
@@ -81,14 +74,14 @@ class ImplicitHeadMiddleware implements MiddlewareInterface {
 
     $response = await $handler->handle(
       $request
-        ->withAttribute(RouteResultInterface::class, $routeResult)
-        ->withMethod(RequestMethod::METHOD_GET)
+        ->withAttribute(Router\RouteResult::class, $routeResult)
+        ->withMethod(Message\RequestMethod::METHOD_GET)
         ->withAttribute(
           self::FORWARDED_HTTP_METHOD_ATTRIBUTE,
-          RequestMethod::METHOD_HEAD,
+          Message\RequestMethod::METHOD_HEAD,
         ),
     );
 
-    return $response->withBody($this->streamFactory->createStream());
+    return $response->withBody(Message\stream(''));
   }
 }

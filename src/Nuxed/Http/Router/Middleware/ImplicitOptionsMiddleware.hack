@@ -1,12 +1,8 @@
 namespace Nuxed\Http\Router\Middleware;
 
-use type Nuxed\Http\Message\RequestMethod;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ResponseFactoryInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Router\RouteResultInterface;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Router;
+use namespace Nuxed\Http\Message;
 
 /**
  * Handle implicit OPTIONS requests.
@@ -31,25 +27,21 @@ use type Nuxed\Contract\Http\Router\RouteResultInterface;
  *
  * In all other circumstances, it will return the result of the delegate.
  */
-class ImplicitOptionsMiddleware implements MiddlewareInterface {
-  public function __construct(
-    private ResponseFactoryInterface $responseFactory,
-  ) {}
-
+class ImplicitOptionsMiddleware implements Server\IMiddleware {
   /**
    * Handle an implicit OPTIONS request.
    */
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
-    if ($request->getMethod() !== RequestMethod::METHOD_OPTIONS) {
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
+    if ($request->getMethod() !== Message\RequestMethod::METHOD_OPTIONS) {
       return await $handler->handle($request);
     }
 
-    $result = $request->getAttribute(RouteResultInterface::class);
+    $result = $request->getAttribute(Router\RouteResult::class);
 
-    if (!$result is RouteResultInterface) {
+    if (!$result is Router\RouteResult) {
       return await $handler->handle($request);
     }
 
@@ -63,8 +55,7 @@ class ImplicitOptionsMiddleware implements MiddlewareInterface {
 
     $allowedMethods = $result->getAllowedMethods();
 
-    return $this->responseFactory
-      ->createResponse()
+    return Message\response()
       ->withHeader('Allow', $allowedMethods ?? vec[]);
   }
 }

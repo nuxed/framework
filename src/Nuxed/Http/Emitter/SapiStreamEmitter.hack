@@ -3,7 +3,7 @@ namespace Nuxed\Http\Emitter;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Regex;
 use namespace HH\Lib\Experimental\IO;
-use namespace Nuxed\Contract\Http\Message;
+use namespace Nuxed\Http\Message;
 
 type MaxBufferLength = int;
 
@@ -24,9 +24,7 @@ final class SapiStreamEmitter extends SapiEmitter {
   );
 
   <<__Override>>
-  public async function emit(
-    Message\ResponseInterface $response,
-  ): Awaitable<bool> {
+  public async function emit(Message\Response $response): Awaitable<bool> {
     $this->assertNoPreviousOutput();
     $this->emitHeaders($response);
     $this->emitStatusLine($response);
@@ -44,7 +42,7 @@ final class SapiStreamEmitter extends SapiEmitter {
 
   <<__Override>>
   protected async function emitBody(
-    Message\ResponseInterface $response,
+    Message\Response $response,
   ): Awaitable<void> {
     $stream = $response->getBody();
     if ($stream->isSeekable()) {
@@ -61,7 +59,7 @@ final class SapiStreamEmitter extends SapiEmitter {
   }
 
   protected async function emitBodyRange(
-    Message\ResponseInterface $response,
+    Message\Response $response,
     this::TContentRange $range,
   ): Awaitable<void> {
     $stream = $response->getBody();

@@ -1,9 +1,8 @@
 namespace Nuxed\Http\Session;
 
 use namespace HH\Lib\C;
-use type Nuxed\Contract\Http\Session\SessionInterface;
 
-class Session implements SessionInterface {
+final class Session {
   const string SESSION_AGE_KEY = '__SESSION_AGE__';
 
   /**
@@ -42,9 +41,9 @@ class Session implements SessionInterface {
   /**
    * Retrieve a value from the session.
    *
-   * @param mixed $default Default value to return if $name does not exist.
+   * @param dynamic $default Default value to return if $name does not exist.
    */
-  public function get(string $name, mixed $default = null): mixed {
+  public function get(string $name, mixed $default = null): dynamic {
     if ($this->contains($name)) {
       return $this->data[$name];
     } else {
@@ -72,7 +71,7 @@ class Session implements SessionInterface {
   /**
    * Remove a value from the session.
    */
-  public function remove(string $name): void {
+  public function forget(string $name): void {
     unset($this->data[$name]);
   }
 
@@ -117,7 +116,7 @@ class Session implements SessionInterface {
    * return a new instance; that instance should always return true for
    * isRegenerated().
    */
-  public function regenerate(): SessionInterface {
+  public function regenerate(): this {
     $session = clone $this;
     $session->isRegenerated = true;
     return $session;
@@ -167,7 +166,8 @@ class Session implements SessionInterface {
     return $this->age;
   }
 
-  public function items(): KeyedContainer<string, mixed> {
+  public function items(): KeyedContainer<string, dynamic> {
+    /* HH_IGNORE_ERROR[4110] */
     return $this->data;
   }
 }

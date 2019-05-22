@@ -1,19 +1,18 @@
 namespace Nuxed\Container;
 
-use namespace Nuxed\Contract\Service;
-use type His\Container\ContainerInterface;
+use namespace Nuxed\Contract;
 
 final class ServiceDefinition<T> {
-  private vec<Service\InflectorInterface<T>> $inflectors = vec[];
+  private vec<IInflector<T>> $inflectors = vec[];
   private ?T $resolved = null;
 
   public function __construct(
     private typename<T> $id,
-    private Service\FactoryInterface<T> $factory,
+    private IFactory<T> $factory,
     private bool $shared = true,
   ) {}
 
-  public function resolve(ContainerInterface $container): T {
+  public function resolve(IServiceContainer $container): T {
     if ($this->isShared() && $this->resolved is nonnull) {
       return $this->resolved;
     }
@@ -30,11 +29,11 @@ final class ServiceDefinition<T> {
     return $this->id;
   }
 
-  public function getFactory(): Service\FactoryInterface<T> {
+  public function getFactory(): IFactory<T> {
     return $this->factory;
   }
 
-  public function setFactory(Service\FactoryInterface<T> $factory): this {
+  public function setFactory(IFactory<T> $factory): this {
     $this->factory = $factory;
     $this->resolved = null;
 
@@ -51,11 +50,11 @@ final class ServiceDefinition<T> {
     return $this;
   }
 
-  public function getInflectors(): Container<Service\InflectorInterface<T>> {
+  public function getInflectors(): Container<IInflector<T>> {
     return $this->inflectors;
   }
 
-  public function inflect(Service\InflectorInterface<T> $inflector): this {
+  public function inflect(IInflector<T> $inflector): this {
     $this->inflectors[] = $inflector;
     $this->resolved = null;
 

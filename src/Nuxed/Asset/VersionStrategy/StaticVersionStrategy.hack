@@ -2,7 +2,7 @@ namespace Nuxed\Asset\VersionStrategy;
 
 use namespace HH\Lib\Str;
 
-class StaticVersionStrategy implements VersionStrategyInterface {
+class StaticVersionStrategy implements IVersionStrategy {
   private string $format;
 
   /**

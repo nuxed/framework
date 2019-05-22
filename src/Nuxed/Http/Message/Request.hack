@@ -2,17 +2,13 @@ namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
 use namespace Nuxed\Util;
-use namespace Nuxed\Contract\Http\Message;
 
-class Request implements Message\RequestInterface {
-  use MessageTrait;
-  use RequestTrait;
-
+class Request extends AbstractRequest {
   public function __construct(
     string $method,
-    Message\UriInterface $uri,
+    Uri $uri,
     KeyedContainer<string, Container<string>> $headers = dict[],
-    ?Message\StreamInterface $body = null,
+    ?IStream $body = null,
     string $version = '1.1',
   ) {
     $this->method = $method;
@@ -29,6 +25,7 @@ class Request implements Message\RequestInterface {
     }
   }
 
+  <<__Override>>
   protected function updateHostFromUri(): void {
     $host = $this->uri->getHost();
     if ('' === $host) {

@@ -1,11 +1,9 @@
 namespace Nuxed\Http\Router;
 
+use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
-use namespace HH\Lib\C;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Router\RouteCollectorInterface;
-use type Nuxed\Contract\Http\Router\RouteInterface;
+use namespace Nuxed\Http\Server;
 
 /**
  * Aggregate routes for the router.
@@ -27,11 +25,11 @@ use type Nuxed\Contract\Http\Router\RouteInterface;
  * attaching via one of the exposed methods, and will raise an exception when a
  * collision occurs.
  */
-trait RouteCollectorTrait implements RouteCollectorInterface {
+trait RouteCollectorTrait implements IRouteCollector {
   /**
    * List of all routes registered directly with the application.
    */
-  protected vec<RouteInterface> $routes = vec[];
+  protected vec<Route> $routes = vec[];
 
   /**
    * Add a route for the route middleware to match.
@@ -44,19 +42,19 @@ trait RouteCollectorTrait implements RouteCollectorInterface {
    */
   abstract public function route(
     string $path,
-    MiddlewareInterface $middleware,
+    Server\IMiddleware $middleware,
     ?Container<string> $methods = null,
     ?string $name = null,
-  ): RouteInterface;
+  ): Route;
 
   /**
    * @param null|string $name The name of the route.
    */
   public function get(
     string $path,
-    MiddlewareInterface $middleware,
+    Server\IMiddleware $middleware,
     ?string $name = null,
-  ): RouteInterface {
+  ): Route {
     return $this->route($path, $middleware, vec['GET'], $name);
   }
 
@@ -65,9 +63,9 @@ trait RouteCollectorTrait implements RouteCollectorInterface {
    */
   public function post(
     string $path,
-    MiddlewareInterface $middleware,
+    Server\IMiddleware $middleware,
     ?string $name = null,
-  ): RouteInterface {
+  ): Route {
     return $this->route($path, $middleware, vec['POST'], $name);
   }
 
@@ -76,9 +74,9 @@ trait RouteCollectorTrait implements RouteCollectorInterface {
    */
   public function put(
     string $path,
-    MiddlewareInterface $middleware,
+    Server\IMiddleware $middleware,
     ?string $name = null,
-  ): RouteInterface {
+  ): Route {
     return $this->route($path, $middleware, vec['PUT'], $name);
   }
 
@@ -87,9 +85,9 @@ trait RouteCollectorTrait implements RouteCollectorInterface {
    */
   public function patch(
     string $path,
-    MiddlewareInterface $middleware,
+    Server\IMiddleware $middleware,
     ?string $name = null,
-  ): RouteInterface {
+  ): Route {
     return $this->route($path, $middleware, vec['PATCH'], $name);
   }
 
@@ -98,9 +96,9 @@ trait RouteCollectorTrait implements RouteCollectorInterface {
    */
   public function delete(
     string $path,
-    MiddlewareInterface $middleware,
+    Server\IMiddleware $middleware,
     ?string $name = null,
-  ): RouteInterface {
+  ): Route {
     return $this->route($path, $middleware, vec['DELETE'], $name);
   }
 
@@ -109,9 +107,9 @@ trait RouteCollectorTrait implements RouteCollectorInterface {
    */
   public function any(
     string $path,
-    MiddlewareInterface $middleware,
+    Server\IMiddleware $middleware,
     ?string $name = null,
-  ): RouteInterface {
+  ): Route {
     return $this->route($path, $middleware, null, $name);
   }
 
@@ -130,7 +128,7 @@ trait RouteCollectorTrait implements RouteCollectorInterface {
   ): void {
     $matches = Vec\filter(
       $this->routes,
-      (RouteInterface $route) ==> {
+      (Route $route) ==> {
         if ($path !== $route->getPath()) {
           return false;
         }

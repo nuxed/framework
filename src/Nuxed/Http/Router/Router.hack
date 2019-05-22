@@ -1,28 +1,26 @@
 namespace Nuxed\Http\Router;
 
 use namespace HH\Lib\C;
+use namespace Nuxed\Util;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
-use namespace Nuxed\Util;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Message;
 use namespace Facebook\HackRouter;
 use namespace Facebook\HackRouter\PatternParser;
-use type Nuxed\Contract\Http\Router\RouterInterface;
-use type Nuxed\Contract\Http\Router\RouteInterface;
-use type Nuxed\Contract\Http\Router\RouteResultInterface;
-use type Nuxed\Contract\Http\Message\UriInterface;
-use type Nuxed\Contract\Http\Message\RequestInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Http\Message\Uri;
-use function Facebook\AutoloadMap\Generated\is_dev;
+use namespace Facebook\AutoloadMap\Generated;
 
-final class Router implements RouterInterface {
+final class Router implements IRouter {
   use RouteCollectorTrait;
 
-  private ?HackRouter\IResolver<RouteInterface> $resolver;
-  protected vec<RouteInterface> $routes;
+  private ?HackRouter\IResolver<Route> $resolver;
+  protected vec<Route> $routes;
 
-  public function __construct(Container<RouteInterface> $routes = vec[]) {
+  public function __construct(
+    private bool $cache = false,
+    Container<Route> $routes = vec[],
+  ) {
     $this->routes = vec($routes);
   }
 
@@ -40,7 +38,7 @@ final class Router implements RouterInterface {
    * or `generateUri()` have already been called, to ensure integrity of the
    * router between invocations of either of those methods.
    */
-  public function addRoute(RouteInterface $route): void {
+  public function addRoute(Route $route): void {
     $this->routes[] = $route;
   }
 
@@ -55,7 +53,7 @@ final class Router implements RouterInterface {
    */
   public function route(
     string $path,
-    MiddlewareInterface $middleware,
+    Server\IMiddleware $middleware,
     ?Container<string> $methods = null,
     ?string $name = null,
   ): Route {
@@ -69,7 +67,7 @@ final class Router implements RouterInterface {
   /**
    * Retrieve all directly registered routes with the application.
    */
-  public function getRoutes(): Container<RouteInterface> {
+  public function getRoutes(): Container<Route> {
     return $this->routes;
   }
 
@@ -81,7 +79,7 @@ final class Router implements RouterInterface {
    * when done, they will then marshal a `RouteResult` instance indicating
    * the results of the matching operation and return it to the caller.
    */
-  public function match(RequestInterface $request): RouteResultInterface {
+  public function match(Message\AbstractRequest $request): RouteResult {
     $method = HackRouter\HttpMethod::assert($request->getMethod());
     $path = $request->getUri()->getPath();
     $resolver = $this->getResolver();
@@ -125,7 +123,7 @@ final class Router implements RouterInterface {
   public function generateUri(
     string $route,
     KeyedContainer<string, mixed> $substitutions = dict[],
-  ): UriInterface {
+  ): Message\Uri {
     $routes = Dict\from_values($this->routes, ($route) ==> $route->getName());
     if (!C\contains_key($routes, $route)) {
       $message = Str\format('Route %s doesn\'t exist', $route);
@@ -186,9 +184,9 @@ final class Router implements RouterInterface {
         }
       }
 
-      return new Uri($uriBuilder->getPath());
+      return new Message\Uri($uriBuilder->getPath());
     } catch (\Exception $e) {
-      if (!$e is Exception\ExceptionInterface) {
+      if (!$e is Exception\IException) {
         $e = new Exception\RuntimeException(
           $e->getMessage(),
           $e->getCode(),
@@ -200,12 +198,12 @@ final class Router implements RouterInterface {
     }
   }
 
-  private function getResolver(): HackRouter\IResolver<RouteInterface> {
+  private function getResolver(): HackRouter\IResolver<Route> {
     if ($this->resolver is nonnull) {
       return $this->resolver;
     }
 
-    if (is_dev()) {
+    if (!$this->cache) {
       $routes = null;
     } else {
       $routes = \apc_fetch(__FILE__.'/cache');
@@ -217,7 +215,7 @@ final class Router implements RouterInterface {
     if ($routes is null) {
       $routes = _Private\map($this->routes);
 
-      if (!is_dev()) {
+      if ($this->cache) {
         \apc_store(__FILE__.'/cache', $routes);
       }
     }

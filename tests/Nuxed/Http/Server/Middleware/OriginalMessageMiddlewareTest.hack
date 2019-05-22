@@ -36,7 +36,7 @@ class OriginalMessageMiddlewareTest extends HackTest {
         $handler->handle($request->withUri($request->getUri()->withPort(8080))),
     );
 
-    $middleware = Server\pipe(
+    $middleware = Server\stack(
       new Server\Middleware\OriginalMessagesMiddleware(),
       $RequestModifier,
       $UriModifier,

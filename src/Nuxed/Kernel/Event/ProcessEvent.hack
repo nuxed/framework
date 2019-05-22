@@ -1,12 +1,12 @@
 namespace Nuxed\Kernel\Event;
 
-use type Nuxed\Contract\Event\EventInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
+use namespace Nuxed\EventDispatcher;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Message;
 
-class ProcessEvent implements EventInterface {
+final class ProcessEvent implements EventDispatcher\IEvent {
   public function __construct(
-    public ServerRequestInterface $request,
-    public RequestHandlerInterface $handler,
+    public Message\ServerRequest $request,
+    public Server\IRequestHandler $handler,
   ) {}
 }

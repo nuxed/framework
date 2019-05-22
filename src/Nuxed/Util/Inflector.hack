@@ -1,7 +1,6 @@
 namespace Nuxed\Util;
 
 use namespace HH\Lib\Str;
-use function ctype_upper;
 
 final abstract class Inflector {
   /**
@@ -172,7 +171,7 @@ final abstract class Inflector {
           // Check whether the first character in the plural suffix
           // is uppercased. If yes, uppercase the first character in
           // the singular suffix too
-          $firstUpper = ctype_upper($pluralRev[$j - 1]);
+          $firstUpper = \ctype_upper($pluralRev[$j - 1]);
 
           $singulars = vec[];
 

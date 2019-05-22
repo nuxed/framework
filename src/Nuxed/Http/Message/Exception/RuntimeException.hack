@@ -7,5 +7,5 @@ namespace Nuxed\Http\Message\Exception;
   UploadedFileErrorException::class,
   UploadedFileAlreadyMovedException::class,
 )>>
-class RuntimeException extends \RuntimeException implements ExceptionInterface {
+class RuntimeException extends \RuntimeException implements IException {
 }

@@ -1,22 +1,19 @@
 namespace Nuxed\Http\Flash;
 
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Session\SessionInterface;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Message;
 
-final class FlashMessagesMiddleware implements MiddlewareInterface {
+final class FlashMessagesMiddleware implements Server\IMiddleware {
   public function __construct(
     private string $key = FlashMessages::FLASH_NEXT,
   ) {}
 
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
-    $session = $request->getAttribute('session') as SessionInterface;
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
+    $session = $request->getSession();
     $flash = FlashMessages::create($session, $this->key);
-    return await $handler->handle($request->withAttribute('flash', $flash));
+    return await $handler->handle($request->withFlash($flash));
   }
 }

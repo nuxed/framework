@@ -5,7 +5,6 @@ use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Math;
 use type Nuxed\Util\StringableTrait;
-use function microtime;
 
 class Event {
   use StringableTrait;
@@ -188,7 +187,7 @@ class Event {
    * @return float Time in ms
    */
   protected function getNow(): num {
-    return $this->formatTime(microtime(true) * 1000 - $this->origin);
+    return $this->formatTime(\microtime(true) * 1000 - $this->origin);
   }
 
   /**

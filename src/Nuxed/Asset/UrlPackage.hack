@@ -2,15 +2,10 @@ namespace Nuxed\Asset;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
-use type Nuxed\Asset\Context\ContextInterface;
+use type Nuxed\Asset\Context\IContext;
 use type Nuxed\Asset\Exception\InvalidArgumentException;
 use type Nuxed\Asset\Exception\LogicException;
-use type Nuxed\Asset\VersionStrategy\VersionStrategyInterface;
-use function hexdec;
-use function hash;
-use function fmod;
-use function parse_url;
-use const PHP_URL_SCHEME;
+use type Nuxed\Asset\VersionStrategy\IVersionStrategy;
 
 /**
  * Package that adds a base URL to asset URLs in addition to a version.
@@ -33,13 +28,13 @@ class UrlPackage extends Package {
 
   /**
    * @param Container<string>        $baseUrls        Base asset URLs
-   * @param VersionStrategyInterface $versionStrategy The version strategy
-   * @param ContextInterface|null    $context         Context
+   * @param IVersionStrategy $versionStrategy The version strategy
+   * @param IContext|null    $context         Context
    */
   public function __construct(
     Container<string> $baseUrls,
-    VersionStrategyInterface $versionStrategy,
-    ContextInterface $context = new Context\NullContext(),
+    IVersionStrategy $versionStrategy,
+    IContext $context = new Context\NullContext(),
   ) {
     parent::__construct($versionStrategy, $context);
 
@@ -110,8 +105,8 @@ class UrlPackage extends Package {
    * @return int The base URL index for the given path
    */
   protected function chooseBaseUrl(string $path): int {
-    return (int)fmod(
-      (float)hexdec(Str\slice(hash('sha256', $path), 0, 10)),
+    return (int)\fmod(
+      (float)\hexdec(Str\slice(\hash('sha256', $path), 0, 10)),
       (float)C\count($this->baseUrls),
     );
   }
@@ -121,7 +116,7 @@ class UrlPackage extends Package {
     foreach ($urls as $url) {
       if (Str\starts_with($url, 'https://') || Str\starts_with($url, '//')) {
         $sslUrls[] = $url;
-      } else if (null === parse_url($url, PHP_URL_SCHEME)) {
+      } else if (null === \parse_url($url, \PHP_URL_SCHEME)) {
         throw new InvalidArgumentException(
           Str\format('"%s" is not a valid URL', $url),
         );

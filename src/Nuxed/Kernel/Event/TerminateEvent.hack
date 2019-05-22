@@ -1,12 +1,11 @@
 namespace Nuxed\Kernel\Event;
 
-use type Nuxed\Contract\Event\EventInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
+use namespace Nuxed\EventDispatcher;
+use namespace Nuxed\Http\Message;
 
-class TerminateEvent implements EventInterface {
+class TerminateEvent implements EventDispatcher\IEvent {
   public function __construct(
-    public ServerRequestInterface $request,
-    public ResponseInterface $response,
+    public Message\ServerRequest $request,
+    public Message\Response $response,
   ) {}
 }

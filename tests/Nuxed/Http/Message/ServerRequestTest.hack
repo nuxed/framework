@@ -2,15 +2,17 @@ namespace Nuxed\Test\Http\Message;
 
 use namespace HH\Lib\C;
 use namespace Nuxed\Http\Message;
-use type Nuxed\Contract\Http\Message\UploadedFileError;
 use type Facebook\HackTest\HackTest;
 use function Facebook\FBExpect\expect;
 
 class ServerRequestTest extends HackTest {
   public function testUploadsFiles(): void {
     $request1 = new Message\ServerRequest('GET', Message\uri('/'));
-    $factory = new Message\MessageFactory();
-    $file = $factory->createUploadedFile($factory->createStream('test'));
+    $file = new Message\UploadedFile(
+      Message\stream('test'),
+      null,
+      Message\UploadedFileError::ERROR_OK,
+    );
     $request2 = $request1->withUploadedFiles(['file' => $file]);
     expect($request2)->toNotBeSame($request1);
     expect($request1->getUploadedFiles())->toBeEmpty();

@@ -1,15 +1,13 @@
 namespace Nuxed\Http\Server\Middleware;
 
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Server;
 
-class OriginalMessagesMiddleware implements MiddlewareInterface {
+class OriginalMessagesMiddleware implements Server\IMiddleware {
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
     return await $handler->handle(
       $request
         ->withAttribute('OriginalUri', $request->getUri())

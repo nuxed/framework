@@ -4,5 +4,5 @@ use type InvalidArgumentException;
 
 class JsonDecodeException
   extends InvalidArgumentException
-  implements ExceptionInterface {
+  implements IException {
 }

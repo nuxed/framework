@@ -2,20 +2,22 @@ namespace Nuxed\Http\Flash;
 
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
-use namespace Nuxed\Contract\Http;
+use namespace Nuxed\Http\Session;
 use namespace Facebook\TypeAssert;
 
-class FlashMessages implements Http\Flash\FlashMessagesInterface {
+final class FlashMessages {
+  const string FLASH_NEXT = self::class.'::FLASH_NEXT';
+
   const type TMessages = KeyedContainer<string, shape(
-    'value' => mixed,
+    'value' => dynamic,
     'hops' => int,
     ...
   )>;
 
-  private dict<string, mixed> $current = dict[];
+  private dict<string, dynamic> $current = dict[];
 
   public function __construct(
-    private Http\Session\SessionInterface $session,
+    private Session\Session $session,
     private string $key,
   ) {
     $this->prepare();
@@ -25,16 +27,16 @@ class FlashMessages implements Http\Flash\FlashMessagesInterface {
    * Create an instance from a session container.
    */
   public static function create(
-    Http\Session\SessionInterface $session,
+    Session\Session $session,
     string $sessionKey = self::FLASH_NEXT,
-  ): Http\Flash\FlashMessagesInterface {
+  ): this {
     return new FlashMessages($session, $sessionKey);
   }
 
   /**
    * Set a flash value with the given key.
    */
-  public function flash(string $name, mixed $value, int $hops = 1): void {
+  public function flash(string $name, dynamic $value, int $hops = 1): void {
     if ($hops < 1) {
       throw new Exception\InvalidHopsValueException(Str\format(
         'Hops value specified for flash message "%s" was too low; must be greater than 0, received %d',
@@ -54,7 +56,7 @@ class FlashMessages implements Http\Flash\FlashMessagesInterface {
   /**
    * Set a flash value with the given key, but allow access during this request.
    */
-  public function now(string $name, mixed $value, int $hops = 1): void {
+  public function now(string $name, dynamic $value, int $hops = 1): void {
     $this->current[$name] = $value;
     $this->flash($name, $value, $hops);
   }
@@ -62,14 +64,14 @@ class FlashMessages implements Http\Flash\FlashMessagesInterface {
   /**
   * Retrieve a flash value.
   */
-  public function get(string $name, mixed $default = null): mixed {
+  public function get(string $name, ?dynamic $default = null): dynamic {
     return $this->current[$name] ?? $default;
   }
 
   /**
    * Retrieve all flash items.
    */
-  public function items(): KeyedContainer<string, mixed> {
+  public function items(): KeyedContainer<string, dynamic> {
     return $this->current;
   }
 
@@ -77,7 +79,7 @@ class FlashMessages implements Http\Flash\FlashMessagesInterface {
    * Clear all flash values.
    */
   public function clear(): void {
-    $this->session->remove($this->key);
+    $this->session->forget($this->key);
   }
 
   /**
@@ -115,7 +117,7 @@ class FlashMessages implements Http\Flash\FlashMessagesInterface {
     }
 
     if (C\is_empty($messages)) {
-      $this->session->remove($this->key);
+      $this->session->forget($this->key);
     } else {
       $this->session->set($this->key, $messages);
     }

@@ -3,23 +3,6 @@ namespace Nuxed\Io;
 use namespace HH\Asio;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Regex;
-use type Stringish;
-use function is_writable;
-use function is_readable;
-use function is_executable;
-use function rename;
-use function clearstatcache;
-use function fileatime;
-use function filectime;
-use function filegroup;
-use function filemtime;
-use function fileowner;
-use function fileperms;
-use function chgrp;
-use function chmod;
-use function chown;
-use function lchgrp;
-use function lchown;
 
 /**
  * Shared functionality between file and folder objects.
@@ -37,7 +20,7 @@ abstract class Node {
    * Initialize the node path. If the node doesn't exist and `$create` is true, create it.
    */
   public function __construct(
-    Stringish $path,
+    \Stringish $path,
     bool $create = false,
     int $mode = 0755,
   ) {
@@ -53,7 +36,7 @@ abstract class Node {
    */
   public function accessTime(): int {
     $this->isAvailable();
-    return fileatime($this->path->toString()) as int;
+    return \fileatime($this->path->toString()) as int;
   }
 
   /**
@@ -68,7 +51,7 @@ abstract class Node {
    */
   public function changeTime(): int {
     $this->isAvailable();
-    return filectime($this->path->toString()) as int;
+    return \filectime($this->path->toString()) as int;
   }
 
   /**
@@ -81,10 +64,10 @@ abstract class Node {
     $this->isAvailable();
     $this->reset();
     if ($this->path->isSymlink()) {
-      return lchgrp($this->path->toString(), $group) as bool;
+      return \lchgrp($this->path->toString(), $group) as bool;
     }
 
-    return chgrp($this->path->toString(), $group) as bool;
+    return \chgrp($this->path->toString(), $group) as bool;
   }
 
   /**
@@ -96,7 +79,7 @@ abstract class Node {
   ): Awaitable<bool> {
     $this->isAvailable();
     $this->reset();
-    return chmod($this->path->toString(), $mode) as bool;
+    return \chmod($this->path->toString(), $mode) as bool;
   }
 
   /**
@@ -109,10 +92,10 @@ abstract class Node {
     $this->isAvailable();
     $this->reset();
     if ($this->path->isSymlink()) {
-      return lchown($this->path->toString(), $user) as bool;
+      return \lchown($this->path->toString(), $user) as bool;
     }
 
-    return chown($this->path->toString(), $user) as bool;
+    return \chown($this->path->toString(), $user) as bool;
   }
 
   /**
@@ -143,7 +126,7 @@ abstract class Node {
   /**
    * Helper method for deleting a file or folder.
    */
-  public static async function destroy(Stringish $path): Awaitable<bool> {
+  public static async function destroy(\Stringish $path): Awaitable<bool> {
     $path = Path::create($path);
     if (!$path->exists()) {
       throw new Exception\MissingNodeException(
@@ -165,7 +148,7 @@ abstract class Node {
    * Is the file executable.
    */
   public function executable(): bool {
-    return is_executable($this->path->toString()) as bool;
+    return \is_executable($this->path->toString()) as bool;
   }
 
   /**
@@ -180,7 +163,7 @@ abstract class Node {
    */
   public function group(): int {
     $this->isAvailable();
-    return filegroup($this->path->toString()) as int;
+    return \filegroup($this->path->toString()) as int;
   }
 
   /**
@@ -200,7 +183,7 @@ abstract class Node {
   /**
    * Attempt to load a file or folder object at a target location.
    */
-  final public static function load(Stringish $path): Node {
+  final public static function load(\Stringish $path): Node {
     $path = Path::create($path);
     if (!$path->exists()) {
       throw new Exception\MissingNodeException(
@@ -220,7 +203,7 @@ abstract class Node {
    */
   public function modifyTime(): int {
     $this->isAvailable();
-    return filemtime($this->path->toString()) as int;
+    return \filemtime($this->path->toString()) as int;
   }
 
   /**
@@ -251,7 +234,7 @@ abstract class Node {
     }
 
     // Move node
-    $moved = rename($this->path->toString(), $target->toString()) as bool;
+    $moved = \rename($this->path->toString(), $target->toString()) as bool;
     if ($moved) {
       $this->reset($target);
     }
@@ -271,7 +254,7 @@ abstract class Node {
    */
   public function owner(): int {
     $this->isAvailable();
-    return fileowner($this->path->toString()) as int;
+    return \fileowner($this->path->toString()) as int;
   }
 
   /**
@@ -303,7 +286,7 @@ abstract class Node {
    */
   public function permissions(): int {
     $this->isAvailable();
-    return fileperms($this->path->toString()) & 0777;
+    return \fileperms($this->path->toString()) & 0777;
   }
 
   /**
@@ -317,7 +300,7 @@ abstract class Node {
    * Is the node readable.
    */
   public function readable(): bool {
-    return is_readable($this->path->toString());
+    return \is_readable($this->path->toString());
   }
 
   /**
@@ -333,6 +316,8 @@ abstract class Node {
     bool $overwrite = true,
   ): Awaitable<bool> {
     $this->isAvailable();
+    $this->parent()?->isWritable();
+
     // Remove unwanted characters
     $name = Regex\replace(
       Path::create($name)->basename(),
@@ -344,6 +329,9 @@ abstract class Node {
     if ($name === $this->name()) {
       return true;
     }
+
+    // Append extension
+    $name .= Str\slice($this->basename(), Str\length($this->name()));
 
     // Prepend folder
     $target = Path::create($this->dir()->toString().$name);
@@ -361,7 +349,7 @@ abstract class Node {
     }
 
     // Rename the file within the current folder
-    if (rename($this->path->toString(), $target->toString())) {
+    if (\rename($this->path->toString(), $target->toString())) {
       $this->reset($target);
 
       return true;
@@ -375,7 +363,7 @@ abstract class Node {
    */
   public function reset(Path $path = $this->path): this {
     $this->path = $this->normalizePath($path);
-    clearstatcache();
+    \clearstatcache();
 
     return $this;
   }
@@ -389,7 +377,7 @@ abstract class Node {
    * Is the node writable.
    */
   public function writable(): bool {
-    return is_writable($this->path->toString());
+    return \is_writable($this->path->toString());
   }
 
   /**

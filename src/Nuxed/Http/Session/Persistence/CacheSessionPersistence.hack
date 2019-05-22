@@ -1,13 +1,10 @@
 namespace Nuxed\Http\Session\Persistence;
 
 use namespace HH\Lib\C;
+use namespace Nuxed\Cache;
 use namespace Facebook\TypeSpec;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Session\SessionInterface;
-use type Nuxed\Contract\Cache\CacheInterface;
-use type Nuxed\Http\Session\CacheLimiter;
-use type Nuxed\Http\Session\Session;
+use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\Session;
 
 /**
  * Session persistence using a cache item pool.
@@ -18,16 +15,16 @@ use type Nuxed\Http\Session\Session;
  */
 class CacheSessionPersistence extends AbstractSessionPersistence {
   public function __construct(
-    private CacheInterface $cache,
+    private Cache\ICache $cache,
     protected this::TCookieOptions $cookieOptions,
-    protected ?CacheLimiter $cacheLimiter,
+    protected ?Session\CacheLimiter $cacheLimiter,
     protected int $cacheExpire,
   ) {}
 
   <<__Override>>
   public async function initialize(
-    ServerRequestInterface $request,
-  ): Awaitable<SessionInterface> {
+    Message\ServerRequest $request,
+  ): Awaitable<Session\Session> {
     $this->pathTranslated = (string)(
       $request->getServerParams()['PATH_TRANSLATED'] ?? ''
     );
@@ -36,14 +33,16 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
     if ($id !== '') {
       $sessionData = await $this->getSessionDataFromCache($id);
     }
-    return new Session($sessionData, $id);
+
+    /* HH_IGNORE_ERROR[4110] */
+    return new Session\Session($sessionData, $id);
   }
 
   <<__Override>>
   public async function persist(
-    SessionInterface $session,
-    ResponseInterface $response,
-  ): Awaitable<ResponseInterface> {
+    Session\Session $session,
+    Message\Response $response,
+  ): Awaitable<Message\Response> {
     $id = $session->getId();
 
     // New session? No data? Nothing to do.

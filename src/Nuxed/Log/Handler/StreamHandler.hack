@@ -2,7 +2,7 @@ namespace Nuxed\Log\Handler;
 
 use namespace HH\Lib\Str;
 use namespace Nuxed\Log;
-use type Nuxed\Contract\Log\LogLevel;
+use type Nuxed\Log\LogLevel;
 
 class StreamHandler extends AbstractHandler {
   protected ?resource $stream;
@@ -59,7 +59,7 @@ class StreamHandler extends AbstractHandler {
    * {@inheritdoc}
    */
   <<__Override>>
-  protected function write(Log\Record $record): void {
+  protected function write(Log\LogRecord $record): void {
     $message = $record['formatted'] ?? $record['message'];
 
     if (null === $this->stream) {

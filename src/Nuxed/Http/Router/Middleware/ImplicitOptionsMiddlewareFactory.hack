@@ -1,16 +1,13 @@
 namespace Nuxed\Http\Router\Middleware;
 
-use namespace His\Container;
-use namespace Nuxed\Contract\Service;
-use namespace Nuxed\Contract\Http\Message;
+use namespace Nuxed\Container;
+use namespace Nuxed\Contract;
 
 class ImplicitOptionsMiddlewareFactory
-  implements Service\FactoryInterface<ImplicitOptionsMiddleware> {
+  implements Container\IFactory<ImplicitOptionsMiddleware> {
   public function create(
-    Container\ContainerInterface $container,
+    Container\IServiceContainer $_container,
   ): ImplicitOptionsMiddleware {
-    return new ImplicitOptionsMiddleware(
-      $container->get(Message\ResponseFactoryInterface::class),
-    );
+    return new ImplicitOptionsMiddleware();
   }
 }

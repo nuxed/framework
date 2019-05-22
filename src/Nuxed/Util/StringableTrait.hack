@@ -1,6 +1,6 @@
 namespace Nuxed\Util;
 
-use type Nuxed\Contract\Util\Stringable;
+use type Nuxed\Util\Stringable;
 use type Throwable;
 use type Stringish;
 

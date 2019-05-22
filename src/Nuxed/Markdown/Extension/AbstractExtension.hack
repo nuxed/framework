@@ -4,7 +4,7 @@ use type Facebook\Markdown\RenderFilter;
 use type Facebook\Markdown\Inlines\Inline;
 use type Facebook\Markdown\UnparsedBlocks\BlockProducer;
 
-class AbstractExtension implements ExtensionInterface {
+class AbstractExtension implements IExtension {
   /**
    * @see Facebook\Markdown\RenderContext::appendFilters()
    */

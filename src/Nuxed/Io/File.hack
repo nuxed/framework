@@ -4,22 +4,6 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\Filesystem;
-use type Exception;
-use function filesize;
-use function touch;
-use function copy;
-use function md5_file;
-use function link;
-use function unlink;
-use function symlink;
-use function finfo_close;
-use function finfo_file;
-use function finfo_open;
-use function tempnam;
-use function sys_get_temp_dir;
-use const FILEINFO_MIME_TYPE;
-use const PATHINFO_BASENAME;
-use const PATHINFO_FILENAME;
 
 final class File extends Node {
   <<__ReturnDisposable>>
@@ -29,7 +13,7 @@ final class File extends Node {
 
     try {
       return Filesystem\open_read_only($this->path->toString());
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
           'Error while opening file (%s) for reading.',
@@ -74,7 +58,7 @@ final class File extends Node {
 
     try {
       return Filesystem\open_write_only($this->path->toString(), $mode);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
           'Error while opening file (%s) for writing (mode:%s).',
@@ -89,14 +73,14 @@ final class File extends Node {
 
   public static async function temporary(
     string $perfix,
-    Path $directory = Path::create(sys_get_temp_dir()),
+    Path $directory = Path::create(\sys_get_temp_dir()),
   ): Awaitable<File> {
     $folder = new Folder($directory, true);
     if (!$folder->exists()) {
       await $folder->create();
     }
     return new self(
-      Path::create(tempnam($directory->toString(), $perfix)),
+      Path::create(\tempnam($directory->toString(), $perfix)),
       true,
     );
   }
@@ -123,7 +107,7 @@ final class File extends Node {
     }
 
     if ($folder->writable()) {
-      $created = touch($this->path->toString()) as bool;
+      $created = \touch($this->path->toString()) as bool;
       if ($created) {
         await $this->chmod($mode);
       }
@@ -153,7 +137,7 @@ final class File extends Node {
       );
     }
 
-    if (copy($this->path->toString(), $target->toString())) {
+    if (\copy($this->path->toString(), $target->toString())) {
       $file = new File($target);
       await $file->chmod($mode);
 
@@ -171,7 +155,7 @@ final class File extends Node {
   <<__Override>>
   public async function delete(): Awaitable<bool> {
     $this->isAvailable();
-    $deleted = unlink($this->path->toString());
+    $deleted = \unlink($this->path->toString());
     $this->reset();
     return $deleted;
   }
@@ -189,7 +173,7 @@ final class File extends Node {
   public function md5(bool $raw = false): string {
     $this->isAvailable();
     $this->isReadable();
-    return md5_file($this->path->toString(), $raw) as string;
+    return \md5_file($this->path->toString(), $raw) as string;
   }
 
   /**
@@ -197,9 +181,9 @@ final class File extends Node {
    */
   public function mimeType(): string {
     $this->isAvailable();
-    $info = finfo_open(FILEINFO_MIME_TYPE);
-    $type = finfo_file($info, $this->path->toString());
-    finfo_close($info);
+    $info = \finfo_open(\FILEINFO_MIME_TYPE);
+    $type = \finfo_file($info, $this->path->toString());
+    \finfo_close($info);
     return $type as string;
   }
 
@@ -226,7 +210,7 @@ final class File extends Node {
   public async function append(string $data): Awaitable<void> {
     try {
       await $this->write($data, Filesystem\FileWriteMode::APPEND);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       throw new Exception\WriteErrorException(
         Str\format(
           'Error while appending data to file (%s).',
@@ -245,7 +229,7 @@ final class File extends Node {
     try {
       $content = await $this->read();
       await $this->write($data.$content);
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       throw new Exception\WriteErrorException(
         Str\format(
           'Error while prepending data to file (%s).',
@@ -272,7 +256,7 @@ final class File extends Node {
           await $file->writeAsync($data);
         }
       }
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       throw new Exception\WriteErrorException(
         Str\format(
           'Error while writing to file (%s).',
@@ -296,7 +280,7 @@ final class File extends Node {
           return await $handle->readAsync($length);
         }
       }
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       throw new Exception\ReadErrorException(
         Str\format(
           'Error while reading from file (%s).',
@@ -325,7 +309,7 @@ final class File extends Node {
   <<__Override>>
   public async function size(): Awaitable<int> {
     $this->isAvailable();
-    return filesize($this->path->toString()) as int;
+    return \filesize($this->path->toString()) as int;
   }
 
   /**
@@ -339,7 +323,7 @@ final class File extends Node {
       );
     }
 
-    @symlink($this->path->toString(), $target->toString());
+    @\symlink($this->path->toString(), $target->toString());
     if (!$target->exists() || !$target->isSymlink()) {
       throw new Exception\RuntimeException(Str\format(
         'Error while creating a symbolic link (%s) for file (%s).',
@@ -362,7 +346,7 @@ final class File extends Node {
       );
     }
 
-    @link($this->path->toString(), $link->toString());
+    @\link($this->path->toString(), $link->toString());
     if (!$link->exists()) {
       throw new Exception\RuntimeException(Str\format(
         'Error while creating a hard link (%s) for file (%s).',

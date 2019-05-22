@@ -1,15 +1,13 @@
 namespace Nuxed\Http\Server\Exception;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Contract\Http\Server\MiddlewarePipeInterface;
-use type OutOfBoundsException;
+use namespace Nuxed\Http\Server;
 
-<<__ConsistentConstruct>>
-class EmptyPipelineException
-  extends OutOfBoundsException
-  implements ExceptionInterface {
+final class EmptyPipelineException
+  extends \OutOfBoundsException
+  implements IException {
   public static function forClass(
-    classname<MiddlewarePipeInterface> $class,
+    classname<Server\IRequestHandler> $class,
   ): this {
     return new static(Str\format(
       '%s cannot handle request; no middleware available to process the request.',

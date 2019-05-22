@@ -1,15 +1,14 @@
 namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\Experimental\Filesystem;
-use namespace Nuxed\Contract\Http\Message;
 
-class UploadedFile implements Message\UploadedFileInterface {
+class UploadedFile {
   private bool $moved = false;
 
   public function __construct(
-    private Message\StreamInterface $stream,
+    private IStream $stream,
     private ?int $size,
-    private Message\UploadedFileError $error,
+    private UploadedFileError $error,
     private ?string $clientFilename = null,
     private ?string $clientMediaType = null,
   ) {}
@@ -18,11 +17,11 @@ class UploadedFile implements Message\UploadedFileInterface {
    * @return bool return true if there is no upload error
    */
   private function isOk(): bool {
-    return Message\UploadedFileError::ERROR_OK === $this->error;
+    return UploadedFileError::ERROR_OK === $this->error;
   }
 
   /**
-   * @throws Exception\ExceptionInterface if is moved or not ok
+   * @throws Exception\IException if is moved or not ok
    */
   private function validateActive(): void {
     if (false === $this->isOk()) {
@@ -36,7 +35,7 @@ class UploadedFile implements Message\UploadedFileInterface {
     }
   }
 
-  public function getStream(): Message\StreamInterface {
+  public function getStream(): IStream {
     $this->validateActive();
 
     return $this->stream;
@@ -55,16 +54,15 @@ class UploadedFile implements Message\UploadedFileInterface {
     if ($stream->isSeekable()) {
       $stream->rewind();
     }
-
     await using (
-      $handle = Filesystem\open_write_only(
+      $target = Filesystem\open_write_only(
         $targetPath,
         Filesystem\FileWriteMode::OPEN_OR_CREATE,
       )
     ) {
       while (!$stream->isEndOfFile()) {
         $content = await $stream->readAsync(1048576);
-        await $handle->writeAsync($content);
+        await $target->writeAsync($content);
       }
     }
 
@@ -79,7 +77,7 @@ class UploadedFile implements Message\UploadedFileInterface {
     return $this->size;
   }
 
-  public function getError(): Message\UploadedFileError {
+  public function getError(): UploadedFileError {
     return $this->error;
   }
 

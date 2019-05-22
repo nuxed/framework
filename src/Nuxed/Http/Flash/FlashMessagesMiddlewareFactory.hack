@@ -1,16 +1,16 @@
 namespace Nuxed\Http\Flash;
 
-use namespace His\Container;
-use namespace Nuxed\Contract\Service;
+use namespace Nuxed\Container;
+use namespace Nuxed\Contract;
 
 final class FlashMessagesMiddlewareFactory
-  implements Service\FactoryInterface<FlashMessagesMiddleware> {
+  implements Container\IFactory<FlashMessagesMiddleware> {
   public function __construct(
     private string $key = FlashMessages::FLASH_NEXT,
   ) {}
 
   public function create(
-    Container\ContainerInterface $_container,
+    Container\IServiceContainer $_container,
   ): FlashMessagesMiddleware {
     return new FlashMessagesMiddleware($this->key);
   }

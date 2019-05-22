@@ -1,21 +1,19 @@
 namespace Nuxed\Http\Server\Middleware;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Contract\Http\Message\ResponseInterface;
-use type Nuxed\Contract\Http\Message\ServerRequestInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
-use type Nuxed\Contract\Http\Server\RequestHandlerInterface;
+use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\Message;
 
-class HostMiddlewareDecorator implements MiddlewareInterface {
+class HostMiddlewareDecorator implements Server\IMiddleware {
   public function __construct(
     private string $host,
-    private MiddlewareInterface $middleware,
+    private Server\IMiddleware $middleware,
   ) {}
 
   public async function process(
-    ServerRequestInterface $request,
-    RequestHandlerInterface $handler,
-  ): Awaitable<ResponseInterface> {
+    Message\ServerRequest $request,
+    Server\IRequestHandler $handler,
+  ): Awaitable<Message\Response> {
     $host = $request->getUri()->getHost();
 
     if ($host !== Str\lowercase($this->host)) {

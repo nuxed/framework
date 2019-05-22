@@ -1,11 +1,13 @@
 namespace Nuxed\Log\Processor;
 
-use type Nuxed\Log\Record;
+use type Nuxed\Log\LogRecord;
 
-class CallableProcessor implements ProcessorInterface {
-  public function __construct(protected (function(Record): Record) $callable) {}
+class CallableProcessor implements IProcessor {
+  public function __construct(
+    protected (function(LogRecord): LogRecord) $callable,
+  ) {}
 
-  public function process(Record $record): Record {
+  public function process(LogRecord $record): LogRecord {
     $fun = $this->callable;
 
     return $fun($record);

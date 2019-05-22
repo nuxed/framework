@@ -4,10 +4,9 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Regex;
-use type Nuxed\Contract\Http\Router\RouteInterface;
-use type Nuxed\Contract\Http\Server\MiddlewareInterface;
+use namespace Nuxed\Http\Server;
 
-class Route implements RouteInterface {
+class Route {
   const HTTP_METHOD_SEPARATOR = ':';
 
   private KeyedContainer<string, mixed> $options = dict[];
@@ -18,13 +17,13 @@ class Route implements RouteInterface {
 
   /**
    * @param string $path Path to match.
-   * @param MiddlewareInterface $middleware Middleware to use when this route is matched.
+   * @param Server\IMiddleware $middleware Middleware to use when this route is matched.
    * @param null|string[] $methods Allowed HTTP methods; defaults to HTTP_METHOD_ANY.
    * @param null|string $name the route name
    */
   public function __construct(
     private string $path,
-    private MiddlewareInterface $middleware,
+    private Server\IMiddleware $middleware,
     ?Container<string> $methods = null,
     ?string $name = null,
   ) {
@@ -56,7 +55,7 @@ class Route implements RouteInterface {
     return $this->name;
   }
 
-  public function getMiddleware(): MiddlewareInterface {
+  public function getMiddleware(): Server\IMiddleware {
     return $this->middleware;
   }
 
