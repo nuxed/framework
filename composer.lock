@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c156501b131a1dd891f557312823d6e4",
+    "content-hash": "41bc7916acbfdeb3f80b5149674bd3cf",
     "packages": [
         {
             "name": "azjezz/http-normalizer",
@@ -606,7 +606,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "hhvm": "^4.0"
+        "hhvm": "^4.6"
     },
     "platform-dev": []
 }

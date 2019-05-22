@@ -21,14 +21,14 @@
         }
     ],
     "require": {
-        "hhvm": "^4.0",
+        "hhvm": "^4.6",
         "azjezz/http-normalizer": "^0.1.1",
         "facebook/fbmarkdown": "^1.5",
         "facebook/hack-router": "^0.18",
         "facebook/xhp-lib": "^2.9",
         "hhvm/hhvm-autoload": "^2.0",
-        "hhvm/hsl": "^4.0",
-        "hhvm/hsl-experimental": "^4.0",
+        "hhvm/hsl": "^4.5",
+        "hhvm/hsl-experimental": "^4.5",
         "hhvm/type-assert": "^3.3",
         "his/container": "^0.1"
     },
