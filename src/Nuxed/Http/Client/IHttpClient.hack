@@ -10,7 +10,7 @@ interface IHttpClient {
    *
    * @return Awaitable<Message\Response>
    *
-   * @throws \Nuxed\Http\Client\Exception\IException If an error happens while processing the request.
+   * @throws Exception\IException If an error happens while processing the request.
    */
   public function send(Message\Request $request): Awaitable<Message\Response>;
 }
