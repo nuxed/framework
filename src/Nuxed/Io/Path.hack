@@ -141,11 +141,8 @@ final class Path implements \Stringish {
     string $path,
     bool $endSlash = false,
   ): string {
-    $path = Str\replace($path, '\\', '/');
-    if ($endSlash && !Str\ends_with($path, '/')) {
-      $path .= '/';
-    }
-    return $path;
+    return Str\replace($path, '\\', '/')
+      |> $endSlash && !Str\ends_with($$, '/') ? $$.'/' : $$;
   }
 
   /**
