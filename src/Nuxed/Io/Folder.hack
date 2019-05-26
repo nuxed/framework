@@ -4,6 +4,7 @@ use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
+use namespace HH\Lib\Regex;
 use type Nuxed\Io\Exception\InvalidPathException;
 
 final class Folder extends Node {
@@ -199,55 +200,22 @@ final class Folder extends Node {
   }
 
   /**
-   * Find all files and folders within the current folder that match a specific pattern.
+   * Find all files and folders within the current folder that match a specific regex pattern.
    */
-  public async function find<T as Node>(
-    string $pattern,
-    ?classname<T> $filter = null,
-  ): Awaitable<Container<T>> {
-    $this->isAvailable();
-    $this->isReadable();
-
-    try {
-      $directory = $this->path->toString();
-      $flags = \FilesystemIterator::SKIP_DOTS |
-        \FilesystemIterator::UNIX_PATHS |
-        \FilesystemIterator::NEW_CURRENT_AND_KEY;
-      $iterator = new \GlobIterator(
-        Path::standard($directory, true).$pattern,
-        $flags,
-      );
-    } catch (\Exception $e) {
-      throw new Exception\ReadErrorException(
-        Str\format(
-          'Error while reading from folder (%s).',
-          $this->path->toString(),
-        ),
-        $e->getCode(),
-        $e,
-      );
-    }
-
-    /**
-     * @link https://github.com/facebook/hhvm/issues/8090
-     */
-    $filter ??= Node::class;
-    $contents = vec[];
-    foreach ($iterator as $file) {
-      if (
-        $file->isDir() && ($filter === Node::class || $filter === Folder::class)
-      ) {
-        $contents[] = new Folder(Path::create($file->getPathname()));
-
-      } else if (
-        $file->isFile() && ($filter === Node::class || $filter === File::class)
-      ) {
-        $contents[] = new File(Path::create($file->getPathname()));
-      }
-    }
-
-    // UNSAFE
-    return $contents;
+  public async function find<Tr as Regex\Match>(
+    Regex\Pattern<Tr> $pattern,
+    bool $recursive = false,
+  ): Awaitable<Container<Node>> {
+    return Vec\filter(
+      await $this->list(true, $recursive, Node::class),
+      ($node) ==> Regex\matches(
+        $this->path()->relativeTo($node->path())
+          |> $$->toString()
+          |> Str\slice($$, 2)
+          |> Str\trim_right($$, '/'),
+        $pattern,
+      ),
+    );
   }
 
   /**

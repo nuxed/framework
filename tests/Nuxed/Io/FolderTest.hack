@@ -225,27 +225,29 @@ class FolderTest extends HackTest {
       $folder->touch('sub/c'),
     ]);
 
-    $result = await $folder->find('foo*', Io\Node::class);
+    $result = await $folder->find(re"/^foo([a-z\.])*/i");
     expect(C\count($result))->toBeSame(6);
-    $result = await $folder->find('*.txt', Io\File::class);
+    $result = await $folder->find(re"/^([a-z\.])*\.txt$/i", true);
     expect(C\count($result))->toBeSame(6);
-    $result = await $folder->find('*', Io\Folder::class);
-    expect(C\count($result))->toBeSame(7);
-    $result = await $folder->find('*');
+    $result = await $folder->find(re"/.*/");
     expect(C\count($result))->toBeSame(13);
-    $result = await $folder->find('sub/*', Io\File::class);
-    expect(C\count($result))->toBeSame(3);
-    $result = await $folder->find('*.baz.txt');
+    $result = await $folder->find(re"/^([a-z\.])*\.baz.txt$/i");
     expect(C\count($result))->toBeSame(2);
-    $result = await $folder->find('*bar*');
+    $result = await $folder->find(re"/.*bar.*/");
     expect(C\count($result))->toBeSame(8);
+    $result = await $folder->find(re"/.*a(r|z).*/i", true);
+    expect(C\count($result))->toBeSame(10);
+    $result = await $folder->find(re"/.*a.*/");
+    expect(C\count($result))->toBeSame(10);
+    $result = await $folder->find(re"/.*a.*/", true);
+    expect(C\count($result))->toBeSame(11);
   }
 
   <<DataProvider('provideMissingNodes')>>
   public function testFindThrowsIfFolderDoesntExist(Io\Folder $folder): void {
     expect(async () ==> {
       expect($folder->exists())->toBeFalse();
-      await $folder->find('bar');
+      await $folder->find(re"/.*/");
     })->toThrow(Io\Exception\MissingNodeException::class);
   }
 
@@ -256,7 +258,7 @@ class FolderTest extends HackTest {
     $this->markAsSkippedIfRoot();
     $permissions = $folder->permissions();
     await $folder->chmod(0111);
-    expect(() ==> $folder->find('*'))
+    expect(() ==> $folder->find(re"/.*/"))
       ->toThrow(Io\Exception\UnreadableNodeException::class);
     await $folder->chmod($permissions);
   }
