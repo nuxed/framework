@@ -191,14 +191,9 @@ final class CurlHttpClient extends HttpClient {
         continue;
       }
 
-      list($header, $value) = Str\split($header, ':', 2)
-        |> tuple(Str\trim($$[0]), Str\trim($$[1]));
-
-      $values = 'set-cookie' === Str\lowercase($header)
-        |> $$ ? vec[$value] : Str\split($value, ';')
-        |> Vec\map($$, ($v) ==> Str\trim($v));
-
-      $response = $response->withAddedHeader($header, $values);
+      $response = Str\split($header, ':', 2)
+        |> tuple(Str\trim($$[0]), vec[Str\trim($$[1])])
+        |> $response->withAddedHeader($$[0], $$[1]);
     }
 
     return $response;
