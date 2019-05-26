@@ -59,7 +59,7 @@
             "@test"
         ],
         "lint": "hhast-lint -v src/",
-        "test": "hacktest -v tests/",
+        "test": "hacktest tests/",
         "type-check": "hh_client src/"
     },
     "support": {

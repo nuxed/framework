@@ -320,20 +320,20 @@
         },
         {
             "name": "hhvm/type-assert",
-            "version": "v3.3.2",
+            "version": "v3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/type-assert.git",
-                "reference": "92f95a5726d705d219e703ab0baa3910d7565fe9"
+                "reference": "bc266f1e5a9f0797094a740a5988b8a442f1b46f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/type-assert/zipball/92f95a5726d705d219e703ab0baa3910d7565fe9",
-                "reference": "92f95a5726d705d219e703ab0baa3910d7565fe9",
+                "url": "https://api.github.com/repos/hhvm/type-assert/zipball/bc266f1e5a9f0797094a740a5988b8a442f1b46f",
+                "reference": "bc266f1e5a9f0797094a740a5988b8a442f1b46f",
                 "shasum": ""
             },
             "require": {
-                "hhvm": "^4.0",
+                "hhvm": "^4.1",
                 "hhvm/hsl": "^4.0"
             },
             "require-dev": {
@@ -357,7 +357,7 @@
                 "TypeAssert",
                 "hack"
             ],
-            "time": "2019-03-22T20:19:06+00:00"
+            "time": "2019-05-23T18:10:19+00:00"
         },
         {
             "name": "his/container",
@@ -553,26 +553,26 @@
         },
         {
             "name": "hhvm/hhast",
-            "version": "v4.6.0",
+            "version": "v4.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hhast.git",
-                "reference": "5ae13e95ed07f895358983c03fc7fee0bf47d3d8"
+                "reference": "8b8db37cebbb40639e60c39f9b54b4930d042697"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hhast/zipball/5ae13e95ed07f895358983c03fc7fee0bf47d3d8",
-                "reference": "5ae13e95ed07f895358983c03fc7fee0bf47d3d8",
+                "url": "https://api.github.com/repos/hhvm/hhast/zipball/8b8db37cebbb40639e60c39f9b54b4930d042697",
+                "reference": "8b8db37cebbb40639e60c39f9b54b4930d042697",
                 "shasum": ""
             },
             "require": {
                 "facebook/difflib": "^1.0.0",
                 "facebook/hh-clilib": "^2.0.0",
-                "hhvm": "^4.6",
+                "hhvm": "^4.7",
                 "hhvm/hhvm-autoload": "^2.0.4",
                 "hhvm/hsl": "^4.0",
                 "hhvm/hsl-experimental": "^4.5",
-                "hhvm/type-assert": "^3.1"
+                "hhvm/type-assert": "^3.4"
             },
             "require-dev": {
                 "facebook/fbexpect": "^2.1.1",
@@ -597,7 +597,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2019-05-21T17:56:31+00:00"
+            "time": "2019-05-23T20:31:58+00:00"
         }
     ],
     "aliases": [],
