@@ -10,6 +10,7 @@ final class MockHttpClient extends HttpClient {
     parent::__construct($options);
   }
 
+  <<__Override>>
   public function send(Message\Request $request): Awaitable<Message\Response> {
     $request = $this->prepare($request);
     $handler = $this->handler;
