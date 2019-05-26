@@ -15,7 +15,7 @@ final class Uri {
 
   private string $scheme = '';
 
-  private string $userInfo = '';
+  private (string, ?string) $userInfo = tuple('', null);
 
   private string $host = '';
 
@@ -62,8 +62,14 @@ final class Uri {
 
     $authority = $this->host;
 
-    if ('' !== $this->userInfo) {
-      $authority = $this->userInfo.'@'.$authority;
+    list($user, $password) = $this->userInfo;
+
+    if ('' !== $user) {
+      if ($password is nonnull) {
+        $authority = Str\format('%s:%s@%s', $user, $password, $authority);
+      } else {
+        $authority = Str\format('%s@%s', $user, $authority);
+      }
     }
 
     if (null !== $this->port) {
@@ -73,7 +79,7 @@ final class Uri {
     return $authority;
   }
 
-  public function getUserInfo(): string {
+  public function getUserInfo(): (string, ?string) {
     return $this->userInfo;
   }
 
@@ -112,11 +118,10 @@ final class Uri {
   }
 
   public function withUserInfo(string $user, ?string $password = null): this {
-    $info = $user;
-
-    if (null !== $password && '' !== $password) {
-      $info .= ':'.$password;
+    if ('' === $password) {
+      $password = null;
     }
+    $info = tuple($user, $password);
 
     if ($this->userInfo === $info) {
       return $this;
@@ -221,14 +226,15 @@ final class Uri {
       : '';
 
     if (C\contains_key($parts, 'user')) {
-      $this->userInfo = (string)$parts['user'];
+
+      $this->userInfo = tuple((string)$parts['user'], null);
 
       if (C\contains_key($parts, 'pass')) {
-        $this->userInfo .= ':'.$parts['pass'];
+        $this->userInfo = tuple((string)$parts['user'], (string)$parts['pass']);
       }
 
     } else {
-      $this->userInfo = '';
+      $this->userInfo = tuple('', null);
     }
   }
 
@@ -293,13 +299,17 @@ final class Uri {
       return null;
     }
 
+    if (!self::isNonStandardPort($this->scheme, $port)) {
+      return null;
+    }
+
     if (1 > $port || 0xffff < $port) {
       throw new Exception\InvalidArgumentException(
         Str\format('Invalid port: %d. Must be between 1 and 65535', $port),
       );
     }
 
-    return self::isNonStandardPort($this->scheme, $port) ? $port : null;
+    return $port;
   }
 
   private function filterPath(string $path): string {
