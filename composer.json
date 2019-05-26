@@ -35,7 +35,7 @@
     "require-dev": {
         "facebook/fbexpect": "^2.4",
         "hhvm/hacktest": "^1.4",
-        "hhvm/hhast": "^4.0"
+        "hhvm/hhast": "4.6"
     },
     "config": {
         "sort-packages": true
