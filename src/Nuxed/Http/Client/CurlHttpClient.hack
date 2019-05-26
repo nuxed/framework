@@ -179,12 +179,14 @@ final class CurlHttpClient extends HttpClient {
           $header = Str\trim($header)
             |> Str\slice($$, 0, Str\search($header, (string)$status))
             |> Str\trim($$);
-          $matches = Regex\first_match(
+
+          $response = Regex\first_match(
             $header,
             re"#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#",
-          ) as nonnull;
-
-          $response = $response->withProtocolVersion($matches['version']);
+          ) as nonnull
+            |> $$['version']
+            |> Str\contains($$, '.') ? $$ : ($$ . '.0')
+            |> $response->withProtocolVersion($$);
         }
         continue;
       }
