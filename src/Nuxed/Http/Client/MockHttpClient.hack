@@ -2,13 +2,17 @@ namespace Nuxed\Http\Client;
 
 use namespace Nuxed\Http\Message;
 
-final class MockHttpClient implements IHttpClient {
+final class MockHttpClient extends HttpClient {
   public function __construct(
-    private (function(Message\Request): Awaitable<Message\Response>) $client,
-  ) {}
+    private (function(Message\Request): Awaitable<Message\Response>) $handler,
+    HttpClientOptions $options = shape()
+  ) {
+    parent::__construct($options);
+  }
 
   public function send(Message\Request $request): Awaitable<Message\Response> {
-    $client = $this->client;
-    return $client($request);
+    $request = $this->prepare($request);
+    $handler = $this->handler;
+    return $handler($request);
   }
 }
