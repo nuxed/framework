@@ -14,7 +14,7 @@ class UriTest extends HackTest {
     );
     expect($uri->getScheme())->toBeSame('https');
     expect($uri->getAuthority())->toBeSame('user:pass@example.com:8080');
-    expect($uri->getUserInfo())->toBeSame(tuple('user','pass'));
+    expect($uri->getUserInfo())->toBeSame(tuple('user', 'pass'));
     expect($uri->getHost())->toBeSame('example.com');
     expect($uri->getPort())->toBeSame(8080);
     expect($uri->getPath())->toBeSame('/path/123');
@@ -132,7 +132,7 @@ class UriTest extends HackTest {
     $uri = new Message\Uri('0://0:0@0/0?0#0');
     expect($uri->getScheme())->toBeSame('0');
     expect($uri->getAuthority())->toBeSame('0:0@0');
-    expect($uri->getUserInfo())->toBeSame(tuple('0','0'));
+    expect($uri->getUserInfo())->toBeSame(tuple('0', '0'));
     expect($uri->getHost())->toBeSame('0');
     expect($uri->getPath())->toBeSame('/0');
     expect($uri->getQuery())->toBeSame('0');
@@ -150,7 +150,7 @@ class UriTest extends HackTest {
       ->withFragment('0');
     expect($uri->getScheme())->toBeSame('0');
     expect($uri->getAuthority())->toBeSame('0:0@0');
-    expect($uri->getUserInfo())->toBeSame(tuple('0','0'));
+    expect($uri->getUserInfo())->toBeSame(tuple('0', '0'));
     expect($uri->getHost())->toBeSame('0');
     expect($uri->getPath())->toBeSame('/0');
     expect($uri->getQuery())->toBeSame('0');
@@ -275,7 +275,7 @@ class UriTest extends HackTest {
 
   public function testAuthorityWithUserInfoButWithoutHost(): void {
     $uri = (new Message\Uri())->withUserInfo('user', 'pass');
-    expect($uri->getUserInfo())->toBeSame(tuple('user','pass'));
+    expect($uri->getUserInfo())->toBeSame(tuple('user', 'pass'));
     expect($uri->getAuthority())->toBeSame('');
   }
 
