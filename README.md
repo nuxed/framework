@@ -14,9 +14,9 @@
 
 ---
 
-### Security Vulnerabilities
+### Security
 
-If you discover a security vulnerability within Nuxed, please send an e-mail to Saif Eddin Gmati via azjezz@protonmail.com.
+For information on reporting security vulnerabilities in Nuxed, see [SECURITY.md](SECURITY.md).
 
 ---
 
