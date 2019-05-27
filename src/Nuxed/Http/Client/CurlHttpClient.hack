@@ -2,7 +2,6 @@ namespace Nuxed\Http\Client;
 
 use namespace HH\Asio;
 use namespace HH\Lib\C;
-use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
 use namespace HH\Lib\Math;
