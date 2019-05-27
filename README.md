@@ -10,11 +10,7 @@
 
 # Nuxed
 
-## Hack framework for building web applications with expressive, elegant syntax
-
----
-
-> Note: This repository contains the core code of the Nuxed framework. If you want to build an application using Nuxed, visit the main Nuxed repository.
+## High Performance, Asynchronous, Hack Framework for building web applications with expressive, elegant syntax.
 
 ---
 
