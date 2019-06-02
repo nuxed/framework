@@ -28,11 +28,7 @@ final class Publisher {
       ->withHeader('Authorization', vec[
         Str\format('Bearer %s', $this->getJwt()),
       ]);
-    $body = $request->getBody();
-    await $body->writeAsync($this->buildQuery($update));
-    if ($body->isSeekable()) {
-      $body->rewind();
-    }
+    await $request->getBody()->writeAsync($this->buildQuery($update));
 
     $response = await $this->http->send($request);
     return await $response->getBody()->readAsync();
