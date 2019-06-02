@@ -5,6 +5,17 @@ use namespace HH\Lib\Regex;
 use namespace Nuxed\Http\Client;
 use namespace Nuxed\Http\Message;
 
+/**
+ * Publishes an update to the hub.
+ *
+ * @author Saif Eddin Gmati <azjezz@protonmail.com>
+ *
+ * Logic largely refactored from the Symfony Mercure component.
+ *
+ * @see       https://github.com/symfony/mercure
+ * @copyright Copyright (c) 2018 Kévin Dunglas
+ * @license   https://github.com/symfony/mercure/blob/master/LICENSE MIT License
+ */
 final class Publisher {
   public function __construct(
     private string $hub,
