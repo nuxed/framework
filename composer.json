@@ -1,12 +1,13 @@
 {
     "name": "nuxed/framework",
     "type": "framework",
-    "description": "Hack framework for building web applications with expressive, elegant syntax.",
+    "description": "High Performance, Asynchronous, Hack Framework for building web applications with expressive, elegant syntax.",
     "keywords": [
         "hack",
         "hhvm",
         "framework",
-        "nuxed"
+        "nuxed",
+        "async"
     ],
     "license": "MIT",
     "authors": [
@@ -21,21 +22,21 @@
         }
     ],
     "require": {
-        "hhvm": "^4.6",
+        "hhvm": "^4.7",
+        "hhvm/hsl": "^4.7",
+        "hhvm/hsl-experimental": "^4.7",
+        "hhvm/hhvm-autoload": "^2.0",
+        "hhvm/type-assert": "^3.4",
         "azjezz/http-normalizer": "^0.1.1",
         "facebook/fbmarkdown": "^1.5",
         "facebook/hack-router": "^0.18",
         "facebook/xhp-lib": "^2.9",
-        "hhvm/hhvm-autoload": "^2.0",
-        "hhvm/hsl": "^4.5",
-        "hhvm/hsl-experimental": "^4.5",
-        "hhvm/type-assert": "^3.3",
         "his/container": "^0.1"
     },
     "require-dev": {
+        "hhvm/hhast": "^4.7",
         "facebook/fbexpect": "^2.4",
-        "hhvm/hacktest": "^1.4",
-        "hhvm/hhast": "4.6"
+        "hhvm/hacktest": "^1.4"
     },
     "config": {
         "sort-packages": true
