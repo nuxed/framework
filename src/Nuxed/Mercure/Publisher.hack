@@ -12,7 +12,7 @@ final class Publisher {
     private Client\IHttpClient $http = Client\HttpClient::create(),
   ) {}
 
-  public async function push(Update $update): Awaitable<string> {
+  public async function publish(Update $update): Awaitable<string> {
     $request = Message\request('POST', Message\uri($this->hub))
       ->withHeader('Authorization', vec[
         Str\format('Bearer %s', $this->getJwt()),
@@ -68,15 +68,15 @@ final class Publisher {
   }
 
   /**
-     * Regex ported from Windows Azure Active Directory IdentityModel Extensions for .Net.
-     *
-     * @throws Exception\InvalidArgumentException
-     *
-     * @license MIT
-     * @copyright Copyright (c) Microsoft Corporation
-     *
-     * @see https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/blob/6e7a53e241e4566998d3bf365f03acd0da699a31/src/Microsoft.IdentityModel.JsonWebTokens/JwtConstants.cs#L58
-     */
+   * Regex ported from Windows Azure Active Directory IdentityModel Extensions for .Net.
+   *
+   * @throws Exception\InvalidArgumentException
+   *
+   * @license MIT
+   * @copyright Copyright (c) Microsoft Corporation
+   *
+   * @see https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/blob/6e7a53e241e4566998d3bf365f03acd0da699a31/src/Microsoft.IdentityModel.JsonWebTokens/JwtConstants.cs#L58
+   */
   private function validateJwt(string $jwt): void {
     if (
       !Regex\matches(

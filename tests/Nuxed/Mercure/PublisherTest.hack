@@ -12,7 +12,7 @@ class PublisherTest extends HackTest\HackTest {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJmb28iLCJiYXIiXSwicHVibGlzaCI6WyJmb28iXX19.LRLvirgONK13JgacQ_VbcjySbVhkSmHy3IznH3tA9PM';
   const string AUTH_HEADER = 'Bearer '.self::JWT;
 
-  public async function testPush(): Awaitable<void> {
+  public async function testPublish(): Awaitable<void> {
     $client = new Client\MockHttpClient(
       async ($request) ==> {
         expect($request->getMethod())->toBeSame('POST');
@@ -35,7 +35,7 @@ class PublisherTest extends HackTest\HackTest {
       'id',
     );
 
-    expect(await $publisher->push($update))->toBeSame('id');
+    expect(await $publisher->publish($update))->toBeSame('id');
   }
 
   public async function testInvalidJwt(): Awaitable<void> {
@@ -47,7 +47,7 @@ class PublisherTest extends HackTest\HackTest {
       vec['https://demo.mercure.rocks/demo/books/1.jsonld'],
       'Hello, World!',
     );
-    expect(() ==> $publisher->push($update))
+    expect(() ==> $publisher->publish($update))
       ->toThrow(
         Mercure\Exception\InvalidArgumentException::class,
         'The provided JWT is not valid',
