@@ -60,11 +60,7 @@ final class Publisher {
       $query .= Str\format('retry=%d', $retry);
     }
 
-    if (Str\ends_with($query, '&')) {
-      $query = Str\slice($query, 0, Str\length($query) - 1);
-    }
-
-    return $query;
+    return Str\trim_right($query, '&');
   }
 
   private function getJwt(): string {
