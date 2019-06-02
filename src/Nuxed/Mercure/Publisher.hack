@@ -29,8 +29,8 @@ final class Publisher {
         Str\format('Bearer %s', $this->getJwt()),
       ]);
     await $request->getBody()->writeAsync($this->buildQuery($update));
-
     $response = await $this->http->send($request);
+
     return await $response->getBody()->readAsync();
   }
 
@@ -71,6 +71,7 @@ final class Publisher {
     $provider = $this->jwt;
     $jwt = $provider();
     $this->validateJwt($jwt);
+
     return $jwt;
   }
 
