@@ -21,5 +21,8 @@ interface IHttpClient {
    * relative path to append to the base path of the client. The URL can
    * contain the query string as well.
    */
-  public function request(string $method, string $uri): Awaitable<Message\Response>;
+  public function request(
+    string $method,
+    string $uri,
+  ): Awaitable<Message\Response>;
 }

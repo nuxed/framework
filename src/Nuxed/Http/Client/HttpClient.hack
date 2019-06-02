@@ -34,10 +34,11 @@ abstract class HttpClient implements IHttpClient {
    * relative path to append to the base path of the client. The URL can
    * contain the query string as well.
    */
-  public function request(string $method, string $uri): Awaitable<Message\Response> {
-    return $this->send(
-      Message\request($method, Message\uri($uri))
-    );
+  public function request(
+    string $method,
+    string $uri,
+  ): Awaitable<Message\Response> {
+    return $this->send(Message\request($method, Message\uri($uri)));
   }
 
   final protected function prepare(Message\Request $request): Message\Request {
