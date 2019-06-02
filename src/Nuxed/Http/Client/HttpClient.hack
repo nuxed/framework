@@ -77,6 +77,11 @@ abstract class HttpClient implements IHttpClient {
     if ($protocol !== '1.1') {
       $request = $request->withProtocolVersion($protocol);
     }
+  
+    $body = $request->getBody();
+    if ($body->isSeekable()) {
+      $body->rewind();
+    }
 
     return $request->withUri($uri);
   }
