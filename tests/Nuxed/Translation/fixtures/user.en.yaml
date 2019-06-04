@@ -1,0 +1,25 @@
+group:
+    edit:
+        submit: 'Update group'
+    show:
+        name: 'Group name'
+    new:
+        submit: 'Create group'
+    flash:
+        updated: 'The group has been updated.'
+        created: 'The group has been created.'
+        deleted: 'The group has been deleted.'
+security:
+    login:
+        username: Username
+        password: Password
+        remember_me: 'Remember me'
+        submit: 'Log in'
+profile:
+    show:
+        username: Username
+        email: Email
+    edit:
+        submit: Update
+    flash:
+        updated: 'The profile has been updated.'

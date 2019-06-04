@@ -5,7 +5,7 @@ use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Regex;
 
-class Translator implements ITranslator, ILocaleAware {
+class Translator implements ITranslator, ILocaleAware, ITranslatorBag {
   protected dict<string, MessageCatalogue> $catalogues = dict[];
 
   private ?string $locale;
@@ -118,7 +118,8 @@ class Translator implements ITranslator, ILocaleAware {
     $catalogue = $this->getCatalogue($locale);
     $locale = $catalogue->getLocale();
     while (!$catalogue->defines($id, $domain)) {
-      if ($cat = $catalogue->getFallbackCatalogue()) {
+      $cat = $catalogue->getFallbackCatalogue();
+      if ($cat is nonnull) {
         $catalogue = $cat;
         $locale = $catalogue->getLocale();
       } else {
@@ -161,7 +162,7 @@ class Translator implements ITranslator, ILocaleAware {
     try {
       $this->doLoadCatalogue($locale);
     } catch (Exception\NotFoundResourceException $e) {
-      if (!$this->computeFallbackLocales($locale)) {
+      if (0 === C\count($this->computeFallbackLocales($locale))) {
         throw $e;
       }
     }
@@ -210,12 +211,8 @@ class Translator implements ITranslator, ILocaleAware {
 
     while ($locale is nonnull) {
       $parent = _Private\Parents[$locale] ?? null;
-      if ($parent is null && Str\search($locale, '_') is nonnull) {
-        $locale = Str\slice(
-          $locale,
-          0,
-          -(Str\search_last($locale, '_') as nonnull),
-        );
+      if ($parent is null && Str\contains($locale, '_')) {
+        $locale = Str\slice($locale, 0, Str\search_last($locale, '_'));
       } else if ('root' !== $parent) {
         $locale = $parent;
       } else {

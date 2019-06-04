@@ -12,7 +12,7 @@ final class YamlFileLoader extends FileLoader {
   ): KeyedContainer<string, mixed> {
     if (!\function_exists('yaml_parse_file')) {
       throw new Exception\LogicException(
-        'Yaml extension is not loaded, make sure to enable zend compat.',
+        'Yaml extension is required to use the yaml loader.',
       );
     }
 

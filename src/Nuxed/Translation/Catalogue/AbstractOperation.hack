@@ -18,12 +18,12 @@ abstract class AbstractOperation implements IOperation {
   protected Translation\MessageCatalogue $result;
 
   /**
-   * @var string[] The domains affected by this operation
+   * @var ?vec<string> The domains affected by this operation
    */
   private ?vec<string> $domains;
 
   /**
-   * This array stores 'all', 'new' and 'obsolete' messages for all valid domains.
+   * This container stores 'all', 'new' and 'obsolete' messages for all valid domains.
    */
   protected dict<string, shape(
     'all' => dict<string, string>,
@@ -61,7 +61,7 @@ abstract class AbstractOperation implements IOperation {
     return $this->domains;
   }
 
-  /**
+  /** 
    * {@inheritdoc}
    */
   public function getMessages(string $domain): KeyedContainer<string, string> {

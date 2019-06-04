@@ -1,0 +1,13 @@
+{
+  "layout": {
+    "home": "Home",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "settings": "Settings",
+    "forgot_password": "Forgot your password ?",
+    "logout_confirmation": "Are you sure you want to logout ?",
+    "password_recover": "Recover password",
+    "password_reset": "Reset password"
+  }
+}

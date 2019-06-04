@@ -37,7 +37,6 @@ final class MessageCatalogue {
     return $domains;
   }
 
-
   public function all(
   ): KeyedContainer<string, KeyedContainer<string, string>> {
     $allMessages = dict[];
@@ -97,9 +96,11 @@ final class MessageCatalogue {
     if (C\contains_key($this->messages[$domain] ?? dict[], $id)) {
       return $this->messages[$domain][$id];
     }
+
     if ($this->fallbackCatalogue is nonnull) {
       return $this->fallbackCatalogue->get($id, $domain);
     }
+
     return $id;
   }
 
@@ -149,6 +150,7 @@ final class MessageCatalogue {
       $this->add($messages, $domain);
     }
   }
+
   /**
    * Merges translations from the given Catalogue into the current one
    * only when the translation does not exist.
@@ -166,6 +168,7 @@ final class MessageCatalogue {
         ));
       }
     }
+
     $c = $this;
     do {
       if ($c->getLocale() === $catalogue->getLocale()) {
@@ -175,6 +178,7 @@ final class MessageCatalogue {
         ));
       }
     } while ($c = $c->parent);
+
     $catalogue->parent = $this;
     $this->fallbackCatalogue = $catalogue;
   }

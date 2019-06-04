@@ -47,11 +47,11 @@ final class TranslationReader implements ITranslationReader {
     }
 
     foreach ($this->loaders as $format => $loader) {
-      $extension = Str\format('%s.%s', $catalogue->getLocale(), $format);
+      $extension = Str\format('.%s.%s', $catalogue->getLocale(), $format);
       foreach ($files as $file) {
         $basename = $file->path()->basename();
         if (Str\ends_with($basename, $extension)) {
-          $domain = Str\slice($basename, 0, -1 * Str\length($extension) - 1);
+          $domain = Str\strip_suffix($basename, $extension);
           $catalogue->addCatalogue(
             $loader->load(
               $file->path()->toString(),

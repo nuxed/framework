@@ -1,9 +1,12 @@
 namespace Nuxed\Translation\Catalogue;
 
-function __construct(): void {
-
-}
-
+/**
+ * Merge operation between two catalogues as follows:
+ * all = source ∪ target = {x: x ∈ source ∨ x ∈ target}
+ * new = all ∖ source = {x: x ∈ target ∧ x ∉ source}
+ * obsolete = source ∖ all = {x: x ∈ source ∧ x ∉ source ∧ x ∉ target} = ∅
+ * Basically, the result contains messages from both catalogues.
+ */
 final class MergeOperation extends AbstractOperation {
   /**
      * {@inheritdoc}
