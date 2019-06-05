@@ -4,7 +4,7 @@ use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 
-class ArrayStore extends Store {
+class ArrayStore extends AbstractStore {
   public function __construct(
     int $defaultTtl = 0,
     protected dict<string, shape(

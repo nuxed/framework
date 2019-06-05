@@ -8,7 +8,7 @@ use type Nuxed\Cache\Serializer\ISerializer;
 use type Nuxed\Cache\Serializer\DefaultSerializer;
 use type Nuxed\Cache\Exception\InvalidArgumentException;
 
-class RedisStore extends Store {
+class RedisStore extends AbstractStore {
   public function __construct(
     protected \Redis $redis,
     string $namespace = '',

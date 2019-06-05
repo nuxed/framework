@@ -3,7 +3,7 @@ namespace Nuxed\Cache\Store;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Cache\Serializer;
 
-class ApcStore extends Store {
+class ApcStore extends AbstractStore {
   public function __construct(
     string $namespace = '',
     int $defaultTtl = 0,

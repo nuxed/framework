@@ -6,7 +6,7 @@ use namespace HH\Lib\Str;
 use namespace HH\Lib\SecureRandom;
 use namespace Nuxed\Cache\_Private;
 
-abstract class Store implements IStore {
+abstract class AbstractStore implements IStore {
   protected dict<string, string> $ids = dict[];
   protected dict<string, shape('value' => mixed, 'ttl' => ?int, ...)>
     $deferred = dict[];
