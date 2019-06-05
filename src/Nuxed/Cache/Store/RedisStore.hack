@@ -25,7 +25,7 @@ class RedisStore extends Store {
   }
 
   <<__Override>>
-  public async function doGet(string $id): Awaitable<mixed> {
+  public async function doGet(string $id): Awaitable<dynamic> {
     $exists = await $this->doContains($id);
     if (!$exists) {
       return null;

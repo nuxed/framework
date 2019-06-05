@@ -13,7 +13,7 @@ interface IStore {
   /**
    * Sets a cache item to be persisted later.
    */
-  public function defer<T>(string $id, T $value, ?int $ttl = null): bool;
+  public function defer(string $id, mixed $value, ?int $ttl = null): bool;
 
   /**
    * Determines whether an item is present in the cache.
@@ -28,7 +28,7 @@ interface IStore {
   /**
    * Fetches a value from the cache.
    */
-  public function get(string $id): Awaitable<mixed>;
+  public function get(string $id): Awaitable<dynamic>;
 
   /**
    * Wipes clean the entire cache's keys.

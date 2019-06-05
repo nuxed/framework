@@ -58,7 +58,7 @@ class ArrayStore extends Store {
   }
 
   <<__Override>>
-  public async function doGet(string $id): Awaitable<mixed> {
+  public async function doGet(string $id): Awaitable<dynamic> {
     return $this->cache[$id]['value'] ?? null;
   }
 

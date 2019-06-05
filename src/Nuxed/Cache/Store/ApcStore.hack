@@ -33,7 +33,7 @@ class ApcStore extends Store {
   }
 
   <<__Override>>
-  public async function doGet(string $id): Awaitable<mixed> {
+  public async function doGet(string $id): Awaitable<dynamic> {
     $exist = await $this->doContains($id);
     if (!$exist) {
       return null;

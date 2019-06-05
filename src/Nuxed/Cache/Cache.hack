@@ -39,6 +39,7 @@ final class Cache implements ICache, ILoggerAware {
       if ($exist) {
         return await $this->store->get($key);
       } else {
+        /* HH_IGNORE_ERROR[4110] mixed <-> dynamic */
         return $default;
       }
     });
@@ -51,6 +52,7 @@ final class Cache implements ICache, ILoggerAware {
     return $this->box(async () ==> {
       $exist = await $this->contains($key);
       if (!$exist) {
+        /* HH_IGNORE_ERROR[4110] mixed <-> dynamic */
         return $default;
       }
 

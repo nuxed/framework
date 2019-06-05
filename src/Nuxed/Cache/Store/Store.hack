@@ -31,7 +31,7 @@ abstract class Store implements IStore {
    */
   abstract protected function doStore(
     string $id,
-    mixed $value,
+    dynamic $value,
     int $ttl,
   ): Awaitable<bool>;
 
@@ -48,7 +48,7 @@ abstract class Store implements IStore {
   /**
    * Fetches a value from the cache.
    */
-  abstract protected function doGet(string $id): Awaitable<mixed>;
+  abstract protected function doGet(string $id): Awaitable<dynamic>;
 
   /**
    * Wipes clean the entire cache's keys.
@@ -99,7 +99,7 @@ abstract class Store implements IStore {
   /**
    * Fetches a value from the cache.
    */
-  public async function get(string $key): Awaitable<mixed> {
+  public async function get(string $key): Awaitable<dynamic> {
     if (0 !== C\count($this->deferred)) {
       await $this->commit();
     }

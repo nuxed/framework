@@ -36,7 +36,7 @@ class NullStore implements IStore {
   /**
    * Fetches a value from the cache.
    */
-  public async function get(string $_id): Awaitable<mixed> {
+  public async function get(string $_id): Awaitable<dynamic> {
     return null;
   }
 
