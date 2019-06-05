@@ -33,12 +33,13 @@ final class EventDispatcher implements IEventDispatcher {
   public async function dispatch<TEvent as IEvent>(
     TEvent $event,
   ): Awaitable<TEvent> {
-    if ($event is IStoppableEvent && $event->isPropagationStopped()) {
+    $ref = $event;
+    if ($ref is IStoppableEvent && $ref->isPropagationStopped()) {
       // event is already stopped.
       return $event;
     }
 
-    $name = \get_class($event);
+    $name = \get_class($ref);
     $listeners = $this->listeners[$name] ?? vec[];
     $stopped = false;
     $lastOperation = async {
@@ -51,12 +52,12 @@ final class EventDispatcher implements IEventDispatcher {
 
       $lastOperation = async {
         await $lastOperation;
-        if ($event is IStoppableEvent && $event->isPropagationStopped()) {
+        if ($ref is IStoppableEvent && $ref->isPropagationStopped()) {
           $stopped = true;
           return;
         }
 
-        return await $listener($event);
+        return await $listener($ref);
       };
     }
 
