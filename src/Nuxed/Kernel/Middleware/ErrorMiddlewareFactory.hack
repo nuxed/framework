@@ -7,6 +7,6 @@ class ErrorMiddlewareFactory implements Container\IFactory<ErrorMiddleware> {
   public function create(
     Container\IServiceContainer $container,
   ): ErrorMiddleware {
-    return new ErrorMiddleware($container->get(Error\ErrorHandler::class));
+    return new ErrorMiddleware($container->get(Error\IErrorHandler::class));
   }
 }

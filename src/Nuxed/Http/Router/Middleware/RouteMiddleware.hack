@@ -15,7 +15,9 @@ use namespace Nuxed\Http\Message;
  * matched parameters as well.
  */
 class RouteMiddleware implements Server\IMiddleware {
-  public function __construct(protected Router\Matcher\IRequestMatcher $matcher) {}
+  public function __construct(
+    protected Router\Matcher\IRequestMatcher $matcher,
+  ) {}
 
   public function process(
     Message\ServerRequest $request,

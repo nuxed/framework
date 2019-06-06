@@ -73,7 +73,9 @@ class RequestMatcher implements IRequestMatcher {
     if ($cache is null) {
       $routes = null;
     } else {
-      $routes = Asio\join($cache->contains(self::CACHE_KEY)) ? Asio\join($cache->get(self::CACHE_KEY)) : null;
+      $routes = Asio\join($cache->contains(self::CACHE_KEY))
+        ? Asio\join($cache->get(self::CACHE_KEY))
+        : null;
     }
 
     if ($routes is null) {

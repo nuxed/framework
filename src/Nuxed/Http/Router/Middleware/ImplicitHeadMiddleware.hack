@@ -33,7 +33,9 @@ use namespace Nuxed\Http\Router;
 class ImplicitHeadMiddleware implements Server\IMiddleware {
   const string FORWARDED_HTTP_METHOD_ATTRIBUTE = 'FORWARDED_HTTP_METHOD';
 
-  public function __construct(private Router\Matcher\IRequestMatcher $matcher) {}
+  public function __construct(
+    private Router\Matcher\IRequestMatcher $matcher,
+  ) {}
 
   /**
    * Handle an implicit HEAD request.

@@ -6,7 +6,7 @@ final class RouterFactory implements Container\IFactory<IRouter> {
   public function create(Container\IServiceContainer $container): Router {
     return new Router(
       $container->get(Matcher\IRequestMatcher::class),
-      $container->get(Generator\IUriGenerator::class)
+      $container->get(Generator\IUriGenerator::class),
     );
   }
 }

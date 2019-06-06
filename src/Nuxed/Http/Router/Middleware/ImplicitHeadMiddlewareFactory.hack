@@ -8,6 +8,8 @@ class ImplicitHeadMiddlewareFactory
   public function create(
     Container\IServiceContainer $container,
   ): ImplicitHeadMiddleware {
-    return new ImplicitHeadMiddleware($container->get(Router\Matcher\IRequestMatcher::class));
+    return new ImplicitHeadMiddleware(
+      $container->get(Router\Matcher\IRequestMatcher::class),
+    );
   }
 }

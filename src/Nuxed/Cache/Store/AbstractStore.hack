@@ -122,12 +122,16 @@ abstract class AbstractStore implements IStore {
    * Persists any deferred cache items.
    */
   public async function commit(): Awaitable<bool> {
-    return C\reduce(await Asio\mmk(
-      $this->deferred,
-      ($key, $value) ==> {
-        return $this->store($key, $value['value'], $value['ttl']);
-      },
-    ), ($ok, $c) ==> $ok && $c, true);
+    return C\reduce(
+      await Asio\mmk(
+        $this->deferred,
+        ($key, $value) ==> {
+          return $this->store($key, $value['value'], $value['ttl']);
+        },
+      ),
+      ($ok, $c) ==> $ok && $c,
+      true,
+    );
   }
 
   final protected async function getId(string $key): Awaitable<string> {
@@ -145,7 +149,11 @@ abstract class AbstractStore implements IStore {
     $max = $this->maxIdLength as int;
     if (Str\length($id) > $max) {
       // Use MD5 to favor speed over security, which is not an issue here
-      $this->ids[$key] = $id = Str\splice(\base64_encode(\hash('md5', $key, true)), ':', -2);
+      $this->ids[$key] = $id = Str\splice(
+        \base64_encode(\hash('md5', $key, true)),
+        ':',
+        -2,
+      );
       $id = $this->namespace.$id;
     }
 
