@@ -6,7 +6,6 @@ use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
 use namespace Nuxed\Http\Router;
-use namespace Nuxed\Http\Server;
 use namespace Nuxed\Http\Message;
 use namespace Nuxed\Http\Router\Exception;
 use namespace Facebook\HackRouter;

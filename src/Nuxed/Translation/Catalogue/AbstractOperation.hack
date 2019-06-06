@@ -61,7 +61,7 @@ abstract class AbstractOperation implements IOperation {
     return $this->domains;
   }
 
-  /** 
+  /**
    * {@inheritdoc}
    */
   public function getMessages(string $domain): KeyedContainer<string, string> {

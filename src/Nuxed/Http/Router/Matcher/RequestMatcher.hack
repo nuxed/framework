@@ -3,16 +3,11 @@ namespace Nuxed\Http\Router\Matcher;
 use namespace Nuxed\Http\Router;
 use namespace HH\Asio;
 use namespace HH\Lib\C;
-use namespace Nuxed\Util;
 use namespace HH\Lib\Vec;
-use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
 use namespace Nuxed\Cache;
-use namespace Nuxed\Http\Server;
 use namespace Nuxed\Http\Message;
 use namespace Facebook\HackRouter;
-use namespace Facebook\TypeSpec;
-use namespace Facebook\HackRouter\PatternParser;
 
 class RequestMatcher implements IRequestMatcher {
   const string CACHE_KEY = 'nuxed.http.router.matcher.request_matcher.cache';
