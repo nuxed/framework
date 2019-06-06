@@ -92,13 +92,15 @@ final class CacheExtension extends AbstractExtension {
 
     $builder->add(
       Cache\Store\FilesystemStore::class,
-      Container\factory(($container) ==> new Cache\Store\FilesystemStore(
-        Shapes::idx($this->config, 'cache_dir', \sys_get_temp_dir()),
-        $namespace,
-        $defaultTtl,
-        $container->get(Cache\Serializer\ISerializer::class)
-      )),
-      true
+      Container\factory(
+        ($container) ==> new Cache\Store\FilesystemStore(
+          Shapes::idx($this->config, 'cache_dir', \sys_get_temp_dir()),
+          $namespace,
+          $defaultTtl,
+          $container->get(Cache\Serializer\ISerializer::class),
+        ),
+      ),
+      true,
     );
 
     $builder->add(
@@ -111,7 +113,13 @@ final class CacheExtension extends AbstractExtension {
       Cache\Store\IStore::class,
       Container\factory(
         ($container) ==> $container->get(
-          Shapes::idx($this->config, 'store', Cache\Store\ArrayStore::class),
+          Shapes::idx(
+            $this->config,
+            'store',
+            Shapes::keyExists($this->config, 'cache_dir')
+              ? Cache\Store\FilesystemStore::class
+              : Cache\Store\ArrayStore::class,
+          ),
         ),
       ),
       true,
@@ -121,7 +129,7 @@ final class CacheExtension extends AbstractExtension {
       Cache\Serializer\DefaultSerializer::class,
       Container\factory(($_) ==> new Cache\Serializer\DefaultSerializer()),
       true,
-    ); 
+    );
 
     $builder->add(
       Cache\Serializer\ISerializer::class,
