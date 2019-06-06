@@ -37,6 +37,13 @@ final class CacheExtension extends AbstractExtension {
     #───────────────────────────────────────────────────────────────────────#
     ?'default_ttl' => int,
 
+    #───────────────────────────────────────────────────────────────────────#
+    # Filesystem cache directory                                            #
+    #───────────────────────────────────────────────────────────────────────#
+    # Here we define the directory to be used by the filesystem cache       #
+    # store.                                                                #
+    #───────────────────────────────────────────────────────────────────────#
+    ?'cache_dir' => string,
     ...
   );
 
@@ -84,6 +91,17 @@ final class CacheExtension extends AbstractExtension {
     );
 
     $builder->add(
+      Cache\Store\FilesystemStore::class,
+      Container\factory(($container) ==> new Cache\Store\FilesystemStore(
+        Shapes::idx($this->config, 'cache_dir', \sys_get_temp_dir()),
+        $namespace,
+        $defaultTtl,
+        $container->get(Cache\Serializer\ISerializer::class)
+      )),
+      true
+    );
+
+    $builder->add(
       Cache\Store\NullStore::class,
       Container\factory(($_) ==> new Cache\Store\NullStore()),
       true,
@@ -103,7 +121,7 @@ final class CacheExtension extends AbstractExtension {
       Cache\Serializer\DefaultSerializer::class,
       Container\factory(($_) ==> new Cache\Serializer\DefaultSerializer()),
       true,
-    );
+    ); 
 
     $builder->add(
       Cache\Serializer\ISerializer::class,
