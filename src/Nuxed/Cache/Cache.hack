@@ -35,8 +35,7 @@ final class Cache implements ICache, ILoggerAware {
   public function get(string $key, mixed $default = null): Awaitable<dynamic> {
     return $this->box(async () ==> {
       _Private\validate_key($key);
-      $exist = await $this->store->contains($key);
-      if ($exist) {
+      if (await $this->store->contains($key)) {
         return await $this->store->get($key);
       } else {
         /* HH_IGNORE_ERROR[4110] mixed <-> dynamic */
