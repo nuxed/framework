@@ -33,7 +33,7 @@ use namespace Nuxed\Http\Router;
 class ImplicitHeadMiddleware implements Server\IMiddleware {
   const string FORWARDED_HTTP_METHOD_ATTRIBUTE = 'FORWARDED_HTTP_METHOD';
 
-  public function __construct(private Router\Router $router) {}
+  public function __construct(private Router\Matcher\IRequestMatcher $matcher) {}
 
   /**
    * Handle an implicit HEAD request.
@@ -60,7 +60,7 @@ class ImplicitHeadMiddleware implements Server\IMiddleware {
       return await $handler->handle($request);
     }
 
-    $routeResult = $this->router
+    $routeResult = $this->matcher
       ->match($request->withMethod(Message\RequestMethod::METHOD_GET));
 
     if ($routeResult->isFailure()) {

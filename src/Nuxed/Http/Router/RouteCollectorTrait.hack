@@ -32,6 +32,23 @@ trait RouteCollectorTrait implements IRouteCollector {
   protected vec<Route> $routes = vec[];
 
   /**
+   * Add a route.
+   *
+   * This method adds a route against which the underlying implementation may
+   * match.
+   */
+  public function addRoute(Route $route): void {
+    $this->routes[] = $route;
+  }
+
+  /**
+   * Retrieve all directly registered routes with the application.
+   */
+  public function getRoutes(): Container<Route> {
+    return $this->routes;
+  }
+
+  /**
    * Add a route for the route middleware to match.
    *
    * Accepts a combination of a path and middleware, and optionally the HTTP methods allowed.
@@ -40,12 +57,18 @@ trait RouteCollectorTrait implements IRouteCollector {
    * @param null|string $name The name of the route.
    * @throws Exception\DuplicateRouteException if specification represents an existing route.
    */
-  abstract public function route(
+  public function route(
     string $path,
     Server\IMiddleware $middleware,
     ?Container<string> $methods = null,
     ?string $name = null,
-  ): Route;
+  ): Route {
+    $this->checkForDuplicateRoute($path, $methods);
+
+    $route = new Route($path, $middleware, $methods, $name);
+    $this->addRoute($route);
+    return $route;
+  }
 
   /**
    * @param null|string $name The name of the route.

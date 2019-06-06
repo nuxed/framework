@@ -93,6 +93,14 @@ interface IRouteCollector {
   ): Route;
 
   /**
+   * Add a route.
+   *
+   * This method adds a route against which the underlying implementation may
+   * match.
+   */
+  public function addRoute(Route $route): void;
+
+  /**
    * Retrieve all directly registered routes with the application.
    */
   public function getRoutes(): Container<Route>;

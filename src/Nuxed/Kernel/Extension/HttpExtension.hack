@@ -31,46 +31,7 @@ class HttpExtension extends AbstractExtension {
     );
 
     $builder->add(Emitter\IEmitter::class, new Emitter\EmitterFactory(), true);
-
-    $builder->add(Router\IRouter::class, new Router\RouterFactory(), true);
-
-    $builder->add(
-      Router\IRouteCollector::class,
-      Container\factory(
-        ($container) ==> $container->get(Router\IRouter::class),
-      ),
-      true,
-    );
-
-    $builder->add(
-      Router\Middleware\DispatchMiddleware::class,
-      new Router\Middleware\DispatchMiddlewareFactory(),
-      true,
-    );
-
-    $builder->add(
-      Router\Middleware\ImplicitHeadMiddleware::class,
-      new Router\Middleware\ImplicitHeadMiddlewareFactory(),
-      true,
-    );
-
-    $builder->add(
-      Router\Middleware\ImplicitOptionsMiddleware::class,
-      new Router\Middleware\ImplicitOptionsMiddlewareFactory(),
-      true,
-    );
-
-    $builder->add(
-      Router\Middleware\MethodNotAllowedMiddleware::class,
-      new Router\Middleware\MethodNotAllowedMiddlewareFactory(),
-      true,
-    );
-
-    $builder->add(
-      Router\Middleware\RouteMiddleware::class,
-      new Router\Middleware\RouteMiddlewareFactory(),
-      true,
-    );
+    $builder->register(new Router\RouterServiceProvider());
   }
 
   <<__Override>>

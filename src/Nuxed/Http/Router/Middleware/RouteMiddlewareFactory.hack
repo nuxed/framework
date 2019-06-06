@@ -7,6 +7,6 @@ class RouteMiddlewareFactory implements Container\IFactory<RouteMiddleware> {
   public function create(
     Container\IServiceContainer $container,
   ): RouteMiddleware {
-    return new RouteMiddleware($container->get(Router\Router::class));
+    return new RouteMiddleware($container->get(Router\Matcher\IRequestMatcher::class));
   }
 }

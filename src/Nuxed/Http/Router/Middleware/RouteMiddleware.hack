@@ -15,13 +15,13 @@ use namespace Nuxed\Http\Message;
  * matched parameters as well.
  */
 class RouteMiddleware implements Server\IMiddleware {
-  public function __construct(protected Router\Router $router) {}
+  public function __construct(protected Router\Matcher\IRequestMatcher $matcher) {}
 
   public function process(
     Message\ServerRequest $request,
     Server\IRequestHandler $handler,
   ): Awaitable<Message\Response> {
-    $result = $this->router->match($request);
+    $result = $this->matcher->match($request);
 
     // Inject the actual route result, as well as individual matched parameters.
     $request = $request->withAttribute(Router\RouteResult::class, $result);
