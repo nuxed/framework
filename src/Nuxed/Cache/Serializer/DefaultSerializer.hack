@@ -10,7 +10,12 @@ class DefaultSerializer implements ISerializer {
    */
   public function serialize(mixed $value): ?string {
     try {
-      return \serialize($value) as ?string;
+      $val = @\serialize($value);
+      if (false === $val) {
+        return null;
+      }
+
+      return $value as string;
     } catch (\Throwable $e) {
       return null;
     }
