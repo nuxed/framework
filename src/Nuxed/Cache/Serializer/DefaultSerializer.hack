@@ -15,7 +15,7 @@ class DefaultSerializer implements ISerializer {
         return null;
       }
 
-      return $value as string;
+      return $val as string;
     } catch (\Throwable $e) {
       return null;
     }
