@@ -25,7 +25,7 @@ class RedisStore extends AbstractStore {
   }
 
   <<__Override>>
-  public async function doGet(string $id): Awaitable<dynamic> {
+  protected async function doGet(string $id): Awaitable<dynamic> {
     $exists = await $this->doContains($id);
     if (!$exists) {
       return null;
@@ -35,17 +35,17 @@ class RedisStore extends AbstractStore {
   }
 
   <<__Override>>
-  public async function doDelete(string $id): Awaitable<bool> {
+  protected async function doDelete(string $id): Awaitable<bool> {
     return (bool)$this->redis->del($id);
   }
 
   <<__Override>>
-  public async function doContains(string $id): Awaitable<bool> {
+  protected async function doContains(string $id): Awaitable<bool> {
     return (bool)$this->redis->exists($id);
   }
 
   <<__Override>>
-  public async function doStore(
+  protected async function doStore(
     string $id,
     mixed $value,
     int $ttl = 0,
@@ -60,7 +60,7 @@ class RedisStore extends AbstractStore {
   }
 
   <<__Override>>
-  public async function doClear(string $namespace): Awaitable<bool> {
+  protected async function doClear(string $namespace): Awaitable<bool> {
     if (Str\is_empty($namespace)) {
       return $this->redis->flushDB();
     }

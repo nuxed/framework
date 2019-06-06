@@ -14,7 +14,7 @@ class ApcStore extends AbstractStore {
   }
 
   <<__Override>>
-  public async function doStore(
+  protected async function doStore(
     string $id,
     mixed $value,
     int $ttl = 0,
@@ -23,17 +23,17 @@ class ApcStore extends AbstractStore {
   }
 
   <<__Override>>
-  public async function doContains(string $id): Awaitable<bool> {
+  protected async function doContains(string $id): Awaitable<bool> {
     return \apc_exists($id);
   }
 
   <<__Override>>
-  public async function doDelete(string $id): Awaitable<bool> {
+  protected async function doDelete(string $id): Awaitable<bool> {
     return \apc_delete($id);
   }
 
   <<__Override>>
-  public async function doGet(string $id): Awaitable<dynamic> {
+  protected async function doGet(string $id): Awaitable<dynamic> {
     $exist = await $this->doContains($id);
     if (!$exist) {
       return null;
@@ -43,7 +43,7 @@ class ApcStore extends AbstractStore {
   }
 
   <<__Override>>
-  public function doClear(string $namespace): Awaitable<bool> {
+  protected function doClear(string $namespace): Awaitable<bool> {
     if (Str\is_empty($namespace)) {
       return \apc_clear_cache();
     }

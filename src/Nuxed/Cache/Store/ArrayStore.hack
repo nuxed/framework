@@ -17,7 +17,7 @@ class ArrayStore extends AbstractStore {
   }
 
   <<__Override>>
-  public async function doStore(
+  protected async function doStore(
     string $id,
     mixed $value,
     int $ttl = 0,
@@ -31,7 +31,7 @@ class ArrayStore extends AbstractStore {
   }
 
   <<__Override>>
-  public async function doContains(string $id): Awaitable<bool> {
+  protected async function doContains(string $id): Awaitable<bool> {
     if (!C\contains_key($this->cache, $id)) {
       return false;
     }
@@ -52,18 +52,18 @@ class ArrayStore extends AbstractStore {
   }
 
   <<__Override>>
-  public async function doDelete(string $id): Awaitable<bool> {
+  protected async function doDelete(string $id): Awaitable<bool> {
     unset($this->cache[$id]);
     return true;
   }
 
   <<__Override>>
-  public async function doGet(string $id): Awaitable<dynamic> {
+  protected async function doGet(string $id): Awaitable<dynamic> {
     return $this->cache[$id]['value'] ?? null;
   }
 
   <<__Override>>
-  public async function doClear(string $namespace): Awaitable<bool> {
+  protected async function doClear(string $namespace): Awaitable<bool> {
     if (Str\is_empty($namespace)) {
       $wrappers = await Asio\vmkw(
         $this->cache,

@@ -3,7 +3,6 @@ namespace Nuxed\Cache\Store;
 use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
-use namespace HH\Lib\SecureRandom;
 use namespace Nuxed\Cache\_Private;
 
 abstract class AbstractStore implements IStore {
@@ -11,18 +10,14 @@ abstract class AbstractStore implements IStore {
   protected dict<string, shape('value' => mixed, 'ttl' => ?int, ...)>
     $deferred = dict[];
 
-  protected string $namespace = '';
-  protected string $namespaceVersion = '';
-  protected bool $versioningIsEnabled = true;
   protected ?int $maxIdLength = null;
 
   public function __construct(
-    string $namespace = '',
+    protected string $namespace = '',
     protected int $defaultTtl = 0,
   ) {
     if ('' !== $namespace) {
       _Private\validate_key($namespace);
-      $this->namespace = $namespace.':';
     }
   }
 
@@ -92,8 +87,7 @@ abstract class AbstractStore implements IStore {
       $def = true;
     }
 
-    $deleted = await $this->doDelete($id);
-    return $deleted || $def;
+    return await $this->doDelete($id) || $def;
   }
 
   /**
@@ -110,30 +104,7 @@ abstract class AbstractStore implements IStore {
 
   public async function clear(): Awaitable<bool> {
     $this->deferred = dict[];
-    if ($cleared = $this->versioningIsEnabled) {
-      $namespaceVersion = Str\splice(
-        \base64_encode(\pack('V', SecureRandom\int())),
-        ':',
-        5,
-      );
-      try {
-        $cleared = await $this->store(
-          '/'.$this->namespace,
-          $namespaceVersion,
-          0,
-        );
-      } catch (\Exception $e) {
-        $cleared = false;
-      }
-
-      if ($cleared) {
-        $this->namespaceVersion = $namespaceVersion;
-        $this->ids = dict[];
-      }
-    }
-
-    $result = await $this->doClear($this->namespace);
-    return $result || $cleared;
+    return await $this->doClear($this->namespace);
   }
 
   /**
@@ -151,81 +122,31 @@ abstract class AbstractStore implements IStore {
    * Persists any deferred cache items.
    */
   public async function commit(): Awaitable<bool> {
-    $wrappers = await Asio\vmkw(
+    return C\reduce(await Asio\mmk(
       $this->deferred,
       ($key, $value) ==> {
         return $this->store($key, $value['value'], $value['ttl']);
       },
-    );
-    $ok = true;
-    foreach ($wrappers as $wrapper) {
-      $ok = $ok && $wrapper->getResult();
-    }
-    $this->deferred = dict[];
-    return $ok;
+    ), ($ok, $c) ==> $ok && $c, true);
   }
 
-  /**
-   * Enables/disables versioning of items.
-   *
-   * When versioning is enabled, clearing the cache is atomic and doesn't require listing existing keys to proceed,
-   * but old keys may need garbage collection and extra round-trips to the back-end are required.
-   *
-   * Calling this method also clears the memoized namespace version and thus forces a resynchonization of it.
-   *
-   * @return bool the previous state of versioning
-   */
-  public function enableVersioning(bool $enable = true): bool {
-    $wasEnabled = $this->versioningIsEnabled;
-    $this->versioningIsEnabled = $enable;
-    $this->namespaceVersion = '';
-    $this->ids = dict[];
-    return $wasEnabled;
-  }
-
-  protected async function getId(string $key): Awaitable<string> {
-    if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
-      $this->ids = dict[];
-      $this->namespaceVersion = '1/';
-      try {
-        $namespaceVersion = await $this->doGet('/'.$this->namespace);
-        $this->namespaceVersion = $namespaceVersion as string;
-        if ('1:' === $this->namespaceVersion) {
-          $this->namespaceVersion = Str\splice(
-            \base64_encode(\pack('V', \time())),
-            ':',
-            5,
-          );
-          await $this->doStore(
-            '@'.$this->namespace,
-            $this->namespaceVersion,
-            0,
-          );
-        }
-      } catch (\Throwable $e) {
-      }
-    }
-
+  final protected async function getId(string $key): Awaitable<string> {
     if (C\contains_key($this->ids, $key)) {
-      return $this->namespace.$this->namespaceVersion.$this->ids[$key];
+      return $this->namespace.$this->ids[$key];
     }
 
     _Private\validate_key($key);
     $this->ids[$key] = $key;
 
-    if (null === $this->maxIdLength) {
-      return $this->namespace.$this->namespaceVersion.$key;
+    if ($this->maxIdLength is null) {
+      return $this->namespace.$key;
     }
-    $id = $this->namespace.$this->namespaceVersion.$key;
+    $id = $this->namespace.$key;
     $max = $this->maxIdLength as int;
     if (Str\length($id) > $max) {
       // Use MD5 to favor speed over security, which is not an issue here
-      $this->ids[$key] = $id = Str\splice(
-        \base64_encode(\hash('md5', $key, true)),
-        ':',
-        -(Str\length($this->namespaceVersion) + 2),
-      );
-      $id = $this->namespace.$this->namespaceVersion.$id;
+      $this->ids[$key] = $id = Str\splice(\base64_encode(\hash('md5', $key, true)), ':', -2);
+      $id = $this->namespace.$id;
     }
 
     return $id;
