@@ -1,9 +1,11 @@
 namespace Nuxed\Http\Message\_Private;
 
+use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Dict;
+use namespace HH\Lib\Experimental\IO;
 use namespace Nuxed\Http\Message;
 use namespace AzJezz\HttpNormalizer;
 
@@ -49,7 +51,7 @@ function create_server_request_from_globals(): Message\ServerRequest {
     $method,
     $uri,
     $headers,
-    Message\stream(\fopen('php://input', 'rb')),
+    Message\stream(Asio\join(IO\request_input()->readAsync())),
     $protocol,
     $server,
   )
