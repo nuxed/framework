@@ -1,12 +1,12 @@
 namespace Nuxed\Kernel\Extension;
 
+use namespace Nuxed\Log;
 use namespace Nuxed\Cache;
 use namespace Nuxed\Container;
 use namespace Nuxed\Http\Flash;
 use namespace Nuxed\Http\Server;
 use namespace Nuxed\Http\Message;
 use namespace Nuxed\Http\Session;
-
 
 class SessionExtension extends AbstractExtension {
   const type TConfig = shape(
@@ -108,6 +108,13 @@ class SessionExtension extends AbstractExtension {
     #───────────────────────────────────────────────────────────────────────#
     ?'persistence' => classname<Session\Persistence\ISessionPersistence>,
 
+    #───────────────────────────────────────────────────────────────────────#
+    # Cache Persistence Store                                               #
+    #───────────────────────────────────────────────────────────────────────#
+    # Cache store to use for cache session persistence.                     #
+    #───────────────────────────────────────────────────────────────────────#
+    ?'cache' => classname<Cache\Store\IStore>,
+
     ...
   );
 
@@ -129,17 +136,15 @@ class SessionExtension extends AbstractExtension {
 
     $builder->add(
       Session\Persistence\ISessionPersistence::class,
-      Container\factory(
-        ($container) ==> $container->get(
-          $this->config['persistence'] ??
-            Session\Persistence\CacheSessionPersistence::class,
-        ),
+      new Session\Persistence\SessionPersistenceFactory(
+        $this->config['persistence'] ??
+          Session\Persistence\CacheSessionPersistence::class,
       ),
       true,
     );
 
     $cookie = shape(
-      'name' => $this->config['cookie']['name'] ?? 'hh-session',
+      'name' => $this->config['cookie']['name'] ?? 'nux-session',
       'lifetime' => $this->config['cookie']['lifetime'] ?? 0,
       'path' => $this->config['cookie']['path'] ?? '/',
       'domain' => $this->config['cookie']['domain'] ?? null,
@@ -152,15 +157,23 @@ class SessionExtension extends AbstractExtension {
     $ce = $this->config['cache-expire'] ?? 180;
 
     $builder->add(
-      Session\Persistence\CacheSessionPersistence::class,
+      Session\Persistence\ISessionCache::class,
       Container\factory(
-        ($container) ==> new Session\Persistence\CacheSessionPersistence(
-          $container->get(Cache\ICache::class),
-          $cookie,
-          $cl,
-          $ce,
+        ($container) ==> new Cache\Cache(
+          $container->get(
+            Shapes::idx($this->config, 'cache', Cache\Store\IStore::class),
+          ),
+          $container->has(Log\ILogger::class)
+            ? $container->get(Log\ILogger::class)
+            : new Log\NullLogger(),
         ),
       ),
+      true,
+    );
+
+    $builder->add(
+      Session\Persistence\CacheSessionPersistence::class,
+      new Session\Persistence\CacheSessionPersistenceFactory($cookie, $cl, $ce),
       true,
     );
   }

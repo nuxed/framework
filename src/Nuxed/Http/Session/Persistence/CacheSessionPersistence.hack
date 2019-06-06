@@ -6,6 +6,8 @@ use namespace Facebook\TypeSpec;
 use namespace Nuxed\Http\Message;
 use namespace Nuxed\Http\Session;
 
+type ISessionCache = Cache\ICache;
+
 /**
  * Session persistence using a cache item pool.
  *
@@ -15,7 +17,7 @@ use namespace Nuxed\Http\Session;
  */
 class CacheSessionPersistence extends AbstractSessionPersistence {
   public function __construct(
-    private Cache\ICache $cache,
+    private ISessionCache $cache,
     protected this::TCookieOptions $cookieOptions,
     protected ?Session\CacheLimiter $cacheLimiter,
     protected int $cacheExpire,
