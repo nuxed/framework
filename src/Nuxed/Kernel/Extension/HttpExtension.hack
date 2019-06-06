@@ -31,6 +31,11 @@ class HttpExtension extends AbstractExtension {
     );
 
     $builder->add(Emitter\IEmitter::class, new Emitter\EmitterFactory(), true);
+    $builder->add(
+      Server\MiddlewareStack::class,
+      new Server\MiddlewareStackFactory(),
+      true,
+    );
     $builder->register(new Router\RouterServiceProvider());
   }
 
