@@ -19,7 +19,7 @@ class DefaultSerializer implements ISerializer {
   /**
    * Unserializes a single value and throws and exception if anything goes wrong.
    */
-  public function unserialize(string $value): mixed {
+  public function unserialize(string $value): dynamic {
     if ('b:0;' === $value) {
       return false;
     }
