@@ -14,7 +14,7 @@ abstract class AbstractExtension implements IExtension {
   ): void {}
 
   public function route(
-    Router\IRouter $_router,
+    Router\IRouteCollector $_routes,
     Container\IServiceContainer $_container,
   ): void {}
 

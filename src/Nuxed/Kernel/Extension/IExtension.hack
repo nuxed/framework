@@ -12,7 +12,7 @@ interface IExtension extends Container\IServiceProvider {
   ): void;
 
   public function route(
-    Router\IRouter $router,
+    Router\IRouteCollector $routes,
     Container\IServiceContainer $container,
   ): void;
 

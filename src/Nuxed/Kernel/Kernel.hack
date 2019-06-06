@@ -12,7 +12,7 @@ final class Kernel implements IKernel {
   private ?Emitter\IEmitter $emitter = null;
   private ?EventDispatcher\IEventDispatcher $dispatcher = null;
   private ?Server\MiddlewareStack $stack = null;
-  private ?Router\IRouter $router = null;
+  private ?Router\Matcher\IRequestMatcher $matcher = null;
 
   private vec<Extension\IExtension> $extensions = vec[];
 
@@ -41,18 +41,19 @@ final class Kernel implements IKernel {
     $container = $builder->build();
     $dispatcher = $container->get(EventDispatcher\IEventDispatcher::class);
     $stack = $container->get(Server\MiddlewareStack::class);
-    $router = $container->get(Router\IRouter::class);
+    $matcher = $container->get(Router\Matcher\IRequestMatcher::class);
+    $routes = $container->get(Router\IRouteCollector::class);
 
     foreach ($this->extensions as $extension) {
       $extension->subscribe($dispatcher, $container);
       $extension->stack($stack, $container);
-      $extension->route($router, $container);
+      $extension->route($routes, $container);
     }
 
     $this->container = $container;
     $this->stack = $stack;
     $this->dispatcher = $dispatcher;
-    $this->router = $router;
+    $this->matcher = $matcher;
     $this->emitter = $this->container->get(Emitter\IEmitter::class);
 
     $this->booted = true;
