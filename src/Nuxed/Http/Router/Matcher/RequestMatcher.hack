@@ -1,22 +1,17 @@
 namespace Nuxed\Http\Router\Matcher;
 
-use namespace Nuxed\Http\Router;
-use namespace HH\Asio;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Dict;
-use namespace Nuxed\Cache;
+use namespace Nuxed\Http\Router;
 use namespace Nuxed\Http\Message;
 use namespace Facebook\HackRouter;
 
 class RequestMatcher implements IRequestMatcher {
-  const string CACHE_KEY = 'nuxed.http.router.matcher.request_matcher.cache';
-
   private ?HackRouter\IResolver<Router\Route> $resolver;
 
   public function __construct(
     protected Router\IRouteCollector $collector,
-    protected ?Cache\ICache $cache = null,
   ) {}
 
   /**
@@ -64,24 +59,7 @@ class RequestMatcher implements IRequestMatcher {
       return $this->resolver;
     }
 
-    $cache = $this->cache;
-    if ($cache is null) {
-      $routes = null;
-    } else {
-      $routes = Asio\join($cache->contains(self::CACHE_KEY))
-        ? Asio\join($cache->get(self::CACHE_KEY))
-        : null;
-    }
-
-    if ($routes is null) {
-      $routes = Router\_Private\map($this->collector->getRoutes());
-
-      if ($cache is nonnull) {
-        Asio\join($cache->put(self::CACHE_KEY, $routes));
-      }
-    }
-
-    /* HH_IGNORE_ERROR[4110] */
+    $routes = Router\_Private\map($this->collector->getRoutes());
     $this->resolver = new HackRouter\PrefixMatchingResolver(dict($routes));
 
     return $this->resolver;
