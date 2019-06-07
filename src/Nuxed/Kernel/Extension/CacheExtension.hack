@@ -49,12 +49,11 @@ final class CacheExtension extends AbstractExtension {
 
   public function __construct(private this::TConfig $config = shape()) {}
 
-
   <<__Override>>
   public function register(Container\ContainerBuilder $builder): void {
     $builder->add(Cache\ICache::class, new Cache\CacheFactory(), true);
 
-    $namespace = Shapes::idx($this->config, 'namespace', \md5(__DIR__));
+    $namespace = Shapes::idx($this->config, 'namespace', '');
     $defaultTtl = Shapes::idx($this->config, 'default_ttl', 0);
 
     $builder->add(
