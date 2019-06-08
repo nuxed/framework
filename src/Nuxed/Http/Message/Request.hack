@@ -1,7 +1,7 @@
 namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
-use namespace Nuxed\Util;
+use namespace HH\Lib\Dict;
 
 class Request extends AbstractRequest {
   public function __construct(
@@ -45,7 +45,11 @@ class Request extends AbstractRequest {
       $this->headerNames['host'] = 'Host';
     }
 
-    $this->headers = Util\Dict::union(
+    if (C\contains_key($this->headers, $header)) {
+      unset($this->headers[$header]);
+    }
+
+    $this->headers = Dict\merge(
       dict[$header => vec[$host]],
       $this->headers,
     );
