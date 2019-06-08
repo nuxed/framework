@@ -2,10 +2,10 @@ namespace Nuxed\Crypto;
 
 use namespace HH\Lib\Str;
 
-class Crypto {
+final class Crypto {
   const string NONCE_MESSAGE_SEPARATOR = '%';
 
-  public function __construct(public string $secret) {}
+  public function __construct(private string $secret) {}
 
   public function encrypt(string $message): string {
     try {
