@@ -2,7 +2,7 @@ namespace Nuxed\Http\Message\Response;
 
 use namespace Nuxed\Http\Message\_Private;
 use namespace Nuxed\Http\Message;
-use namespace Nuxed\Util;
+use namespace Nuxed\Util\Json;
 
 /**
  * JSON response.
@@ -82,7 +82,7 @@ final class JsonResponse extends Message\Response {
    * - JSON_UNESCAPED_SLASHES
    */
   private static function encode(mixed $value, ?int $flags = null): string {
-    return Util\Json::encode(
+    return Json\encode(
       $value,
       false,
       $flags ??

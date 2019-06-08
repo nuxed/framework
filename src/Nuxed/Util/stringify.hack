@@ -1,7 +1,6 @@
 namespace Nuxed\Util;
 
 use namespace HH\Lib\Str;
-use type Nuxed\Util\Json;
 
 function stringify(mixed $value): string {
   if ($value is bool) {
@@ -37,9 +36,9 @@ function stringify(mixed $value): string {
       $value = 'object['.\get_class($value).']';
     }
   } else if ($value is Container<_>) {
-    $value = Json::encode($value, false);
+    $value = Json\encode($value, false);
   } else {
-    $value = '!'.\gettype($value).Json::encode($value, false);
+    $value = '!'.\gettype($value).Json\encode($value, false);
   }
 
   return (string)$value;

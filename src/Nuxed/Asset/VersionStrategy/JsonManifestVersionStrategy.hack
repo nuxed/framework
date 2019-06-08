@@ -3,7 +3,7 @@ namespace Nuxed\Asset\VersionStrategy;
 use namespace HH\Asio;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Io;
-use namespace Nuxed\Util;
+use namespace Nuxed\Util\Json;
 use namespace Nuxed\Asset\Exception;
 
 /**
@@ -46,7 +46,7 @@ class JsonManifestVersionStrategy implements IVersionStrategy {
         ));
       }
 
-      $this->manifestData = Util\Json::structure(
+      $this->manifestData = Json\structure(
         Asio\join($this->manifest->read()),
         type_structure($this, 'TManifest'),
       );
