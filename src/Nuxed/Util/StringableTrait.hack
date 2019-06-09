@@ -1,16 +1,12 @@
 namespace Nuxed\Util;
 
-use type Nuxed\Util\Stringable;
-use type Throwable;
-use type Stringish;
-
-trait StringableTrait implements Stringable, Stringish {
+trait StringableTrait implements Stringable, \Stringish {
   abstract public function toString(): string;
 
   public function __toString(): string {
     try {
       return $this->toString();
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
       return '';
     }
   }
