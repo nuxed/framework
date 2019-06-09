@@ -18,13 +18,13 @@ use namespace Nuxed\Http\Message;
  */
 final class Publisher {
   public function __construct(
-    private string $hub,
+    private Message\Uri $hub,
     private IJwtProvider $provider,
     private Client\IHttpClient $http = Client\HttpClient::create(),
   ) {}
 
   public async function publish(Update $update): Awaitable<string> {
-    $request = Message\request('POST', Message\uri($this->hub))
+    $request = Message\request('POST', $this->hub)
       ->withHeader('Authorization', vec[
         Str\format('Bearer %s', $this->getJwt()),
       ]);

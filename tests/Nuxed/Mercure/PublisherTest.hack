@@ -28,7 +28,7 @@ class PublisherTest extends HackTest\HackTest {
     );
 
     $publisher = new Mercure\Publisher(
-      self::URL,
+      Message\uri(self::URL),
       new Mercure\Provider\StaticJwtProvider(self::JWT),
       $client,
     );
@@ -47,8 +47,8 @@ class PublisherTest extends HackTest\HackTest {
       async ($request) ==> Message\response(500),
     );
     $publisher = new Mercure\Publisher(
-      self::URL,
-      new Mercure\Provider\StaticJwtProvider('invalid'),
+      Message\uri(self::URL),
+      new Mercure\Provider\StaticJwtProvider('Invalid'),
       $client,
     );
     $update = new Mercure\Update(
