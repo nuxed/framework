@@ -2,7 +2,7 @@ namespace Nuxed\Util\Base64;
 
 use namespace HH\Lib\Str;
 
-function decode(string $data): string {
+function url_decode(string $data): string {
   $paddingLength = 4;
   $remainder = Str\length($data) % $paddingLength;
   if ($remainder !== 0) {
