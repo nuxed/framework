@@ -19,7 +19,7 @@ use namespace Nuxed\Http\Message;
 final class Publisher {
   public function __construct(
     private string $hub,
-    private JwtProvider $jwt,
+    private IJwtProvider $provider,
     private Client\IHttpClient $http = Client\HttpClient::create(),
   ) {}
 
@@ -64,8 +64,7 @@ final class Publisher {
   }
 
   private function getJwt(): string {
-    $provider = $this->jwt;
-    $jwt = $provider();
+    $jwt = $this->provider->getJwt();
     $this->validateJwt($jwt);
 
     return $jwt;

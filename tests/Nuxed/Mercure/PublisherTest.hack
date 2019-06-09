@@ -27,7 +27,11 @@ class PublisherTest extends HackTest\HackTest {
       },
     );
 
-    $publisher = new Mercure\Publisher(self::URL, () ==> self::JWT, $client);
+    $publisher = new Mercure\Publisher(
+      self::URL,
+      new Mercure\Provider\StaticJwtProvider(self::JWT),
+      $client,
+    );
     $update = new Mercure\Update(
       vec['https://demo.mercure.rocks/demo/books/1.jsonld'],
       'Hi from Nuxed!',
@@ -42,7 +46,11 @@ class PublisherTest extends HackTest\HackTest {
     $client = new Client\MockHttpClient(
       async ($request) ==> Message\response(500),
     );
-    $publisher = new Mercure\Publisher(self::URL, () ==> 'Invalid', $client);
+    $publisher = new Mercure\Publisher(
+      self::URL,
+      new Mercure\Provider\StaticJwtProvider('invalid'),
+      $client,
+    );
     $update = new Mercure\Update(
       vec['https://demo.mercure.rocks/demo/books/1.jsonld'],
       'Hello, World!',
