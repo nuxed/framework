@@ -1,28 +1,25 @@
-namespace Nuxed\Jwt\Token;
+namespace Nuxed\Jwt;
 
 use namespace HH\Lib\C;
-use namespace HH\Lib\Vec;
-use namespace Nuxed\Jwt;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Util\Json;
 use namespace Nuxed\Util\Base64;
-use namespace Nuxed\Jwt\Exception;
 use namespace Facebook\TypeSpec;
 
-final class Parser implements Jwt\IParser {
+final class Parser implements IParser {
   const type Headers = KeyedContainer<string, dynamic>;
   const int BASE64_PADDING_LENGTH = 4;
 
   /**
    * {@inheritdoc}
    */
-  public function parse(string $jwt): Jwt\IToken {
+  public function parse(string $jwt): IToken {
     list($encodedHeaders, $encodedClaims, $encodedSignature) = $this->split(
       $jwt,
     );
     $headers = $this->parseHeaders($encodedHeaders);
 
-    return new Plain(
+    return new Token(
       $headers,
       $this->parseClaims($encodedClaims),
       $this->parseSignature($headers, $encodedSignature),
@@ -42,17 +39,17 @@ final class Parser implements Jwt\IParser {
   /**
    * Parses the claim set from a string
    */
-  private function parseClaims(string $data): Claims {
+  private function parseClaims(string $data): Token\Claims {
     $claims = Base64\url_decode($data)
-      |> Json\structure($$, \type_structure(Claims::class, 'Type'))
+      |> Json\structure($$, \type_structure(Token\Claims::class, 'Type'))
       |> Shapes::toDict($$)
       |> TypeSpec\dict(TypeSpec\string(), TypeSpec\mixed())
         ->coerceType($$);
 
-    return new Claims($claims, $data);
+    return new Token\Claims($claims, $data);
   }
 
-  private function parseHeaders(string $encodedHeaders): Headers {
+  private function parseHeaders(string $encodedHeaders): Token\Headers {
     $headers = Json\structure(
       Base64\url_decode($encodedHeaders),
       \type_structure($this, 'Headers'),
@@ -70,22 +67,25 @@ final class Parser implements Jwt\IParser {
       );
     }
 
-    return new Headers($headers, $encodedHeaders);
+    return new Token\Headers($headers, $encodedHeaders);
   }
 
   /**
    * Returns the signature from given data
    */
-  private function parseSignature(Headers $header, string $data): Signature {
+  private function parseSignature(
+    Token\Headers $header,
+    string $data,
+  ): Token\Signature {
     if (
       $data === '' ||
       !$header->contains('alg') ||
       $header->get('alg') === 'none'
     ) {
-      return new Signature('', '');
+      return new Token\Signature('', '');
     }
 
     $hash = Base64\url_decode($data);
-    return new Signature($hash, $data);
+    return new Token\Signature($hash, $data);
   }
 }

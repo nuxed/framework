@@ -1,37 +1,36 @@
-namespace Nuxed\Jwt\Token;
+namespace Nuxed\Jwt;
 
 use namespace HH\Lib\C;
-use namespace HH\Lib\Vec;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Util;
 use namespace Nuxed\Jwt;
 
-final class Plain implements Jwt\IToken {
+final class Token implements Jwt\IToken {
   use Util\StringableTrait;
 
   public function __construct(
-    private Headers $headers,
-    private Claims $claims,
-    private Signature $signature,
+    private Token\Headers $headers,
+    private Token\Claims $claims,
+    private Token\Signature $signature,
   ) {}
 
   /**
    * {@inheritdoc}
    */
-  public function getHeaders(): Headers {
+  public function getHeaders(): Token\Headers {
     return $this->headers;
   }
   /**
    * {@inheritdoc}
    */
-  public function getClaims(): Claims {
+  public function getClaims(): Token\Claims {
     return $this->claims;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSignature(): Signature {
+  public function getSignature(): Token\Signature {
     return $this->signature;
   }
 
