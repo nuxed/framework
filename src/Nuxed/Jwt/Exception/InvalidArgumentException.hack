@@ -1,4 +1,6 @@
 namespace Nuxed\Jwt\Exception;
 
-final class InvalidArgumentException extends \InvalidArgumentException implements IException {
+final class InvalidArgumentException
+  extends \InvalidArgumentException
+  implements IException {
 }

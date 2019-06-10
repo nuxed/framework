@@ -3,7 +3,7 @@ namespace Nuxed\Jwt\Signer;
 final class Key {
   public function __construct(
     private string $content,
-    private string $passphrase = ''
+    private string $passphrase = '',
   ) {}
 
   public function getContent(): string {

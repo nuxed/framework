@@ -13,14 +13,14 @@ final class None implements Jwt\ISigner {
   /**
    * {@inhertdoc}
    */
-  public function sign(string $payload, Key $key): string {
+  public function sign(string $_payload, Key $_key): string {
     return '';
   }
 
   /**
    * {@inhertdoc}
    */
-  public function verify(string $expected, string $payload, Key $key): bool {
+  public function verify(string $expected, string $_payload, Key $_key): bool {
     return $expected === '';
   }
 }

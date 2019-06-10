@@ -5,6 +5,7 @@ abstract class Rsa extends OpenSSL {
   /**
    * {@inheritdoc}
    */
+  <<__Override>>
   final public function sign(string $payload, Key $key): string {
     return $this->createSignature(
       $key->getContent(),
@@ -16,6 +17,7 @@ abstract class Rsa extends OpenSSL {
   /**
    * {@inheritdoc}
    */
+  <<__Override>>
   final public function verify(
     string $expected,
     string $payload,
@@ -26,7 +28,8 @@ abstract class Rsa extends OpenSSL {
 
   /**
    * {@inheritdoc}
-   */ final public function getKeyType(): int {
+   */ <<__Override>>
+ final public function getKeyType(): int {
     return \OPENSSL_KEYTYPE_RSA;
   }
 }

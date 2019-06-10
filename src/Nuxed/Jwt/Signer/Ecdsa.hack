@@ -29,6 +29,7 @@ abstract class Ecdsa extends OpenSSL {
   /**
    * {@inheritdoc}
    */
+  <<__Override>>
   final public function verify(
     string $expected,
     string $payload,
