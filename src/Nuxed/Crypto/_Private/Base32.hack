@@ -7,54 +7,6 @@ use namespace Nuxed\Crypto\Exception;
 <<__Sealed(Base32Hex::class)>>
 abstract class Base32 {
   /**
-   * Decode a Base32-encoded string into raw binary
-   */
-  public static function decode(
-    string $src,
-    bool $strictPadding = false,
-  ): string {
-    return static::doDecode($src, false, $strictPadding);
-  }
-
-  /**
-   * Decode an uppercase Base32-encoded string into raw binary
-   */
-  public static function decodeUpper(
-    string $src,
-    bool $strictPadding = false,
-  ): string {
-    return static::doDecode($src, true, $strictPadding);
-  }
-
-  /**
-   * Encode into Base32 (RFC 4648)
-   */
-  public static function encode(string $src): string {
-    return static::doEncode($src, false, true);
-  }
-
-  /**
-   * Encode into Base32 (RFC 4648)
-   */
-  public static function encodeUnpadded(string $src): string {
-    return static::doEncode($src, false, false);
-  }
-
-  /**
-   * Encode into uppercase Base32 (RFC 4648)
-   */
-  public static function encodeUpper(string $src): string {
-    return static::doEncode($src, true, true);
-  }
-
-  /**
-   * Encode into uppercase Base32 (RFC 4648)
-   */
-  public static function encodeUpperUnpadded(string $src): string {
-    return static::doEncode($src, true, false);
-  }
-
-  /**
    * Uses bitwise operators instead of table-lookups to turn 5-bit integers
    * into 8-bit integers.
    */
@@ -109,7 +61,7 @@ abstract class Base32 {
   /**
    * Base32 decoding
    */
-  public static function doDecode(
+  public static function decode(
     string $src,
     bool $upper = false,
     bool $strictPadding = false,
@@ -250,7 +202,7 @@ abstract class Base32 {
   /**
    * Base32 Encoding
    */
-  public static function doEncode(
+  public static function encode(
     string $src,
     bool $upper = false,
     bool $pad = true,
