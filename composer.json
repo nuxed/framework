@@ -27,7 +27,7 @@
         "hhvm/hsl-experimental": "^4.7",
         "hhvm/hhvm-autoload": "^2.0",
         "hhvm/type-assert": "^3.4",
-        "azjezz/http-normalizer": "^0.1.1",
+        "azjezz/http-normalizer": "^0.2",
         "facebook/fbmarkdown": "^1.5",
         "facebook/hack-router": "^0.18",
         "facebook/xhp-lib": "^2.9",

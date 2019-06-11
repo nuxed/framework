@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a37353d3b9184b75ee771802e8bae2f3",
+    "content-hash": "bd2c0aca66c3097df91feb5a7b857005",
     "packages": [
         {
             "name": "azjezz/http-normalizer",
-            "version": "0.1.1",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/azjezz/http-normalizer.git",
-                "reference": "1472df5c1254fb6a746b8f880650f5ebe8f381b8"
+                "reference": "873cd2354c00428c5931403ef8102fc8b88305d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/azjezz/http-normalizer/zipball/1472df5c1254fb6a746b8f880650f5ebe8f381b8",
-                "reference": "1472df5c1254fb6a746b8f880650f5ebe8f381b8",
+                "url": "https://api.github.com/repos/azjezz/http-normalizer/zipball/873cd2354c00428c5931403ef8102fc8b88305d6",
+                "reference": "873cd2354c00428c5931403ef8102fc8b88305d6",
                 "shasum": ""
             },
             "require": {
@@ -39,7 +39,7 @@
                 }
             ],
             "description": "Normalize Http super globals",
-            "time": "2019-04-09T14:02:48+00:00"
+            "time": "2019-06-11T15:09:47+00:00"
         },
         {
             "name": "facebook/fbmarkdown",
@@ -553,16 +553,16 @@
         },
         {
             "name": "hhvm/hhast",
-            "version": "v4.8.0",
+            "version": "v4.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hhast.git",
-                "reference": "6e7d4a24e65ade6550996bc238571dc3f56aba1a"
+                "reference": "428eae24c9a1ddf2dd2d806c8c59ddd740dc27bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hhast/zipball/6e7d4a24e65ade6550996bc238571dc3f56aba1a",
-                "reference": "6e7d4a24e65ade6550996bc238571dc3f56aba1a",
+                "url": "https://api.github.com/repos/hhvm/hhast/zipball/428eae24c9a1ddf2dd2d806c8c59ddd740dc27bc",
+                "reference": "428eae24c9a1ddf2dd2d806c8c59ddd740dc27bc",
                 "shasum": ""
             },
             "require": {
@@ -597,7 +597,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2019-06-03T22:31:27+00:00"
+            "time": "2019-06-10T17:10:20+00:00"
         }
     ],
     "aliases": [],
@@ -606,7 +606,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "hhvm": "^4.7"
+        "hhvm": "^4.8"
     },
     "platform-dev": []
 }
