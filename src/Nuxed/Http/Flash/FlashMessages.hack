@@ -127,7 +127,7 @@ final class FlashMessages {
 
   private function messages(): this::TMessages {
     return TypeAssert\matches_type_structure(
-      \type_structure($this, 'TMessages'),
+      type_structure($this, 'TMessages'),
       $this->session->get($this->key, dict[]),
     );
   }
