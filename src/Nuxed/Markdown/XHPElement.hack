@@ -1,12 +1,11 @@
 namespace Nuxed\Markdown;
 
-use type Nuxed\Util\StringableTrait;
-use type XHPUnsafeRenderable;
+use namespace Nuxed\Util;
 
 // Probably don't need XHPAlwaysValidChild - this is likely to be in a <div />
 // or other similarly liberal container
-final class XHPElement implements XHPUnsafeRenderable {
-  use StringableTrait;
+final class XHPElement implements \XHPUnsafeRenderable {
+  use Util\StringableTrait;
 
   public function __construct(
     private string $markdown,
