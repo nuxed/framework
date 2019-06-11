@@ -8,7 +8,6 @@ use namespace Nuxed\Crypto\Base64;
 
 final class Parser implements IParser {
   const type Headers = KeyedContainer<string, dynamic>;
-  const int BASE64_PADDING_LENGTH = 4;
 
   /**
    * {@inheritdoc}
@@ -41,10 +40,7 @@ final class Parser implements IParser {
    */
   private function parseClaims(string $data): Token\Claims {
     $claims = Base64\UrlSafe\decode($data)
-      |> Json\structure($$, type_structure(Token\Claims::class, 'Type'))
-      |> Shapes::toDict($$)
-      |> TypeSpec\dict(TypeSpec\string(), TypeSpec\mixed())
-        ->coerceType($$);
+      |> Json\spec($$, TypeSpec\dict(TypeSpec\string(), TypeSpec\mixed()));
 
     return new Token\Claims($claims, $data);
   }
