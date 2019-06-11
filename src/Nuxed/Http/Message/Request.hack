@@ -49,10 +49,7 @@ class Request extends AbstractRequest {
       unset($this->headers[$header]);
     }
 
-    $this->headers = Dict\merge(
-      dict[$header => vec[$host]],
-      $this->headers,
-    );
+    $this->headers = Dict\merge(dict[$header => vec[$host]], $this->headers);
   }
 
   public function __clone(): void {

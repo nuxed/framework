@@ -10,9 +10,7 @@ use namespace Facebook\HackRouter;
 class RequestMatcher implements IRequestMatcher {
   private ?HackRouter\IResolver<Router\Route> $resolver;
 
-  public function __construct(
-    protected Router\IRouteCollector $collector,
-  ) {}
+  public function __construct(protected Router\IRouteCollector $collector) {}
 
   /**
    * Match a request against the known routes.

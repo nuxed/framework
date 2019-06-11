@@ -8,8 +8,6 @@ final class RequestMatcherFactory
   public function create(
     Container\IServiceContainer $container,
   ): IRequestMatcher {
-    return new RequestMatcher(
-      $container->get(Router\IRouteCollector::class),
-    );
+    return new RequestMatcher($container->get(Router\IRouteCollector::class));
   }
 }
