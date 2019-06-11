@@ -41,7 +41,7 @@ final class Parser implements IParser {
    */
   private function parseClaims(string $data): Token\Claims {
     $claims = Base64\url_decode($data)
-      |> Json\structure($$, \type_structure(Token\Claims::class, 'Type'))
+      |> Json\structure($$, type_structure(Token\Claims::class, 'Type'))
       |> Shapes::toDict($$)
       |> TypeSpec\dict(TypeSpec\string(), TypeSpec\mixed())
         ->coerceType($$);
@@ -52,7 +52,7 @@ final class Parser implements IParser {
   private function parseHeaders(string $encodedHeaders): Token\Headers {
     $headers = Json\structure(
       Base64\url_decode($encodedHeaders),
-      \type_structure($this, 'Headers'),
+      type_structure($this, 'Headers'),
     );
 
     if (C\contains_key($headers, 'enc')) {
