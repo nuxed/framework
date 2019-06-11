@@ -3,8 +3,8 @@ namespace Nuxed\Jwt;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Util\Json;
-use namespace Nuxed\Util\Base64;
 use namespace Facebook\TypeSpec;
+use namespace Nuxed\Crypto\Base64;
 
 final class Parser implements IParser {
   const type Headers = KeyedContainer<string, dynamic>;
@@ -40,7 +40,7 @@ final class Parser implements IParser {
    * Parses the claim set from a string
    */
   private function parseClaims(string $data): Token\Claims {
-    $claims = Base64\url_decode($data)
+    $claims = Base64\UrlSafe\decode($data)
       |> Json\structure($$, type_structure(Token\Claims::class, 'Type'))
       |> Shapes::toDict($$)
       |> TypeSpec\dict(TypeSpec\string(), TypeSpec\mixed())
@@ -51,7 +51,7 @@ final class Parser implements IParser {
 
   private function parseHeaders(string $encodedHeaders): Token\Headers {
     $headers = Json\structure(
-      Base64\url_decode($encodedHeaders),
+      Base64\UrlSafe\decode($encodedHeaders),
       type_structure($this, 'Headers'),
     );
 
@@ -85,7 +85,7 @@ final class Parser implements IParser {
       return new Token\Signature('', '');
     }
 
-    $hash = Base64\url_decode($data);
+    $hash = Base64\UrlSafe\decode($data);
     return new Token\Signature($hash, $data);
   }
 }

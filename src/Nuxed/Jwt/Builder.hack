@@ -3,8 +3,8 @@ namespace Nuxed\Jwt;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use namespace Nuxed\Util\Json;
-use namespace Nuxed\Util\Base64;
 use namespace Facebook\TypeSpec;
+use namespace Nuxed\Crypto\Base64;
 
 final class Builder implements IBuilder {
   private dict<string, mixed> $headers = dict['alg' => null, 'typ' => 'JWT'];
@@ -96,7 +96,7 @@ final class Builder implements IBuilder {
   }
 
   private function encode(mixed $items): string {
-    return Base64\url_encode(Json\encode($items));
+    return Base64\UrlSafe\encode(Json\encode($items));
   }
 
   /**
@@ -108,7 +108,7 @@ final class Builder implements IBuilder {
     $encodedHeaders = $this->encode($headers);
     $encodedClaims = $this->encode($this->claims);
     $signature = $signer->sign($encodedHeaders.'.'.$encodedClaims, $key);
-    $encodedSignature = Base64\url_encode($signature);
+    $encodedSignature = Base64\UrlSafe\encode($signature);
 
     return new Token(
       new Token\Headers($headers, $encodedHeaders),
