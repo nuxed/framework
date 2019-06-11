@@ -1,6 +1,7 @@
 namespace Nuxed\Util\Json;
 
 use namespace Facebook\TypeSpec;
+use namespace Facebook\TypeAssert;
 
 function spec<T>(
   string $json,
@@ -8,9 +9,17 @@ function spec<T>(
   bool $assert = false,
 ): T {
   $value = decode($json);
-  if ($assert) {
-    return $spec->assertType($value);
-  }
+  try {
+    if ($assert) {
+      return $spec->assertType($value);
+    }
 
-  return $spec->coerceType($value);
+    return $spec->coerceType($value);
+  } catch (TypeAssert\TypeCoercionException $e) {
+    throw new Exception\JsonDecodeException(
+      $e->getMessage(),
+      $e->getCode(),
+      $e,
+    );
+  }
 }
