@@ -29,7 +29,7 @@ abstract class Rsa extends OpenSSL {
   /**
    * {@inheritdoc}
    */ <<__Override>>
- final public function getKeyType(): int {
+  final public function getKeyType(): int {
     return \OPENSSL_KEYTYPE_RSA;
   }
 }
