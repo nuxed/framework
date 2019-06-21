@@ -1,3 +1,4 @@
 namespace Nuxed\Crypto\Exception;
 
-final class RuntimeException extends \RuntimeException implements IException {}
+<<__Sealed(UnserializableException::class, UnclonableException::class)>>
+class RuntimeException extends \RuntimeException implements IException {}

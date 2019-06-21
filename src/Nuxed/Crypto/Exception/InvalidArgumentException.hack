@@ -1,5 +1,10 @@
 namespace Nuxed\Crypto\Exception;
 
-final class InvalidArgumentException
+<<__Sealed(
+  InvalidKeyException::class,
+  InvalidSignatureException::class,
+  InvalidMessageException::class,
+)>>
+class InvalidArgumentException
   extends \InvalidArgumentException
   implements IException {}
