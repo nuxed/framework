@@ -38,13 +38,65 @@ class SessionTest extends HackTest {
     expect($session->contains('qux'))->toBeFalse();
   }
 
-  public function testSet(): void {
+  public function testPut(): void {
     $session = new Session\Session(dict[]);
-    $session->set('foo', 'bar');
+    $session->put('foo', 'bar');
     expect($session->contains('foo'))->toBeTrue();
     expect($session->get('foo'))->toBeSame('bar');
     expect($session->changed())->toBeTrue();
     expect($session->items())->toBeSame(dict['foo' => 'bar']);
+  }
+
+  public function testAdd(): void {
+    $session = new Session\Session(dict[]);
+    $session->add('a', 'b');
+    $session->add('a', 'c');
+    expect($session->contains('a'))->toBeTrue();
+    expect($session->get('a'))->toBeSame('b');
+    expect($session->changed())->toBeTrue();
+    expect($session->items())->toBeSame(dict['a' => 'b']);
+  }
+
+  public function testIncrement(): void {
+    $session = new Session\Session(dict[]);
+    $session->put('a', 1);
+    $session->increment('a', 3);
+    $session->increment('a', 0);
+    $session->increment('a');
+    $session->increment('a', 4);
+    expect($session->get('a'))->toBeSame(9);
+  }
+
+  public function testDecrement(): void {
+    $session = new Session\Session(dict[]);
+    $session->put('a', 1);
+    $session->decrement('a', 3);
+    $session->decrement('a', 0);
+    $session->decrement('a');
+    $session->decrement('a', 4);
+    expect($session->get('a'))->toBeSame(-7);
+  }
+
+  public function testIncrementAndDecrementOnNonNumericValues(): void {
+    $session = new Session\Session(dict[]);
+    $session->put('a', 'b');
+    expect(() ==> $session->increment('a'))
+      ->toThrow(\TypeAssertionException::class);
+    expect(() ==> $session->decrement('a'))
+      ->toThrow(\TypeAssertionException::class);
+  }
+
+  public function testRemember(): void {
+    $session = new Session\Session(dict[]);
+    $session->put('a', 'b');
+    $a = $session->remember('a', () ==> 'c');
+    expect($a)->toBeSame('b');
+    $a = $session->get('a');
+    expect($a)->toBeSame('b');
+    $d = $session->remember('d', () ==> 'c');
+    expect($d)->toBeSame('c');
+    $d = $session->get('d');
+    expect($d)->toBeSame('c');
   }
 
   public function testForget(): void {
@@ -118,7 +170,7 @@ class SessionTest extends HackTest {
   public function testChanged(): void {
     $session = new Session\Session(dict[]);
     expect($session->changed())->toBeFalse();
-    $session->set('foo', 'bar');
+    $session->put('foo', 'bar');
     expect($session->changed())->toBeTrue();
     $session->forget('foo');
     expect($session->changed())->toBeFalse();

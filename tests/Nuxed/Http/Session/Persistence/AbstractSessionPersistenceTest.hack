@@ -69,7 +69,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
 
     $session = await $persistence->initialize($request);
     expect($session->getId())->toBeSame('foo');
-    $session->set('a', 'b');
+    $session->put('a', 'b');
     $response = await $persistence->persist($session, Message\Response\empty());
     $httpCookie = $response->getCookie($cookie['name']);
     expect($httpCookie)->toNotBeNull();
@@ -144,7 +144,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     $request = new Message\ServerRequest('GET', new Message\Uri())
       |> $$->withCookieParams(dict[$cookie['name'] => 'baz']);
     $session = await $persistence->initialize($request);
-    $session->set('a', 'b');
+    $session->put('a', 'b');
     $originalResponse = Message\Response\empty();
     $response = await $persistence->persist($session, $originalResponse);
     expect($response)->toNotBeSame($originalResponse);
@@ -170,7 +170,7 @@ abstract class AbstractSessionPersistenceTest extends HackTest {
     $request = new Message\ServerRequest('GET', new Message\Uri())
       |> $$->withCookieParams(dict[$cookie['name'] => 'baz']);
     $session = await $persistence->initialize($request);
-    $session->set('a', 'b');
+    $session->put('a', 'b');
     $originalResponse = Message\Response\empty()
       |> $$->withAddedHeader('Expires', vec['foo'])
       |> $$->withAddedHeader('Pragma', vec['foo']);
