@@ -2,7 +2,6 @@ namespace Nuxed\Crypto;
 
 use namespace Nuxed\Crypto;
 use namespace Nuxed\Crypto\Str;
-use namespace HH\Lib\SecureRandom;
 use namespace Nuxed\Crypto\Exception;
 use namespace HH\Lib\Experimental\Filesystem;
 

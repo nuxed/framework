@@ -38,6 +38,7 @@ final class SignaturePrivateSecret extends Authentication\SignatureSecret {
     return new SignaturePublicSecret(new Crypto\HiddenString($publicKey));
   }
 
+  <<__Override>>
   public static function generate(): this {
     return new self(
       new Crypto\HiddenString(SecureRandom\string(static::LENGTH)),

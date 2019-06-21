@@ -2,7 +2,6 @@ namespace Nuxed\Crypto\Symmetric\Encryption;
 
 use namespace Nuxed\Crypto;
 use namespace HH\Lib\SecureRandom;
-use namespace Nuxed\Crypto\_Private;
 use namespace Nuxed\Crypto\Symmetric\Authentication;
 
 /**
@@ -19,7 +18,7 @@ function encrypt(
   Secret $secret,
   string $additionalData = '',
 ): string {
-  /** 
+  /**
    * @see https://github.com/paragonie/halite/blob/master/src/Halite.php#L43
    */
   $version = "\x31\x42\x04\x00";
