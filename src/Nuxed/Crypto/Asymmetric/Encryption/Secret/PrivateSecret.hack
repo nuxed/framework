@@ -8,9 +8,7 @@ use namespace Nuxed\Crypto\Asymmetric\Encryption;
 final class PrivateSecret extends Encryption\Secret {
   const int LENGTH = \SODIUM_CRYPTO_BOX_SECRETKEYBYTES;
   public function __construct(Crypto\HiddenString $material) {
-    if (
-      Binary\length($material->toString()) !== static::LENGTH
-    ) {
+    if (Binary\length($material->toString()) !== static::LENGTH) {
       throw new Crypto\Exception\InvalidKeyException(
         'Encryption private secret must be const(PrivateSecret::LENGTH) bytes long',
       );
