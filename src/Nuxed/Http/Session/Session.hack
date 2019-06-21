@@ -92,6 +92,20 @@ final class Session {
   }
 
   /**
+   * Get an item from the session, or execute the given Closure and store the result.
+   */
+  public function remember<T>(string $key, (function(): T) $callback): T {
+    if ($this->contains($key)) {
+      /* HH_IGNORE_ERROR[4110] */
+      return $this->get($key);
+    }
+
+    $value = $callback();
+    $this->put($key, $value);
+    return $value;
+  }
+
+  /**
    * Remove a value from the session.
    */
   public function forget(string $name): void {
