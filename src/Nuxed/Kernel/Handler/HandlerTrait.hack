@@ -12,7 +12,7 @@ trait HandlerTrait {
   ): string {
     $session = $request->getSession();
     $token = \bin2hex(SecureRandom\string(24));
-    $session->set('csrf-token-'.$name, $token);
+    $session->put('csrf-token-'.$name, $token);
     return $token;
   }
 

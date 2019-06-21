@@ -59,12 +59,12 @@ final class Session {
   }
 
   /**
-   * Set a value within the session.
+   * Store a value in the session.
    *
    * Values MUST be serializable in any format; we recommend ensuring the
    * values are JSON serializable for greatest portability.
    */
-  public function set(string $name, mixed $value): void {
+  public function put(string $name, mixed $value): void {
     $this->data[$name] = $value;
   }
 
@@ -143,7 +143,7 @@ final class Session {
    * would make the session expire in 5 minutes of inactivity.
    */
   public function expire(int $duration): void {
-    $this->set(Session::SESSION_AGE_KEY, $duration);
+    $this->put(Session::SESSION_AGE_KEY, $duration);
     $this->age = $duration;
   }
 

@@ -50,7 +50,7 @@ final class FlashMessages {
       'value' => $value,
       'hops' => $hops,
     );
-    $this->session->set($this->key, $messages);
+    $this->session->put($this->key, $messages);
   }
 
   /**
@@ -119,7 +119,7 @@ final class FlashMessages {
     if (C\is_empty($messages)) {
       $this->session->forget($this->key);
     } else {
-      $this->session->set($this->key, $messages);
+      $this->session->put($this->key, $messages);
     }
 
     $this->current = $current;
