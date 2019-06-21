@@ -10,10 +10,15 @@ final class MockHttpClient extends HttpClient {
     parent::__construct($options);
   }
 
+  /**
+   * Process the request and returns a response.
+   *
+   * @throws Exception\IException If an error happens while processing the request.
+   */
   <<__Override>>
-  public function send(Message\Request $request): Awaitable<Message\Response> {
-    $request = $this->prepare($request);
-    $handler = $this->handler;
-    return $handler($request);
+  public function process(
+    Message\Request $request,
+  ): Awaitable<Message\Response> {
+    return ($this->handler)($request);
   }
 }

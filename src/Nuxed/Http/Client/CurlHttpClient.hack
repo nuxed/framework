@@ -14,19 +14,14 @@ final class CurlHttpClient extends HttpClient {
   }
 
   /**
-   * Sends a request and returns a response.
-   *
-   * @param Message\Request $request
-   *
-   * @return Awaitable<Message\Response>
+   * Process the request and returns a response.
    *
    * @throws Exception\IException If an error happens while processing the request.
    */
   <<__Override>>
-  public async function send(
+  public async function process(
     Message\Request $request,
   ): Awaitable<Message\Response> {
-    $request = $this->prepare($request);
     $uri = $request->getUri();
 
     $timeout = $this->options['timeout'] ??

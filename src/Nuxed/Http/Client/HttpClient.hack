@@ -26,7 +26,7 @@ abstract class HttpClient implements IHttpClient {
 
   public static function create(
     HttpClientOptions $options = shape(),
-  ): IHttpClient {
+  ): HttpClient {
     return new CurlHttpClient($options);
   }
 
@@ -42,14 +42,31 @@ abstract class HttpClient implements IHttpClient {
     string $uri,
     HttpClientOptions $options = shape(),
   ): Awaitable<Message\Response> {
-    return await (
-      Message\request($method, Message\uri($uri))
-      |> $this->prepare($$, self::mergeOptions($this->options, $options))
-      |> $this->send($$)
-    );
+    $request = Message\request($method, Message\uri($uri))
+      |> $this->prepare($$, self::mergeOptions($this->options, $options));
+    return await $this->process($request);
   }
 
-  final protected function prepare(
+  /**
+   * Sends a request and returns a response.
+   *
+   * @throws Exception\IException If an error happens while processing the request.
+   */
+  public async function send(
+    Message\Request $request,
+    HttpClientOptions $options = shape(),
+  ): Awaitable<Message\Response> {
+    $request = $this->prepare(
+      $request,
+      self::mergeOptions($this->options, $options),
+    );
+    return await $this->process($request);
+  }
+
+  /**
+   * Prepare the request before execution.
+   */
+  final private function prepare(
     Message\Request $request,
     HttpClientOptions $options = $this->options,
   ): Message\Request {
@@ -106,6 +123,15 @@ abstract class HttpClient implements IHttpClient {
     $this->prepared[] = \spl_object_hash($request);
     return $request;
   }
+
+  /**
+   * Process the request and returns a response.
+   *
+   * @throws Exception\IException If an error happens while processing the request.
+   */
+  abstract protected function process(
+    Message\Request $request,
+  ): Awaitable<Message\Response>;
 
   /**
    * Resolves a URL against a base URI.
