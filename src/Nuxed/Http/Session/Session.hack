@@ -78,6 +78,20 @@ final class Session {
   }
 
   /**
+   * Increment the value of an item in the session.
+   */
+  public function increment(string $key, num $value = 1): void {
+    $this->put($key, $this->get($key, 0) as num + $value);
+  }
+
+  /**
+   * Decrement the value of an item in the session.
+   */
+  public function decrement(string $key, num $value = 1): void {
+    $this->put($key, $this->get($key, 0) as num - $value);
+  }
+
+  /**
    * Remove a value from the session.
    */
   public function forget(string $name): void {
