@@ -69,6 +69,15 @@ final class Session {
   }
 
   /**
+   * Store a value in the session if the key does not exist.
+   */
+  public function add(string $name, mixed $value): void {
+    if (!$this->contains($name)) {
+      $this->put($name, $value);
+    }
+  }
+
+  /**
    * Remove a value from the session.
    */
   public function forget(string $name): void {
