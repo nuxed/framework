@@ -1,12 +1,16 @@
 namespace Nuxed\Http\Client;
 
+use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
+use namespace HH\Lib\Vec;
 use namespace HH\Lib\Dict;
 use namespace Nuxed\Http\Message;
 use namespace Facebook\TypeSpec;
 use namespace Facebook\TypeAssert;
 
 abstract class HttpClient implements IHttpClient {
+  private vec<string> $prepared = vec[];
+
   const HttpClientOptions DEFAULT_OPTIONS = shape(
     'headers' => dict[],
     'max_redirects' => 20,
@@ -22,10 +26,9 @@ abstract class HttpClient implements IHttpClient {
 
   public static function create(
     HttpClientOptions $options = shape(),
-  ): HttpClient {
+  ): IHttpClient {
     return new CurlHttpClient($options);
   }
-
 
   /**
    * Create and send an HTTP request.
@@ -34,14 +37,25 @@ abstract class HttpClient implements IHttpClient {
    * relative path to append to the base path of the client. The URL can
    * contain the query string as well.
    */
-  public function request(
+  public async function request(
     string $method,
     string $uri,
+    HttpClientOptions $options = shape(),
   ): Awaitable<Message\Response> {
-    return $this->send(Message\request($method, Message\uri($uri)));
+    return await (
+      Message\request($method, Message\uri($uri))
+      |> $this->prepare($$, self::mergeOptions($this->options, $options))
+      |> $this->send($$)
+    );
   }
 
-  final protected function prepare(Message\Request $request): Message\Request {
+  final protected function prepare(
+    Message\Request $request,
+    HttpClientOptions $options = $this->options,
+  ): Message\Request {
+    if (C\contains($this->prepared, \spl_object_hash($request))) {
+      return $request;
+    }
     $uri = $request->getUri();
     list($user, $password) = $uri->getUserInfo();
     if (!$request->hasHeader('authorization')) {
@@ -53,7 +67,7 @@ abstract class HttpClient implements IHttpClient {
           ),
         ]);
       } else {
-        $token = Shapes::idx($this->options, 'auth_bearer', null);
+        $token = Shapes::idx($options, 'auth_bearer', null);
         if ($token is nonnull) {
           $request = $request->withAddedHeader('authorization', vec[
             Str\format('Bearer %s', $token),
@@ -63,7 +77,7 @@ abstract class HttpClient implements IHttpClient {
     }
     $uri = $uri->withUserInfo('', null);
 
-    $headers = Shapes::idx($this->options, 'headers', dict[]);
+    $headers = Shapes::idx($options, 'headers', dict[]);
     foreach ($headers as $name => $value) {
       if (!$request->hasHeader($name)) {
         $request = $request->withHeader($name, $value);
@@ -72,8 +86,7 @@ abstract class HttpClient implements IHttpClient {
       }
     }
 
-    $protocol = $this->options['http_version'] ??
-      $request->getProtocolVersion();
+    $protocol = $options['http_version'] ?? $request->getProtocolVersion();
     if ($protocol !== '1.1') {
       $request = $request->withProtocolVersion($protocol);
     }
@@ -83,12 +96,123 @@ abstract class HttpClient implements IHttpClient {
       $body->rewind();
     }
 
-    return $request->withUri($uri);
+    $baseUri = $options['base_uri'] ?? null;
+    $base = null;
+    if ($baseUri is nonnull) {
+      $base = Message\uri($baseUri);
+    }
+
+    $request = $request->withUri(self::resolveUrl($uri, $base));
+    $this->prepared[] = \spl_object_hash($request);
+    return $request;
   }
 
-  public function setOptions(HttpClientOptions $options): this {
-    $current = Shapes::toDict($this->options);
-    $new = Shapes::toDict($options);
+  /**
+   * Resolves a URL against a base URI.
+   *
+   * @see https://tools.ietf.org/html/rfc3986#section-5.2.2
+   *
+   * @throws InvalidArgumentException When an invalid URL is passed
+   */
+  private static function resolveUrl(
+    Message\Uri $url,
+    ?Message\Uri $base,
+  ): Message\Uri {
+    if (
+      null !== $base &&
+      '' === ($base->getScheme() ?? '').($base->getAuthority() ?? '')
+    ) {
+      throw new Exception\InvalidArgumentException(Str\format(
+        'Invalid "base_uri" option: host or scheme is missing in "%s".',
+        $base->toString(),
+      ));
+    }
+    if (null === $base && '' === $url->getScheme().$url->getAuthority()) {
+      throw new Exception\InvalidArgumentException(Str\format(
+        'Invalid URL: no "base_uri" option was provided and host or scheme is missing in "%s".',
+        $url->toString(),
+      ));
+    }
+
+    if ('' !== $url->getScheme()) {
+      $url = $url->withPath(self::removeDotSegments($url->getPath()));
+    } else {
+      if ('' !== $url->getAuthority()) {
+        $url = $url->withPath(self::removeDotSegments($url->getPath()));
+      } else {
+        if ('' === $url->getPath()) {
+          $url = $url->withPath($base?->getPath() ?? '')
+            ->withQuery(
+              $url->getQuery() !== ''
+                ? $url->getQuery()
+                : $base?->getQuery() ?? '',
+            );
+        } else {
+          if (!Str\starts_with($url->getPath(), '/')) {
+            if (C\contains(vec['', null], $base?->getPath())) {
+              $url = $url->withPath('/'.$url->getPath());
+            } else {
+              $segments = Str\split($base?->getPath() ?? '', '/');
+              $url = $url->withPath(
+                Str\join(
+                  Vec\take($segments, C\count($segments) - 1)
+                    |> Vec\concat($$, vec[$url->getPath()]),
+                  '/',
+                ),
+              );
+            }
+          }
+          $url = $url->withPath(self::removeDotSegments($url->getPath()));
+        }
+        $url = $url->withHost($base?->getHost() ?? $url->getHost())
+          ->withPort($base?->getPort() ?? $url->getPort());
+        if ($base is nonnull) {
+          $url = $url->withUserInfo(...$base->getUserInfo());
+        }
+      }
+      $url = $url->withScheme($base?->getScheme() ?? $url->getScheme());
+    }
+    if ('' === $url->getPath()) {
+      $url = $url->withPath('/');
+    }
+    return $url;
+  }
+
+  /**
+   * Removes dot-segments from a path.
+   *
+   * @see https://tools.ietf.org/html/rfc3986#section-5.2.4
+   */
+  private static function removeDotSegments(string $path): string {
+    $result = '';
+    while (!C\contains(vec['', '.', '..'], $path)) {
+      if (
+        '.' === $path[0] &&
+        (Str\starts_with($path, '../') || Str\starts_with($path, './'))
+      ) {
+        $path = Str\slice($path, Str\starts_with($path, './') ? 2 : 3);
+      } else if ('/.' === $path || Str\starts_with($path, '/./')) {
+        $path = Str\splice($path, '/', 0, 3);
+      } else if ('/..' === $path || Str\starts_with($path, '/../')) {
+        $i = Str\search_last($result, '/');
+        $result = $i ? Str\slice($result, 0, $i) : '';
+        $path = Str\splice($path, '/', 0, 4);
+      } else {
+        $i = Str\search($path, '/', 1) ?: Str\length($path);
+        $result .= Str\slice($path, 0, $i);
+        $path = Str\slice($path, $i);
+      }
+    }
+
+    return $result;
+  }
+
+  private static function mergeOptions(
+    HttpClientOptions $current,
+    HttpClientOptions $new,
+  ): HttpClientOptions {
+    $current = Shapes::toDict($current);
+    $new = Shapes::toDict($new);
     $default = Shapes::toDict(static::DEFAULT_OPTIONS);
     $strSpec = TypeSpec\string();
     $spec = TypeSpec\dict($strSpec, $strSpec);
@@ -97,7 +221,7 @@ abstract class HttpClient implements IHttpClient {
       $spec->assertType($new['resolve'] ?? dict[]),
     );
     $spec = TypeSpec\vec($strSpec);
-    $new['ciphers'] = Dict\merge(
+    $new['ciphers'] = Vec\concat(
       $spec->assertType($current['ciphers'] ?? vec[]),
       $spec->assertType($new['ciphers'] ?? vec[]),
     );
@@ -111,10 +235,14 @@ abstract class HttpClient implements IHttpClient {
       $spec->assertType($new['peer_fingerprint'] ?? dict[]),
     );
     $options = Dict\merge($default, $current, $new);
-    $this->options = TypeAssert\matches_type_structure(
+    return TypeAssert\matches_type_structure(
       _Private\Structure::HttpClientOptions(),
       $options,
     );
+  }
+
+  public function setOptions(HttpClientOptions $options): this {
+    $this->options = self::mergeOptions($this->options, $options);
     return $this;
   }
 }

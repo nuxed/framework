@@ -3,6 +3,8 @@ namespace Nuxed\Http\Client;
 type HttpClientOptions = shape(
   ?'http_version' => string,
 
+  ?'base_uri' => string,
+
   ?'headers' => KeyedContainer<string, Container<string>>,
 
   // a token enabling HTTP Bearer authorization (RFC 6750)
