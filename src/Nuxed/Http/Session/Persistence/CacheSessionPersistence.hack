@@ -36,7 +36,6 @@ class CacheSessionPersistence extends AbstractSessionPersistence {
       $sessionData = await $this->getSessionDataFromCache($id);
     }
 
-    /* HH_IGNORE_ERROR[4110] */
     return new Session\Session($sessionData, $id);
   }
 
