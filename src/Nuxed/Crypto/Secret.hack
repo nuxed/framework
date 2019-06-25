@@ -94,27 +94,6 @@ abstract class Secret {
   }
 
   /**
-   * Save a secret to a file.
-   */
-  public async function save(string $file): Awaitable<void> {
-    await using ($file = Filesystem\open_write_only($file)) {
-      await $file->writeAsync($this->export()->toString());
-    }
-  }
-
-  /**
-   * Read a secret from a file, verify its checksum.
-   */
-  public static async function load(string $file): Awaitable<this> {
-    await using ($file = Filesystem\open_read_only($file)) {
-      $content = await $file->readAsync();
-      $data = Hex\decode($content);
-      \sodium_memzero(&$content);
-      return new static(new HiddenString(static::getKeyDataFromString($data)));
-    }
-  }
-
-  /**
    * Take a stored key string, get the derived key (after verifying the
    * checksum)
    */
