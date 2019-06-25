@@ -1,7 +1,6 @@
 namespace Nuxed\Util\Json;
 
-use namespace Facebook\TypeSpec;
-use namespace Facebook\TypeAssert;
+use namespace Facebook\{TypeAssert, TypeSpec};
 
 function spec<T>(
   string $json,
