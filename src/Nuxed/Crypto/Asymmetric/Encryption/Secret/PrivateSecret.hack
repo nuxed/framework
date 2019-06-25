@@ -1,7 +1,6 @@
 namespace Nuxed\Crypto\Asymmetric\Encryption\Secret;
 
 use namespace Nuxed\Crypto;
-use namespace HH\Lib\SecureRandom;
 use namespace Nuxed\Crypto\Binary;
 use namespace Nuxed\Crypto\Asymmetric\Encryption;
 
@@ -23,12 +22,5 @@ final class PrivateSecret extends Encryption\Secret {
   public function derivePublicSecret(): PublicSecret {
     $publicKey = \sodium_crypto_box_publickey_from_secretkey($this->toString());
     return new PublicSecret(new Crypto\HiddenString($publicKey));
-  }
-
-  <<__Override>>
-  public static function generate(): this {
-    return new self(
-      new Crypto\HiddenString(SecureRandom\string(static::LENGTH)),
-    );
   }
 }

@@ -19,4 +19,15 @@ abstract class SignatureSecret extends Asymmetric\Secret {
   ): Secret\SignaturePublicSecret {
     return new Secret\SignaturePublicSecret($material);
   }
+
+  final public static function generate(
+  ): (Secret\SignaturePrivateSecret, Secret\SignaturePublicSecret) {
+    // Encryption keypair
+    $kp = \sodium_crypto_sign_keypair();
+    $private = \sodium_crypto_sign_secretkey($kp);
+
+    \sodium_memzero(&$kp);
+    return new Secret\SignaturePrivateSecret(new Crypto\HiddenString($private))
+      |> tuple($$, $$->derivePublicSecret());
+  }
 }

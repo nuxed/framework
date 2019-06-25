@@ -31,4 +31,15 @@ abstract class Secret extends Asymmetric\Secret {
   ): Secret\PublicSecret {
     return new Secret\PublicSecret($material);
   }
+
+  final public static function generate(
+  ): (Secret\PrivateSecret, Secret\PublicSecret) {
+    // Encryption keypair
+    $kp = \sodium_crypto_box_keypair();
+    $private = \sodium_crypto_box_secretkey($kp);
+
+    \sodium_memzero(&$kp);
+    return new Secret\PrivateSecret(new Crypto\HiddenString($private))
+      |> tuple($$, $$->derivePublicSecret());
+  }
 }

@@ -1,7 +1,6 @@
 namespace Nuxed\Crypto\Asymmetric\Authentication\Secret;
 
 use namespace Nuxed\Crypto;
-use namespace HH\Lib\SecureRandom;
 use namespace Nuxed\Crypto\Asymmetric\Encryption;
 use namespace Nuxed\Crypto\Asymmetric\Authentication;
 
@@ -26,13 +25,6 @@ final class SignaturePublicSecret extends Authentication\SignatureSecret {
 
     return new Encryption\Secret\PublicSecret(
       new Crypto\HiddenString($x25519_pk),
-    );
-  }
-
-  <<__Override>>
-  public static function generate(): this {
-    return new self(
-      new Crypto\HiddenString(SecureRandom\string(static::LENGTH)),
     );
   }
 }

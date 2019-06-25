@@ -1,7 +1,6 @@
 namespace Nuxed\Crypto\Asymmetric\Encryption\Secret;
 
 use namespace Nuxed\Crypto;
-use namespace HH\Lib\SecureRandom;
 use namespace Nuxed\Crypto\Binary;
 use namespace Nuxed\Crypto\Asymmetric\Encryption;
 
@@ -15,12 +14,5 @@ final class PublicSecret extends Encryption\Secret {
     }
 
     parent::__construct($material);
-  }
-
-  <<__Override>>
-  public static function generate(): this {
-    return new self(
-      new Crypto\HiddenString(SecureRandom\string(static::LENGTH)),
-    );
   }
 }

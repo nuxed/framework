@@ -2,8 +2,8 @@ namespace Nuxed\Crypto;
 
 use namespace Nuxed\Crypto;
 use namespace Nuxed\Crypto\Str;
+use namespace HH\Lib\SecureRandom;
 use namespace Nuxed\Crypto\Exception;
-use namespace HH\Lib\Experimental\Filesystem;
 
 /**
  * Base class for all cryptography secrets
@@ -13,6 +13,8 @@ use namespace HH\Lib\Experimental\Filesystem;
   __ConsistentConstruct
 >>
 abstract class Secret {
+  private static int $prefixTagLength = 12;
+
   protected string $material;
 
   public function __construct(Crypto\HiddenString $material) {
@@ -63,12 +65,13 @@ abstract class Secret {
    */
   public function export(): HiddenString {
     $data = $this->toString();
+    $prefix = SecureRandom\string(self::$prefixTagLength);
     $hidden = new HiddenString(
       Hex\encode(
-        _Private\HALITE_VERSION_KEYS.
+        $prefix.
         $data.
         \sodium_crypto_generichash(
-          _Private\HALITE_VERSION_KEYS.$data,
+          $prefix.$data,
           '',
           \SODIUM_CRYPTO_GENERICHASH_BYTES_MAX,
         ),
@@ -116,10 +119,10 @@ abstract class Secret {
    * checksum)
    */
   protected static function getKeyDataFromString(string $data): string {
-    $versionTag = Binary\slice($data, 0, _Private\VERSION_TAG_LEN);
+    $prefixTag = Binary\slice($data, 0, self::$prefixTagLength);
     $keyData = Binary\slice(
       $data,
-      _Private\VERSION_TAG_LEN,
+      self::$prefixTagLength,
       -\SODIUM_CRYPTO_GENERICHASH_BYTES_MAX,
     );
     $checksum = Binary\slice(
@@ -128,7 +131,7 @@ abstract class Secret {
       \SODIUM_CRYPTO_GENERICHASH_BYTES_MAX,
     );
     $calc = \sodium_crypto_generichash(
-      $versionTag.$keyData,
+      $prefixTag.$keyData,
       '',
       \SODIUM_CRYPTO_GENERICHASH_BYTES_MAX,
     );
@@ -136,11 +139,9 @@ abstract class Secret {
       throw new Exception\InvalidKeyException('Checksum validation fail');
     }
     \sodium_memzero(&$data);
-    \sodium_memzero(&$versionTag);
+    \sodium_memzero(&$prefixTag);
     \sodium_memzero(&$calc);
     \sodium_memzero(&$checksum);
     return $keyData;
   }
-
-  abstract public static function generate(): this;
 }

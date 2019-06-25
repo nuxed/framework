@@ -19,7 +19,6 @@ final class Secret extends Symmetric\Secret {
     parent::__construct($material);
   }
 
-  <<__Override>>
   public static function generate(): this {
     return new self(
       new Crypto\HiddenString(SecureRandom\string(static::LENGTH)),
