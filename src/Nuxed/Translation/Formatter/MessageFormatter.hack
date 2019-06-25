@@ -1,7 +1,6 @@
 namespace Nuxed\Translation\Formatter;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 use namespace Nuxed\Translation\Exception;
 
 final class MessageFormatter implements IMessageFormatter {

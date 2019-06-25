@@ -2,8 +2,7 @@ namespace Nuxed\Translation\Reader;
 
 use namespace HH\Asio;
 use namespace HH\Lib\Str;
-use namespace Nuxed\Io;
-use namespace Nuxed\Translation;
+use namespace Nuxed\{Io, Translation};
 use namespace Nuxed\Translation\Loader;
 
 /**

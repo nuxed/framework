@@ -1,8 +1,6 @@
 namespace Nuxed\Translation;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Dict;
+use namespace HH\Lib\{C, Dict, Str};
 use namespace Nuxed\Translation\Exception;
 
 final class MessageCatalogue {

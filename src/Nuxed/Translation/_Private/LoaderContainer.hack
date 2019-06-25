@@ -1,9 +1,7 @@
 namespace Nuxed\Translation\_Private;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace Nuxed\Translation\Loader;
-use namespace Nuxed\Translation\Exception;
+use namespace HH\Lib\{C, Str};
+use namespace Nuxed\Translation\{Exception, Loader};
 
 final class LoaderContainer {
   private dict<string, mixed> $loaders = dict[];

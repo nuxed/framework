@@ -1,9 +1,6 @@
 namespace Nuxed\Translation;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Vec;
-use namespace HH\Lib\Regex;
+use namespace HH\Lib\{C, Regex, Str, Vec};
 
 class Translator implements ITranslator, ILocaleAware, ITranslatorBag {
   protected dict<string, MessageCatalogue> $catalogues = dict[];

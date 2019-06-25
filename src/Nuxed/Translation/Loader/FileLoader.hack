@@ -1,8 +1,7 @@
 namespace Nuxed\Translation\Loader;
 
-use namespace Nuxed\Io;
+use namespace Nuxed\{Io, Translation};
 use namespace HH\Lib\Str;
-use namespace Nuxed\Translation;
 use namespace Nuxed\Translation\Exception;
 
 abstract class FileLoader implements ILoader<string> {

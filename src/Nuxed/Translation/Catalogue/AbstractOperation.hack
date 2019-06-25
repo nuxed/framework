@@ -1,8 +1,6 @@
 namespace Nuxed\Translation\Catalogue;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Vec;
+use namespace HH\Lib\{C, Str, Vec};
 use namespace Nuxed\Translation;
 use namespace Nuxed\Translation\Exception;
 
