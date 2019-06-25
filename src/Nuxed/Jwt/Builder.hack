@@ -1,7 +1,6 @@
 namespace Nuxed\Jwt;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Vec;
+use namespace HH\Lib\{C, Vec};
 use namespace Nuxed\Util\Json;
 use namespace Facebook\TypeSpec;
 use namespace Nuxed\Crypto\Base64;

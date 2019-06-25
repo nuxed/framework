@@ -1,9 +1,7 @@
 namespace Nuxed\Jwt;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace Nuxed\Util;
-use namespace Nuxed\Jwt;
+use namespace HH\Lib\{C, Str};
+use namespace Nuxed\{Jwt, Util};
 
 final class Token implements Jwt\IToken {
   use Util\StringableTrait;
