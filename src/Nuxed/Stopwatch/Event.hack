@@ -1,13 +1,10 @@
 namespace Nuxed\Stopwatch;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Vec;
-use namespace HH\Lib\Math;
-use type Nuxed\Util\StringableTrait;
+use namespace HH\Lib\{C, Math, Str, Vec};
+use namespace Nuxed\Util;
 
 class Event {
-  use StringableTrait;
+  use Util\StringableTrait;
 
   private vec<Period> $periods = vec[];
   private float $origin;

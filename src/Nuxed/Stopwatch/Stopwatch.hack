@@ -1,11 +1,8 @@
 namespace Nuxed\Stopwatch;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Vec;
-use namespace HH\Lib\Str;
-use type Nuxed\Contract\IReset;
+use namespace HH\Lib\{C, Str, Vec};
 
-class Stopwatch implements IReset {
+final class Stopwatch {
   private dict<string, Section> $sections = dict[];
   private vec<Section> $activeSections = vec[];
 

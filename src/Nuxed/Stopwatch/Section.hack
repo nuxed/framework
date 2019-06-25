@@ -1,7 +1,6 @@
 namespace Nuxed\Stopwatch;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 
 class Section {
   private dict<string, Event> $events = dict[];
