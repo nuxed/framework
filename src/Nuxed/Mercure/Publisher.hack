@@ -1,9 +1,7 @@
 namespace Nuxed\Mercure;
 
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Regex;
-use namespace Nuxed\Http\Client;
-use namespace Nuxed\Http\Message;
+use namespace HH\Lib\{Regex, Str};
+use namespace Nuxed\Http\{Client, Message};
 
 /**
  * Publishes an update to the hub.
