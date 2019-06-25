@@ -1,8 +1,6 @@
 namespace Nuxed\Http\Message;
 
-use namespace HH\Lib\Str;
-use namespace HH\Lib\C;
-use namespace HH\Lib\Math;
+use namespace HH\Lib\{C, Math, Str};
 
 /**
  * Logic largely refactored from the Symfony HttpFoundation Symfony\Component\HttpFoundation\IpUtils class.

@@ -1,8 +1,7 @@
 namespace Nuxed\Http\Session\Persistence;
 
 use namespace HH\Lib\Str;
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Session;
+use namespace Nuxed\Http\{Message, Session};
 
 abstract class AbstractSessionPersistence implements ISessionPersistence {
   /**

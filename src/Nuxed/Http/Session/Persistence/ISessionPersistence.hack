@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Session\Persistence;
 
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Session;
+use namespace Nuxed\Http\{Message, Session};
 
 interface ISessionPersistence {
   /**

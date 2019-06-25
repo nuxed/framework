@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Server\RequestHandler;
 
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\{Message, Server};
 
 final class CallableRequestHandlerDecorator implements Server\IRequestHandler {
   public function __construct(

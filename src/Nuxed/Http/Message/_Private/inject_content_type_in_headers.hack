@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Message\_Private;
 
-use namespace HH\Lib\Str;
-use namespace HH\Lib\C;
+use namespace HH\Lib\{C, Str};
 
 /**
 * Inject the provided Content-Type, if none is already present.

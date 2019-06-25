@@ -1,8 +1,6 @@
 namespace Nuxed\Http\Router;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Vec;
+use namespace HH\Lib\{C, Str, Vec};
 use namespace Nuxed\Http\Server;
 
 /**

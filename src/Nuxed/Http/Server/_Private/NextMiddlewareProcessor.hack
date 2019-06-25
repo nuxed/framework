@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Server\_Private;
 
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\{Message, Server};
 
 class NextMiddlewareProcessor implements Server\IRequestHandler {
   private \SplPriorityQueue<Server\IMiddleware> $queue;

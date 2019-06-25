@@ -1,10 +1,7 @@
 namespace Nuxed\Http\Router\Matcher;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Vec;
-use namespace HH\Lib\Dict;
-use namespace Nuxed\Http\Router;
-use namespace Nuxed\Http\Message;
+use namespace HH\Lib\{C, Dict, Vec};
+use namespace Nuxed\Http\{Message, Router};
 use namespace Facebook\HackRouter;
 
 class RequestMatcher implements IRequestMatcher {

@@ -1,12 +1,8 @@
 namespace Nuxed\Http\Client;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Vec;
-use namespace HH\Lib\Dict;
+use namespace HH\Lib\{C, Dict, Str, Vec};
 use namespace Nuxed\Http\Message;
-use namespace Facebook\TypeSpec;
-use namespace Facebook\TypeAssert;
+use namespace Facebook\{TypeAssert, TypeSpec};
 
 abstract class HttpClient implements IHttpClient {
   private vec<string> $prepared = vec[];

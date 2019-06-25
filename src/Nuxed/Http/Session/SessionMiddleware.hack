@@ -1,7 +1,7 @@
 namespace Nuxed\Http\Session;
 
 use type Nuxed\Http\Server\{IMiddleware, IRequestHandler};
-use type Nuxed\Http\Message\{ServerRequest, Response};
+use type Nuxed\Http\Message\{Response, ServerRequest};
 
 class SessionMiddleware implements IMiddleware {
   public function __construct(

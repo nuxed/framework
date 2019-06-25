@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Message\_Private;
 
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Regex;
+use namespace HH\Lib\{Regex, Str};
 use namespace Nuxed\Http\Message\Exception;
 
 final class ProtocolVersionMarshaler {

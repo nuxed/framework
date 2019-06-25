@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Router\Matcher;
 
-use namespace Nuxed\Http\Router;
-use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\{Message, Router};
 
 interface IRequestMatcher {
   /**

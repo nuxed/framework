@@ -1,8 +1,6 @@
 namespace Nuxed\Http\Message\_Private;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Regex;
+use namespace HH\Lib\{C, Regex, Str};
 use namespace Nuxed\Http\Message;
 use namespace Nuxed\Http\Message\Exception;
 

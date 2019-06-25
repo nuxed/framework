@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Flash;
 
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\{Message, Server};
 
 final class FlashMessagesMiddleware implements Server\IMiddleware {
   public function __construct(

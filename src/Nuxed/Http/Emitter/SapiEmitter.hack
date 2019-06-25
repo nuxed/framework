@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Emitter;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 use namespace HH\Lib\Experimental\IO;
 use namespace Nuxed\Http\Emitter\Exception;
 use namespace Nuxed\Http\Message;

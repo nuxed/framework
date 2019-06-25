@@ -1,8 +1,6 @@
 namespace Nuxed\Http\Router\Middleware;
 
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Router;
-use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\{Message, Router, Server};
 
 /**
  * Default routing middleware.

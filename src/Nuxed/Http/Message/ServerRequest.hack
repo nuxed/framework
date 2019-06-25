@@ -1,7 +1,7 @@
 namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
-use namespace Nuxed\Http\{Session, Flash};
+use namespace Nuxed\Http\{Flash, Session};
 
 class ServerRequest extends Request {
   protected dict<string, mixed> $attributes = dict[];

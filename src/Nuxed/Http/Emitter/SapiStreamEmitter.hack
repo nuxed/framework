@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Emitter;
 
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Regex;
+use namespace HH\Lib\{Regex, Str};
 use namespace HH\Lib\Experimental\IO;
 use namespace Nuxed\Http\Message;
 

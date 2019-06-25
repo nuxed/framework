@@ -1,11 +1,7 @@
 namespace Nuxed\Http\Client;
 
 use namespace HH\Asio;
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Dict;
-use namespace HH\Lib\Math;
-use namespace HH\Lib\Regex;
+use namespace HH\Lib\{C, Dict, Math, Regex, Str};
 use namespace Nuxed\Http\Message;
 
 final class CurlHttpClient extends HttpClient {

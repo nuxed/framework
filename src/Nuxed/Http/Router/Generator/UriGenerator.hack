@@ -1,12 +1,8 @@
 namespace Nuxed\Http\Router\Generator;
 
-use namespace HH\Lib\C;
+use namespace HH\Lib\{C, Dict, Str, Vec};
 use namespace Nuxed\Util;
-use namespace HH\Lib\Vec;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Dict;
-use namespace Nuxed\Http\Router;
-use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\{Message, Router};
 use namespace Nuxed\Http\Router\Exception;
 use namespace Facebook\HackRouter;
 use namespace Facebook\HackRouter\PatternParser;

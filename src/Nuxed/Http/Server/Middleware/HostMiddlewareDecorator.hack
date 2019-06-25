@@ -1,8 +1,7 @@
 namespace Nuxed\Http\Server\Middleware;
 
 use namespace HH\Lib\Str;
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\{Message, Server};
 
 class HostMiddlewareDecorator implements Server\IMiddleware {
   public function __construct(

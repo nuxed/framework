@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Message;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 
 /**
  * Logic largely refactored from the Hsl Experimental HH\Lib\_Private\NativeHandler class.

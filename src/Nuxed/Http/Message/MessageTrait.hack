@@ -1,9 +1,6 @@
 namespace Nuxed\Http\Message;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Vec;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Regex;
+use namespace HH\Lib\{C, Regex, Str, Vec};
 
 /**
  * Trait implementing functionality common to requests and responses.

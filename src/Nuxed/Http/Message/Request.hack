@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Message;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Dict;
+use namespace HH\Lib\{C, Dict};
 
 class Request extends AbstractRequest {
   public function __construct(

@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Server\Middleware;
 
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\{Message, Server};
 
 /**
  * Decorate a request handler as middleware.

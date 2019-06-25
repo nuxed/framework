@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Server\Middleware;
 
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\{Message, Server};
 
 final class CallableMiddlewareDecorator implements Server\IMiddleware {
   public function __construct(private Server\CallableMiddleware $middleware) {}

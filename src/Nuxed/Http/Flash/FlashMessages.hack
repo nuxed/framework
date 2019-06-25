@@ -1,7 +1,6 @@
 namespace Nuxed\Http\Flash;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 use namespace Nuxed\Http\Session;
 use namespace Facebook\TypeAssert;
 

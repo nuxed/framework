@@ -1,8 +1,7 @@
 namespace Nuxed\Http\Server;
 
 use namespace Nuxed\Http\Server\Exception;
-use type Nuxed\Http\Message\Response;
-use type Nuxed\Http\Message\ServerRequest;
+use type Nuxed\Http\Message\{Response, ServerRequest};
 use type SplPriorityQueue;
 
 /**
