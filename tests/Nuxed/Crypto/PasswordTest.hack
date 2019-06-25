@@ -43,7 +43,9 @@ class PasswordTest extends HackTest\HackTest {
   public function provideRandomPasswords(): Container<(Crypto\HiddenString)> {
     $passwords = vec[];
     for ($i = 1; $i < 7; $i++) {
-      $passwords[] = tuple(new Crypto\HiddenString(SecureRandom\string($i * 32)));
+      $passwords[] = tuple(
+        new Crypto\HiddenString(SecureRandom\string($i * 32)),
+      );
     }
     return $passwords;
   }
