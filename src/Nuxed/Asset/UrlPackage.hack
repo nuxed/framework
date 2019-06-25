@@ -1,12 +1,6 @@
 namespace Nuxed\Asset;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use type Nuxed\Asset\Context\IContext;
-use type Nuxed\Asset\Exception\InvalidArgumentException;
-use type Nuxed\Asset\Exception\LogicException;
-use type Nuxed\Asset\VersionStrategy\IVersionStrategy;
-
+use namespace HH\Lib\{C, Str};
 /**
  * Package that adds a base URL to asset URLs in addition to a version.
  *
@@ -28,18 +22,18 @@ class UrlPackage extends Package {
 
   /**
    * @param Container<string>        $baseUrls        Base asset URLs
-   * @param IVersionStrategy $versionStrategy The version strategy
-   * @param IContext|null    $context         Context
+   * @param VersionStrategy\IVersionStrategy $versionStrategy The version strategy
+   * @param Context\IContext|null    $context         Context
    */
   public function __construct(
     Container<string> $baseUrls,
-    IVersionStrategy $versionStrategy,
-    IContext $context = new Context\NullContext(),
+    VersionStrategy\IVersionStrategy $versionStrategy,
+    Context\IContext $context = new Context\NullContext(),
   ) {
     parent::__construct($versionStrategy, $context);
 
     if (C\is_empty($baseUrls)) {
-      throw new LogicException('You must provide at least one base URL.');
+      throw new Exception\LogicException('You must provide at least one base URL.');
     }
 
     foreach ($baseUrls as $baseUrl) {
@@ -117,7 +111,7 @@ class UrlPackage extends Package {
       if (Str\starts_with($url, 'https://') || Str\starts_with($url, '//')) {
         $sslUrls[] = $url;
       } else if (null === \parse_url($url, \PHP_URL_SCHEME)) {
-        throw new InvalidArgumentException(
+        throw new Exception\InvalidArgumentException(
           Str\format('"%s" is not a valid URL', $url),
         );
       }

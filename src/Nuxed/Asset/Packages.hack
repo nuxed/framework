@@ -1,9 +1,6 @@
 namespace Nuxed\Asset;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use type Nuxed\Asset\Exception\InvalidArgumentException;
-use type Nuxed\Asset\Exception\LogicException;
+use namespace HH\Lib\{C, Str};
 
 class Packages implements IPackage {
   private dict<string, IPackage> $packages;
@@ -48,7 +45,7 @@ class Packages implements IPackage {
   public function getPackage(?string $name = null): IPackage {
     if (null === $name) {
       if (null === $this->defaultPackage) {
-        throw new LogicException(
+        throw new Exception\LogicException(
           'There is no default asset package, configure one first.',
         );
       }
@@ -59,7 +56,7 @@ class Packages implements IPackage {
     if (C\contains_key($this->packages, $name)) {
       return $this->packages[$name];
     } else {
-      throw new InvalidArgumentException(
+      throw new Exception\InvalidArgumentException(
         Str\format('There is no "%s" asset package.', $name),
       );
     }
