@@ -1,8 +1,7 @@
 namespace Nuxed\Container;
 
 use namespace His;
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 
 type IServiceContainer = His\Container\ContainerInterface;
 
