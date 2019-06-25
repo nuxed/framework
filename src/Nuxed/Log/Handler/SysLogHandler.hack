@@ -8,7 +8,7 @@ class SysLogHandler extends AbstractHandler {
   /**
    * Translates Monolog log levels to syslog log priorities.
    */
-  protected dict<Log\LogLevel, int> $Log\logLevels = dict[
+  protected dict<Log\LogLevel, int> $logLevels = dict[
     Log\LogLevel::DEBUG => \LOG_DEBUG,
     Log\LogLevel::INFO => \LOG_INFO,
     Log\LogLevel::NOTICE => \LOG_NOTICE,
@@ -32,9 +32,9 @@ class SysLogHandler extends AbstractHandler {
   ) {
     parent::__construct($level, $bubble);
   }
-namespace
+
   <<__Override>>
-  public$record): void {
+  public function write(Log\LogRecord $record): void {
     if (!\openlog($this->ident, $this->options, (int)$this->facility)) {
       throw new Exception\LogicException(Str\format(
         "Can't open syslog for ident %s and facility %d",
@@ -44,7 +44,7 @@ namespace
     }
 
     \syslog(
-      $this->Log\logLevels[$record['level']],
+      $this->logLevels[$record['level']],
       $record['formatted'] ?? $record['message'],
     );
   }
