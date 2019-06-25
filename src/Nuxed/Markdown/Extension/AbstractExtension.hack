@@ -1,8 +1,7 @@
 namespace Nuxed\Markdown\Extension;
 
 use namespace Facebook\Markdown;
-use namespace Facebook\Markdown\Inlines;
-use namespace Facebook\Markdown\UnparsedBlocks;
+use namespace Facebook\Markdown\{Inlines, UnparsedBlocks};
 
 class AbstractExtension implements IExtension {
   /**

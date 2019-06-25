@@ -1,8 +1,7 @@
 namespace Nuxed\Markdown;
 
 use namespace Facebook\Markdown;
-use namespace Facebook\Markdown\Inlines;
-use namespace Facebook\Markdown\UnparsedBlocks;
+use namespace Facebook\Markdown\{Inlines, UnparsedBlocks};
 
 final class Environment<T> {
   public function __construct(
