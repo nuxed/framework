@@ -1,7 +1,6 @@
 namespace Nuxed\Kernel\Handler;
 
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\{Message, Server};
 
 class NotFoundHandler implements Server\IRequestHandler {
   public async function handle(

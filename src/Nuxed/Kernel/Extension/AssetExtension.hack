@@ -1,8 +1,6 @@
 namespace Nuxed\Kernel\Extension;
 
-use namespace Nuxed\Io;
-use namespace Nuxed\Asset;
-use namespace Nuxed\Container;
+use namespace Nuxed\{Asset, Container, Io};
 
 final class AssetExtension extends AbstractExtension {
   const type TConfig = shape(

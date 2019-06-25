@@ -1,7 +1,6 @@
 namespace Nuxed\Kernel\Extension;
 
-use namespace Nuxed\Cache;
-use namespace Nuxed\Container;
+use namespace Nuxed\{Cache, Container};
 
 final class CacheExtension extends AbstractExtension {
   const type TConfig = shape(

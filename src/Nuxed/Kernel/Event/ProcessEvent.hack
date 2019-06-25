@@ -1,8 +1,7 @@
 namespace Nuxed\Kernel\Event;
 
 use namespace Nuxed\EventDispatcher;
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\{Message, Server};
 
 final class ProcessEvent implements EventDispatcher\IEvent {
   public function __construct(

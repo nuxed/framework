@@ -1,9 +1,7 @@
 namespace Nuxed\Kernel\Extension;
 
-use namespace Nuxed\EventDispatcher;
-use namespace Nuxed\Container;
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Router;
+use namespace Nuxed\{Container, EventDispatcher};
+use namespace Nuxed\Http\{Router, Server};
 
 interface IExtension extends Container\IServiceProvider {
   public function subscribe(

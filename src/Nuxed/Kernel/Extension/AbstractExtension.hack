@@ -1,9 +1,7 @@
 namespace Nuxed\Kernel\Extension;
 
-use namespace Nuxed\Container;
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Router;
-use namespace Nuxed\EventDispatcher;
+use namespace Nuxed\{Container, EventDispatcher};
+use namespace Nuxed\Http\{Router, Server};
 
 abstract class AbstractExtension implements IExtension {
   public function register(Container\ContainerBuilder $_builder): void {}

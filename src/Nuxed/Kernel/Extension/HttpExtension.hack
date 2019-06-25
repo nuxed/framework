@@ -1,12 +1,8 @@
 namespace Nuxed\Kernel\Extension;
 
-use namespace Nuxed\Kernel;
-use namespace Nuxed\Container;
-use namespace Nuxed\Http\Emitter;
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Router;
-use namespace Nuxed\Kernel\Handler;
-use namespace Nuxed\Kernel\Middleware;
+use namespace Nuxed\{Container, Kernel};
+use namespace Nuxed\Http\{Emitter, Router, Server};
+use namespace Nuxed\Kernel\{Handler, Middleware};
 
 
 class HttpExtension extends AbstractExtension {

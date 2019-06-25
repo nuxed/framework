@@ -1,7 +1,6 @@
 namespace Nuxed\Kernel\Middleware;
 
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Server;
+use namespace Nuxed\Http\{Message, Server};
 use namespace Nuxed\Kernel\Error;
 
 class ErrorMiddleware implements Server\IMiddleware {

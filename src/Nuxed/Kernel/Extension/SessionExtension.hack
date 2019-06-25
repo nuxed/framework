@@ -1,12 +1,7 @@
 namespace Nuxed\Kernel\Extension;
 
-use namespace Nuxed\Log;
-use namespace Nuxed\Cache;
-use namespace Nuxed\Container;
-use namespace Nuxed\Http\Flash;
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Session;
+use namespace Nuxed\{Cache, Container, Log};
+use namespace Nuxed\Http\{Flash, Message, Server, Session};
 
 class SessionExtension extends AbstractExtension {
   const type TConfig = shape(

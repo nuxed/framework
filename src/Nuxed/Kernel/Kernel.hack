@@ -1,11 +1,7 @@
 namespace Nuxed\Kernel;
 
-use namespace Nuxed\Container;
-use namespace Nuxed\Http\Message;
-use namespace Nuxed\Http\Emitter;
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Router;
-use namespace Nuxed\EventDispatcher;
+use namespace Nuxed\{Container, EventDispatcher};
+use namespace Nuxed\Http\{Emitter, Message, Router, Server};
 
 final class Kernel implements IKernel {
   private ?Container\IServiceContainer $container;

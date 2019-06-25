@@ -1,8 +1,6 @@
 namespace Nuxed\Kernel;
 
-use namespace Nuxed\Http\Emitter;
-use namespace Nuxed\Http\Server;
-use namespace Nuxed\Http\Message;
+use namespace Nuxed\Http\{Emitter, Message, Server};
 
 interface IKernel
   extends Server\IMiddleware, Server\IRequestHandler, Emitter\IEmitter {

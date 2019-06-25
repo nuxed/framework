@@ -1,10 +1,8 @@
 namespace Nuxed\Kernel\Extension;
 
-use namespace Nuxed\Log;
+use namespace Nuxed\{Container, EventDispatcher, Log};
 use namespace HH\Lib\Vec;
-use namespace Nuxed\Container;
 use namespace Nuxed\Kernel\Event;
-use namespace Nuxed\EventDispatcher;
 
 final class LogExtension extends AbstractExtension {
   const type TConfig = shape(

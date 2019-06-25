@@ -1,8 +1,7 @@
 namespace Nuxed\Kernel\Extension;
 
 use namespace Facebook;
-use namespace Nuxed\Markdown;
-use namespace Nuxed\Container;
+use namespace Nuxed\{Container, Markdown};
 
 final class MarkdownExtension extends AbstractExtension {
   const type TConfig = shape(

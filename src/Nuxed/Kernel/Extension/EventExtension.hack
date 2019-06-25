@@ -1,7 +1,6 @@
 namespace Nuxed\Kernel\Extension;
 
-use namespace Nuxed\Container;
-use namespace Nuxed\EventDispatcher;
+use namespace Nuxed\{Container, EventDispatcher};
 
 final class EventExtension extends AbstractExtension {
   <<__Override>>
