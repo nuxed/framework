@@ -33,7 +33,9 @@ class UrlPackage extends Package {
     parent::__construct($versionStrategy, $context);
 
     if (C\is_empty($baseUrls)) {
-      throw new Exception\LogicException('You must provide at least one base URL.');
+      throw new Exception\LogicException(
+        'You must provide at least one base URL.',
+      );
     }
 
     foreach ($baseUrls as $baseUrl) {
