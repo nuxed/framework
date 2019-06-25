@@ -300,7 +300,7 @@ final class Folder extends Node {
       );
     }
 
-    // UNSAFE
+    /* HH_FIXME[4110] */
     return $contents;
   }
 
@@ -432,7 +432,7 @@ final class Folder extends Node {
       ));
     }
 
-    // UNSAFE
+    /* HH_FIXME[4110] */
     return $node;
   }
 }

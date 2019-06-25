@@ -42,7 +42,7 @@ final class ContainerBuilder {
     typename<T> $service,
   ): ServiceDefinition<T> {
     if (C\contains_key($this->definitions, $service)) {
-      // UNSAFE
+      /* HH_FIXME[4110] */
       return $this->definitions[$service];
     }
 

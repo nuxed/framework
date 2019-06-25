@@ -23,7 +23,7 @@ final class ServiceContainer implements His\Container\ContainerInterface {
       $def = $this->definitions[$service] as ServiceDefinition<_>;
 
       try {
-        // UNSAFE - we can't type hint the follwoing expression.
+        /* HH_FIXME[4110] - we can't type hint the follwoing expression. */
         return $def->resolve($this);
       } catch (\Exception $e) {
         throw new Exception\ContainerException(

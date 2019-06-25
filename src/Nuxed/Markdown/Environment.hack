@@ -87,7 +87,7 @@ final class Environment<T> {
   }
 
   public function xhp(string $markdown): XHPElement where T as string {
-    // UNSAFE
+    /* HH_FIXME[4110] */
     return new XHPElement($markdown, $this);
   }
 }
