@@ -1,8 +1,7 @@
 namespace Nuxed\Crypto\_Private;
 
 use namespace HH\Lib\Str;
-use namespace Nuxed\Crypto\Binary;
-use namespace Nuxed\Crypto\Exception;
+use namespace Nuxed\Crypto\{Binary, Exception};
 
 <<__Sealed(Base32Hex::class)>>
 abstract class Base32 {

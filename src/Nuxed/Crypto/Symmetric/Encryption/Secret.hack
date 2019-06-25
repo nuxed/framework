@@ -2,9 +2,7 @@ namespace Nuxed\Crypto\Symmetric\Encryption;
 
 use namespace Nuxed\Crypto;
 use namespace HH\Lib\SecureRandom;
-use namespace Nuxed\Crypto\Binary;
-use namespace Nuxed\Crypto\Symmetric;
-use namespace Nuxed\Crypto\Exception;
+use namespace Nuxed\Crypto\{Binary, Exception, Symmetric};
 
 final class Secret extends Symmetric\Secret {
   const int LENGTH = \SODIUM_CRYPTO_STREAM_KEYBYTES;

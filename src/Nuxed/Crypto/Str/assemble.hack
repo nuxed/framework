@@ -1,7 +1,6 @@
 namespace Nuxed\Crypto\Str;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 
 /**
  * Convert a container of integers to a string

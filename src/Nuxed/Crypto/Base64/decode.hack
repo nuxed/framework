@@ -1,5 +1,5 @@
 namespace Nuxed\Crypto\Base64 {
-  use namespace Nuxed\Crypto\_Private;
+  use namespace Nuxed\Crypto\{_Private};
 
   /**
    * Decode from base64 into binary
@@ -14,7 +14,6 @@ namespace Nuxed\Crypto\Base64 {
 }
 
 namespace Nuxed\Crypto\Base64\UrlSafe {
-  use namespace Nuxed\Crypto\_Private;
 
   /**
    * Decode from base64 into binary
@@ -29,7 +28,6 @@ namespace Nuxed\Crypto\Base64\UrlSafe {
 }
 
 namespace Nuxed\Crypto\Base64\DotSlash {
-  use namespace Nuxed\Crypto\_Private;
 
   /**
    * Decode from base64 into binary
@@ -44,7 +42,6 @@ namespace Nuxed\Crypto\Base64\DotSlash {
 }
 
 namespace Nuxed\Crypto\Base64\DotSlash\Ordered {
-  use namespace Nuxed\Crypto\_Private;
 
   /**
    * Decode from base64 into binary

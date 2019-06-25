@@ -2,8 +2,7 @@ namespace Nuxed\Crypto\Hkdf;
 
 use namespace HH\Lib\Str;
 use namespace Nuxed\Crypto;
-use namespace Nuxed\Crypto\Binary;
-use namespace Nuxed\Crypto\Exception;
+use namespace Nuxed\Crypto\{Binary, Exception};
 
 function blake2b(
   string $ikm,

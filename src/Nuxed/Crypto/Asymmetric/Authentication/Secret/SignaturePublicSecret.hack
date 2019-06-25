@@ -1,8 +1,7 @@
 namespace Nuxed\Crypto\Asymmetric\Authentication\Secret;
 
 use namespace Nuxed\Crypto;
-use namespace Nuxed\Crypto\Asymmetric\Encryption;
-use namespace Nuxed\Crypto\Asymmetric\Authentication;
+use namespace Nuxed\Crypto\Asymmetric\{Authentication, Encryption};
 
 final class SignaturePublicSecret extends Authentication\SignatureSecret {
   const int LENGTH = \SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES;

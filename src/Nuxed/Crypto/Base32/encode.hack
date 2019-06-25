@@ -1,5 +1,5 @@
 namespace Nuxed\Crypto\Base32 {
-  use namespace Nuxed\Crypto\_Private;
+  use namespace Nuxed\Crypto\{_Private};
 
   /**
    * Encode into Base32 (RFC 4648)
@@ -25,7 +25,6 @@ namespace Nuxed\Crypto\Base32 {
 }
 
 namespace Nuxed\Crypto\Base32\Hex {
-  use namespace Nuxed\Crypto\_Private;
 
   /**
    * Encode into Base32 (RFC 4648)

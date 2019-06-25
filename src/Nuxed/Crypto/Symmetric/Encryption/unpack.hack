@@ -1,7 +1,6 @@
 namespace Nuxed\Crypto\Symmetric\Encryption;
 
-use namespace Nuxed\Crypto\Binary;
-use namespace Nuxed\Crypto\Exception;
+use namespace Nuxed\Crypto\{Binary, Exception};
 
 /**
  * Unpack ciphertext for decryption.

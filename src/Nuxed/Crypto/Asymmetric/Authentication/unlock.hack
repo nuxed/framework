@@ -1,8 +1,7 @@
 namespace Nuxed\Crypto\Asymmetric\Authentication;
 
 use namespace Nuxed\Crypto;
-use namespace Nuxed\Crypto\Binary;
-use namespace Nuxed\Crypto\Exception;
+use namespace Nuxed\Crypto\{Binary, Exception};
 use namespace Nuxed\Crypto\Asymmetric\Encryption;
 
 /**

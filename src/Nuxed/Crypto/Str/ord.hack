@@ -1,7 +1,6 @@
 namespace Nuxed\Crypto\Str;
 
-use namespace Nuxed\Crypto\Binary;
-use namespace Nuxed\Crypto\Exception;
+use namespace Nuxed\Crypto\{Binary, Exception};
 
 /**
  * Convert a character to an integer (without cache-timing side-channels)

@@ -1,8 +1,6 @@
 namespace Nuxed\Crypto\Symmetric\Authentication;
 
-use namespace Nuxed\Crypto\Str;
-use namespace Nuxed\Crypto\Binary;
-use namespace Nuxed\Crypto\Exception;
+use namespace Nuxed\Crypto\{Binary, Exception, Str};
 
 /**
  * Verify the authenticity of a message, given a shared MAC key

@@ -1,7 +1,6 @@
 namespace Nuxed\Crypto\_Private;
 
-use namespace Nuxed\Crypto\Binary;
-use namespace Nuxed\Crypto\Exception;
+use namespace Nuxed\Crypto\{Binary, Exception};
 
 abstract class Hex {
   /**

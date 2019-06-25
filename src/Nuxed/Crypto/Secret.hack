@@ -1,9 +1,8 @@
 namespace Nuxed\Crypto;
 
 use namespace Nuxed\Crypto;
-use namespace Nuxed\Crypto\Str;
+use namespace Nuxed\Crypto\{Exception, Str};
 use namespace HH\Lib\SecureRandom;
-use namespace Nuxed\Crypto\Exception;
 
 /**
  * Base class for all cryptography secrets

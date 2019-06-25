@@ -1,7 +1,6 @@
 namespace Nuxed\Crypto\Str;
 
-use namespace Nuxed\Crypto\Binary;
-use namespace Nuxed\Crypto\Exception;
+use namespace Nuxed\Crypto\{Binary, Exception};
 
 /**
  * Calculate A xor B, given two binary strings of the same length.
