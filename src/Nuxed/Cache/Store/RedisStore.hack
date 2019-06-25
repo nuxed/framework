@@ -9,7 +9,8 @@ class RedisStore extends AbstractStore {
     protected \Redis $redis,
     string $namespace = '',
     int $defaultTtl = 0,
-    protected Serializer\ISerializer $serializer = new Serializer\DefaultSerializer(),
+    protected Serializer\ISerializer $serializer =
+      new Serializer\DefaultSerializer(),
   ) {
     $redis->ping();
     if (\preg_match('#[^-+_.A-Za-z0-9]#', $namespace)) {
