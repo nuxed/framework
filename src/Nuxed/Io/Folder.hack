@@ -1,10 +1,7 @@
 namespace Nuxed\Io;
 
 use namespace HH\Asio;
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Vec;
-use namespace HH\Lib\Regex;
+use namespace HH\Lib\{C, Regex, Str, Vec};
 use type Nuxed\Io\Exception\InvalidPathException;
 
 final class Folder extends Node {

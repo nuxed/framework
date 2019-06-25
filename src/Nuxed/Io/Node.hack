@@ -1,8 +1,7 @@
 namespace Nuxed\Io;
 
 use namespace HH\Asio;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Regex;
+use namespace HH\Lib\{Regex, Str};
 
 /**
  * Shared functionality between file and folder objects.

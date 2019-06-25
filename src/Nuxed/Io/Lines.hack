@@ -1,8 +1,6 @@
 namespace Nuxed\Io;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Vec;
+use namespace HH\Lib\{C, Str, Vec};
 use type HH\InvariantException;
 use type Nuxed\Util\StringableTrait;
 use type Iterator;
