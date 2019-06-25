@@ -1,9 +1,7 @@
 namespace Nuxed\Log\Handler;
 
-use namespace HH\Lib\{C, Str, Dict};
-use type Nuxed\Log\LogLevel;
-use type Nuxed\Log\LogRecord;
-use type Nuxed\Log\Exception\InvalidArgumentException;
+use namespace HH\Lib\{C, Dict, Str};
+use namespace Nuxed\Log;
 
 class RotatingFileHandler extends StreamHandler {
   const string FILE_PER_DAY = 'Y-m-d';
@@ -20,7 +18,7 @@ class RotatingFileHandler extends StreamHandler {
   /**
    * @param string     $filename
    * @param int        $maxFiles       The maximal amount of files to keep (0 means unlimited)
-   * @param LogLevel   $level          The minimum logging level at which this handler will be triggered
+   * @param Log\LogLevel   $level          The minimum logging level at which this handler will be triggered
    * @param bool       $bubble         Whether the messages that are handled can bubble up the stack or not
    * @param int|null   $filePermission Optional file permissions (default (0644) are only for owner read/write)
    * @param bool       $useLocking     Try to lock log file before doing any writes
@@ -29,7 +27,7 @@ class RotatingFileHandler extends StreamHandler {
   public function __construct(
     string $filename,
     int $maxFiles = 0,
-    LogLevel $level = LogLevel::DEBUG,
+    Log\LogLevel $level = Log\LogLevel::DEBUG,
     bool $bubble = true,
     ?int $filePermission = null,
     bool $useLocking = false,
@@ -72,7 +70,7 @@ class RotatingFileHandler extends StreamHandler {
     string $dateFormat,
   ): this {
     if (!\preg_match('{^Y(([/_.-]?m)([/_.-]?d)?)?$}', $dateFormat)) {
-      throw new InvalidArgumentException(
+      throw new Log\Exception\InvalidArgumentException(
         'Invalid date format - format must be one of '.
         'RotatingFileHandler::FILE_PER_DAY ("Y-m-d"), RotatingFileHandler::FILE_PER_MONTH ("Y-m") '.
         'or RotatingFileHandler::FILE_PER_YEAR ("Y"), or you can set one of the '.
@@ -80,7 +78,7 @@ class RotatingFileHandler extends StreamHandler {
       );
     }
     if (\substr_count($filenameFormat, '{date}') === 0) {
-      throw new InvalidArgumentException(
+      throw new Log\Exception\InvalidArgumentException(
         'Invalid filename format - format must contain at least `{date}`, because otherwise rotating is impossible.',
       );
     }
@@ -93,7 +91,7 @@ class RotatingFileHandler extends StreamHandler {
   }
 
   <<__Override>>
-  protected function write(LogRecord $record): void {
+  protected function write(Log\LogRecord $record): void {
     // on the first record written, if the log is new, we should rotate (once per day)
     if (null === $this->mustRotate) {
       $this->mustRotate = !\file_exists($this->url);

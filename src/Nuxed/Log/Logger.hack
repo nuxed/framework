@@ -1,10 +1,6 @@
 namespace Nuxed\Log;
 
-use type Nuxed\Log\ILogger;
-use type Nuxed\Log\AbstractLogger;
-use type Nuxed\Log\LogLevel;
-use type Nuxed\Contract\IReset;
-use type DateTime;
+use namespace Nuxed\Contract;
 
 class Logger extends AbstractLogger implements ILogger {
   public function __construct(
@@ -22,7 +18,7 @@ class Logger extends AbstractLogger implements ILogger {
       'level' => $level,
       'message' => $message,
       'context' => dict($context),
-      'time' => new DateTime('now'),
+      'time' => new \DateTime('now'),
       'extra' => dict[],
     );
 
@@ -70,13 +66,13 @@ class Logger extends AbstractLogger implements ILogger {
   <<__Override>>
   public function reset(): void {
     foreach ($this->handlers as $handler) {
-      if ($handler is IReset) {
+      if ($handler is Contract\IReset) {
         $handler->reset();
       }
     }
 
     foreach ($this->processors as $processor) {
-      if ($processor is IReset) {
+      if ($processor is Contract\IReset) {
         $processor->reset();
       }
     }

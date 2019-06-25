@@ -1,40 +1,39 @@
 namespace Nuxed\Log\Handler;
 
-use type Nuxed\Log\LogRecord;
-use type Nuxed\Log\LogLevel;
+use namespace Nuxed\Log;
 use type Nuxed\Contract\IReset;
 
 abstract class AbstractHandler implements IFormattableHandler, IReset {
   use FormattableHandlerTrait;
 
-  const dict<LogLevel, int> LEVELS = dict[
-    LogLevel::DEBUG => 0,
-    LogLevel::INFO => 1,
-    LogLevel::NOTICE => 2,
-    LogLevel::WARNING => 3,
-    LogLevel::ERROR => 4,
-    LogLevel::CRITICAL => 5,
-    LogLevel::ALERT => 6,
-    LogLevel::EMERGENCY => 7,
+  const dict<Log\LogLevel, int> LEVELS = dict[
+    Log\LogLevel::DEBUG => 0,
+    Log\LogLevel::INFO => 1,
+    Log\LogLevel::NOTICE => 2,
+    Log\LogLevel::WARNING => 3,
+    Log\LogLevel::ERROR => 4,
+    Log\LogLevel::CRITICAL => 5,
+    Log\LogLevel::ALERT => 6,
+    Log\LogLevel::EMERGENCY => 7,
   ];
 
   /**
-   * @param LogLevel   $level  The minimum logging level at which this handler will be triggered
+   * @param Log\LogLevel   $level  The minimum logging level at which this handler will be triggered
    * @param bool       $bubble Whether the messages that are handled can bubble up the stack or not
    */
   public function __construct(
-    public LogLevel $level = LogLevel::DEBUG,
+    public Log\LogLevel $level = Log\LogLevel::DEBUG,
     public bool $bubble = true,
   ) {}
 
-  public function isHandling(LogRecord $record): bool {
+  public function isHandling(Log\LogRecord $record): bool {
     $minimum = static::LEVELS[$this->level];
     $level = static::LEVELS[$record['level']];
 
     return $level >= $minimum;
   }
 
-  public function handle(LogRecord $record): bool {
+  public function handle(Log\LogRecord $record): bool {
     if (!$this->isHandling($record)) {
       return false;
     }
@@ -49,7 +48,7 @@ abstract class AbstractHandler implements IFormattableHandler, IReset {
   /**
    * Writes the record down to the log of the implementing handler
    */
-  abstract protected function write(LogRecord $record): void;
+  abstract protected function write(Log\LogRecord $record): void;
 
   public function close(): void {
   }

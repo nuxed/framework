@@ -1,41 +1,40 @@
 namespace Nuxed\Log\Handler;
 
+use namespace Nuxed\Log;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Log\Exception;
-use type Nuxed\Log\LogRecord;
-use type Nuxed\Log\LogLevel;
 
 class SysLogHandler extends AbstractHandler {
   /**
    * Translates Monolog log levels to syslog log priorities.
    */
-  protected dict<LogLevel, int> $logLevels = dict[
-    LogLevel::DEBUG => \LOG_DEBUG,
-    LogLevel::INFO => \LOG_INFO,
-    LogLevel::NOTICE => \LOG_NOTICE,
-    LogLevel::WARNING => \LOG_WARNING,
-    LogLevel::ERROR => \LOG_ERR,
-    LogLevel::CRITICAL => \LOG_CRIT,
-    LogLevel::ALERT => \LOG_ALERT,
-    LogLevel::EMERGENCY => \LOG_EMERG,
+  protected dict<Log\LogLevel, int> $Log\logLevels = dict[
+    Log\LogLevel::DEBUG => \LOG_DEBUG,
+    Log\LogLevel::INFO => \LOG_INFO,
+    Log\LogLevel::NOTICE => \LOG_NOTICE,
+    Log\LogLevel::WARNING => \LOG_WARNING,
+    Log\LogLevel::ERROR => \LOG_ERR,
+    Log\LogLevel::CRITICAL => \LOG_CRIT,
+    Log\LogLevel::ALERT => \LOG_ALERT,
+    Log\LogLevel::EMERGENCY => \LOG_EMERG,
   ];
 
   /**
-   * @param LogLevel   $level  The minimum logging level at which this handler will be triggered
+   * @param Log\LogLevel   $level  The minimum logging level at which this handler will be triggered
    * @param bool       $bubble Whether the messages that are handled can bubble up the stack or not
    */
   public function __construct(
     protected string $ident,
     protected SysLogFacility $facility = SysLogFacility::USER,
-    LogLevel $level = LogLevel::DEBUG,
+    Log\LogLevel $level = Log\LogLevel::DEBUG,
     bool $bubble = true,
     protected int $options = \LOG_PID,
   ) {
     parent::__construct($level, $bubble);
   }
-
+namespace
   <<__Override>>
-  public function write(LogRecord $record): void {
+  public$record): void {
     if (!\openlog($this->ident, $this->options, (int)$this->facility)) {
       throw new Exception\LogicException(Str\format(
         "Can't open syslog for ident %s and facility %d",
@@ -45,7 +44,7 @@ class SysLogHandler extends AbstractHandler {
     }
 
     \syslog(
-      $this->logLevels[$record['level']],
+      $this->Log\logLevels[$record['level']],
       $record['formatted'] ?? $record['message'],
     );
   }

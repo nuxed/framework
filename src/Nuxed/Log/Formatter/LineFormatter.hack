@@ -1,10 +1,7 @@
 namespace Nuxed\Log\Formatter;
 
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Dict;
-use namespace Nuxed\Util;
-use namespace Nuxed\Log;
+use namespace HH\Lib\{C, Dict, Str};
+use namespace Nuxed\{Log, Util};
 
 class LineFormatter implements IFormatter {
   const string SIMPLE_DATE = "Y-m-d\TH:i:s.uP";
