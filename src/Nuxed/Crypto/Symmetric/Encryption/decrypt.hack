@@ -16,15 +16,14 @@ function decrypt(
   string $additionalData = '',
 ): Crypto\HiddenString {
   $pieces = unpack($ciphertext);
-  $version = $pieces[0];
   /** @var string $salt */
-  $salt = $pieces[1];
+  $salt = $pieces[0];
   /** @var string $nonce */
-  $nonce = $pieces[2];
+  $nonce = $pieces[1];
   /** @var string $encrypted */
-  $encrypted = $pieces[3];
+  $encrypted = $pieces[2];
   /** @var string $auth */
-  $auth = $pieces[4];
+  $auth = $pieces[3];
   // Split our key into two keys: One for encryption, the other for
   // authentication. By using separate keys, we can reasonably dismiss
   // likely cross-protocol attacks.
@@ -34,7 +33,7 @@ function decrypt(
   // Check the MAC first
   if (
     !Authentication\verify(
-      $version.$salt.$nonce.$additionalData.$encrypted,
+      $salt.$nonce.$additionalData.$encrypted,
       new Authentication\Secret(new Crypto\HiddenString($authKey)),
       $auth,
     )

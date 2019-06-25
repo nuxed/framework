@@ -18,11 +18,6 @@ function encrypt(
   Secret $secret,
   string $additionalData = '',
 ): string {
-  /**
-   * @see https://github.com/paragonie/halite/blob/master/src/Halite.php#L43
-   */
-  $version = "\x31\x42\x04\x00";
-
   // Generate a nonce and HKDF salt:
   $nonce = SecureRandom\string(\SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
   $salt = SecureRandom\string(32);
@@ -40,14 +35,13 @@ function encrypt(
   );
   \sodium_memzero(&$encKey);
   // Calculate an authentication tag:
-
   $auth = Authentication\authenticate(
-    $version.$salt.$nonce.$additionalData.$encrypted,
+    $salt.$nonce.$additionalData.$encrypted,
     new Authentication\Secret(new Crypto\HiddenString($authKey)),
   );
-
+  // wipe authentication key from memory
   \sodium_memzero(&$authKey);
-  $message = $version.$salt.$nonce.$encrypted.$auth;
+  $message = $salt.$nonce.$encrypted.$auth;
   // Wipe every superfluous piece of data from memory
   \sodium_memzero(&$nonce);
   \sodium_memzero(&$salt);
