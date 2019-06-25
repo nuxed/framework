@@ -1,8 +1,7 @@
 namespace Nuxed\Cache\Store;
 
 use namespace HH\Asio;
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str};
 
 class ArrayStore extends AbstractStore {
   public function __construct(

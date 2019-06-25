@@ -1,23 +1,19 @@
 namespace Nuxed\Cache\Store;
 
 use namespace HH\Asio;
-use namespace HH\Lib\C;
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Vec;
-use type Nuxed\Cache\Serializer\ISerializer;
-use type Nuxed\Cache\Serializer\DefaultSerializer;
-use type Nuxed\Cache\Exception\InvalidArgumentException;
+use namespace HH\Lib\{C, Str, Vec};
+use namespace Nuxed\Cache\{Exception, Serializer};
 
 class RedisStore extends AbstractStore {
   public function __construct(
     protected \Redis $redis,
     string $namespace = '',
     int $defaultTtl = 0,
-    protected ISerializer $serializer = new DefaultSerializer(),
+    protected Serializer\ISerializer $serializer = new Serializer\DefaultSerializer(),
   ) {
     $redis->ping();
     if (\preg_match('#[^-+_.A-Za-z0-9]#', $namespace)) {
-      throw new InvalidArgumentException(
+      throw new Exception\InvalidArgumentException(
         'RedisStore namespace cannot contain any characters other than [-+_.A-Za-z0-9].',
       );
     }

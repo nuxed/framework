@@ -1,7 +1,6 @@
 namespace Nuxed\Cache;
 
-use namespace Nuxed\Container;
-use namespace Nuxed\Log;
+use namespace Nuxed\{Container, Log};
 
 class CacheFactory implements Container\IFactory<ICache> {
   public function create(Container\IServiceContainer $container): ICache {

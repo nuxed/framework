@@ -1,19 +1,15 @@
 namespace Nuxed\Cache;
 
 use namespace HH\Asio;
-use type Nuxed\Log\ILogger;
-use type Nuxed\Log\ILoggerAware;
-use type Nuxed\Log\LogLevel;
-use type Nuxed\Log\NullLogger;
-use type Exception;
+use namespace Nuxed\Log;
 
-final class Cache implements ICache, ILoggerAware {
+final class Cache implements ICache, Log\ILoggerAware {
   public function __construct(
     protected Store\IStore $store,
-    protected ILogger $logger = new NullLogger(),
+    protected Log\ILogger $logger = new Log\NullLogger(),
   ) {}
 
-  public function setLogger(ILogger $logger): void {
+  public function setLogger(Log\ILogger $logger): void {
     $this->logger = $logger;
   }
 
@@ -199,11 +195,11 @@ final class Cache implements ICache, ILoggerAware {
   ): Awaitable<T> {
     try {
       return await $fun();
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
 
-      $level = LogLevel::ALERT;
+      $level = Log\LogLevel::ALERT;
       if ($e is Exception\InvalidArgumentException) {
-        $level = LogLevel::WARNING;
+        $level = Log\LogLevel::WARNING;
       }
 
       if (!$e is Exception\IException) {
