@@ -1,7 +1,4 @@
 namespace Nuxed\Asset\Exception;
 
-use type RuntimeException as ParentException;
-
-class RuntimeException extends ParentException implements IException {
-
+class RuntimeException extends \RuntimeException implements IException {
 }
