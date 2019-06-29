@@ -19,7 +19,7 @@ trait MessageTrait {
   protected ?IStream $stream;
 
   public function messageClone(): void {
-    $this->stream = null === $this->stream ? null : (clone $this->stream);
+    $this->stream = $this->stream is null ? null : (clone $this->stream);
   }
 
   public function getProtocolVersion(): string {
@@ -50,7 +50,7 @@ trait MessageTrait {
 
     $header = $this->headerNames[$header] ?? null;
 
-    if (null === $header) {
+    if ($header is null) {
       return vec[];
     }
 
@@ -114,7 +114,7 @@ trait MessageTrait {
   }
 
   public function getBody(): IStream {
-    if (null === $this->stream) {
+    if ($this->stream is null) {
       $this->stream = stream('');
     }
 

@@ -13,7 +13,7 @@ trait RequestTrait {
   protected Uri $uri;
 
   public function getRequestTarget(): string {
-    if (null !== $this->requestTarget) {
+    if ($this->requestTarget is nonnull) {
       return $this->requestTarget;
     }
 
@@ -27,6 +27,7 @@ trait RequestTrait {
       $target .= '?'.$query;
     }
 
+    $this->requestTarget = $target;
     return $target;
   }
 
@@ -65,7 +66,7 @@ trait RequestTrait {
 
     $new = clone $this;
     $new->uri = $uri;
-
+    $new->requestTarget = null;
     if (!$preserveHost || !$this->hasHeader('Host')) {
       $new->updateHostFromUri();
     }

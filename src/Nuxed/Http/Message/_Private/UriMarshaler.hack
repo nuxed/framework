@@ -29,7 +29,7 @@ final class UriMarshaler {
 
     if ($host !== '') {
       $uri = $uri->withHost($host);
-      if (null !== $port) {
+      if ($port is nonnull) {
         $uri = $uri->withPort($port);
       }
     }
@@ -113,7 +113,7 @@ final class UriMarshaler {
       $pos = Str\search_last($host, ':');
     }
 
-    if (null !== $pos) {
+    if ($pos is nonnull) {
       return (int)Str\slice($host, $pos + 1);
     }
 
@@ -130,7 +130,7 @@ final class UriMarshaler {
     KeyedContainer<string, mixed> $server,
   ): shape('host' => string, 'port' => ?int, ...) {
     $header = $this->getHeadersFromMap('host', $headers);
-    if (null !== $header) {
+    if ($header is nonnull) {
       return shape(
         'host' => $this->marshalHostFromHeader($header),
         'port' => $this->marshalPortFromHeader($header),
@@ -194,7 +194,7 @@ final class UriMarshaler {
 
     $origPathInfo = $server['ORIG_PATH_INFO'] ?? null;
 
-    if (null === $origPathInfo || '' === $origPathInfo) {
+    if ($origPathInfo is null || '' === $origPathInfo) {
       return '/';
     }
 

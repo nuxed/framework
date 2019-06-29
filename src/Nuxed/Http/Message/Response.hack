@@ -84,7 +84,7 @@ class Response {
     $this->statusCode = $status;
     $this->setHeaders($headers);
 
-    if (null === $reason && C\contains_key(self::$phrases, $status)) {
+    if ($reason is null && C\contains_key(self::$phrases, $status)) {
       $this->reasonPhrase = self::$phrases[$status];
     } else {
       $this->reasonPhrase = $reason ?? '';

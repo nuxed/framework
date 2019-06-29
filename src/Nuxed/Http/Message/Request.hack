@@ -21,7 +21,7 @@ class Request {
       $this->updateHostFromUri();
     }
 
-    if (null !== $body) {
+    if ($body is nonnull) {
       $this->stream = $body;
     }
   }
@@ -35,7 +35,7 @@ class Request {
 
     $port = $this->uri->getPort();
 
-    if (null !== $port) {
+    if ($port is nonnull) {
       $host .= ':'.((string)$port);
     }
 

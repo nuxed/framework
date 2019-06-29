@@ -70,7 +70,7 @@ final class Uri {
       }
     }
 
-    if (null !== $this->port) {
+    if ($this->port is nonnull) {
       $authority .= ':'.((string)$this->port);
     }
 
@@ -293,7 +293,7 @@ final class Uri {
   }
 
   private function filterPort(?int $port): ?int {
-    if (null === $port) {
+    if ($port is null) {
       return null;
     }
 

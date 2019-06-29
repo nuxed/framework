@@ -88,13 +88,13 @@ class Stream implements IStream {
     }
 
     $data = '';
-    while (($max_bytes === null || $max_bytes > 0) && !$this->isEndOfFile()) {
+    while (($max_bytes is null || $max_bytes > 0) && !$this->isEndOfFile()) {
       $chunk = $this->rawReadBlocking($max_bytes);
       $data .= $chunk;
-      if ($max_bytes !== null) {
+      if ($max_bytes is nonnull) {
         $max_bytes -= Str\length($chunk);
       }
-      if ($max_bytes === null || $max_bytes > 0) {
+      if ($max_bytes is null || $max_bytes > 0) {
         await $this->selectAsync(\STREAM_AWAIT_READ);
       }
     }
@@ -116,7 +116,7 @@ class Stream implements IStream {
 
     await $this->flushAsync();
 
-    if ($max_bytes === null) {
+    if ($max_bytes is null) {
       // The placeholder value for 'default' is not documented
       /* HH_IGNORE_ERROR[2049] __PHPStdLib */
       /* HH_IGNORE_ERROR[4107] __PHPStdLib */
