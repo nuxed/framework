@@ -41,7 +41,7 @@ class DefaultSerializer implements ISerializer {
       }
 
       $error = \error_get_last();
-      $message = (false === $error) || ($error['message'] === null)
+      $message = (false === $error) || ($error['message'] is null)
         ? 'Failed to unserialize values'
         : $error['message'] as string;
       throw new \DomainException($message);
