@@ -10,7 +10,7 @@ class MiddlewareStackTest extends HackTest {
   public function testHandleThrowsIfPipeIsEmpty(): void {
     $middleware = new Server\MiddlewareStack();
     expect(() ==> $middleware->handle($this->request()))
-      ->toThrow(Server\Exception\EmptyPipelineException::class);
+      ->toThrow(Server\Exception\EmptyStackException::class);
   }
 
   public function testHandleThrowsIfItReachsTheEndOfThePipe(): void {
@@ -18,7 +18,7 @@ class MiddlewareStackTest extends HackTest {
     $middleware->stack(Server\cm(($req, $next) ==> $next->handle($req)));
     $middleware->stack(Server\cm(($req, $next) ==> $next->handle($req)));
     expect(() ==> $middleware->handle($this->request()))
-      ->toThrow(Server\Exception\EmptyPipelineException::class);
+      ->toThrow(Server\Exception\EmptyStackException::class);
   }
 
   public async function testHandle(): Awaitable<void> {
