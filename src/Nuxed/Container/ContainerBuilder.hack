@@ -3,7 +3,6 @@ namespace Nuxed\Container;
 use namespace HH\Lib\{C, Dict, Str};
 
 final class ContainerBuilder {
-
   private dict<string, mixed> $definitions = dict[];
 
   public function register(IServiceProvider $provider): this {
