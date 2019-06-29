@@ -3,7 +3,7 @@ namespace Nuxed\Http\Server\Exception;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Http\Server;
 
-final class EmptyPipelineException
+final class EmptyStackException
   extends \OutOfBoundsException
   implements IException {
   public static function forClass(

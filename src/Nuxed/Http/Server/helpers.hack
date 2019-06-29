@@ -113,10 +113,10 @@ function path(string $path, IMiddleware $middleware): IMiddleware {
   return new Middleware\PathMiddlewareDecorator($path, $middleware);
 }
 
-function stack(IMiddleware ...$middlewares): MiddlewareStack {
+function stack(IMiddleware ...$middleware): IMiddlewareStack {
   $stack = new MiddlewareStack();
-  foreach ($middlewares as $middleware) {
-    $stack->stack($middleware);
+  foreach ($middleware as $mw) {
+    $stack->stack($mw);
   }
 
   return $stack;

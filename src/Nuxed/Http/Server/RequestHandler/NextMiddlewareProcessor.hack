@@ -1,4 +1,4 @@
-namespace Nuxed\Http\Server\_Private;
+namespace Nuxed\Http\Server\RequestHandler;
 
 use namespace Nuxed\Http\{Message, Server};
 
