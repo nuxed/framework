@@ -44,7 +44,7 @@ class Section {
       $session = $this->get($id);
     }
 
-    if (null === $session) {
+    if ($session is null) {
       $session = new Section(\microtime(true) * 1000, $this->morePrecision);
       $this->children[] = $session;
     }

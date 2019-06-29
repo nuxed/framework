@@ -65,7 +65,7 @@ class Event {
    */
   public function stop(): this {
     $started = C\last($this->started);
-    if (null === $started || 0 === C\count($this->started)) {
+    if ($started is null || 0 === C\count($this->started)) {
       throw new Exception\LogicException(
         'stop() called but start() has not been called before.',
       );
