@@ -52,7 +52,7 @@ class Translator implements ITranslator, ILocaleAware, ITranslatorBag {
     string $locale,
     ?string $domain = null,
   ): void {
-    if (null === $domain) {
+    if ($domain is null) {
       $domain = 'messages';
     }
 
@@ -107,7 +107,7 @@ class Translator implements ITranslator, ILocaleAware, ITranslatorBag {
     ?string $locale = null,
     ?string $domain = null,
   ): string {
-    if (null === $domain) {
+    if ($domain is null) {
       $domain = 'messages';
     }
     $id = (string)$id;
@@ -131,7 +131,7 @@ class Translator implements ITranslator, ILocaleAware, ITranslatorBag {
    * {@inheritdoc}
    */
   public function getCatalogue(?string $locale = null): MessageCatalogue {
-    if (null === $locale) {
+    if ($locale is null) {
       $locale = $this->getLocale();
     } else {
       $this->assertValidLocale($locale);

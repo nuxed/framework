@@ -61,7 +61,7 @@ class LoggingTranslator implements ITranslator, ITranslatorBag, ILocaleAware {
    * Logs for missing translations.
    */
   private function log(string $id, ?string $domain, ?string $locale): void {
-    if (null === $domain) {
+    if ($domain is null) {
       $domain = 'messages';
     }
     $id = $id;
