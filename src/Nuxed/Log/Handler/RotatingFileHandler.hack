@@ -93,7 +93,7 @@ class RotatingFileHandler extends StreamHandler {
   <<__Override>>
   protected function write(Log\LogRecord $record): void {
     // on the first record written, if the log is new, we should rotate (once per day)
-    if (null === $this->mustRotate) {
+    if ($this->mustRotate is null) {
       $this->mustRotate = !\file_exists($this->url);
     }
 

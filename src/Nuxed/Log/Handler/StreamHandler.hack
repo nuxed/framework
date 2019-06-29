@@ -62,8 +62,8 @@ class StreamHandler extends AbstractHandler {
   protected function write(Log\LogRecord $record): void {
     $message = $record['formatted'] ?? $record['message'];
 
-    if (null === $this->stream) {
-      if (null === $this->url || '' === $this->url) {
+    if ($this->stream is null) {
+      if ($this->url is null || '' === $this->url) {
         throw new Log\Exception\LogicException(
           'Missing stream url, the stream can not be opened. This may be caused by a premature call to close().',
         );
@@ -74,13 +74,13 @@ class StreamHandler extends AbstractHandler {
       \set_error_handler([$this, 'customErrorHandler']);
       $this->stream = \fopen($this->url, 'a') ?: null;
 
-      if ($this->filePermission !== null) {
+      if ($this->filePermission is nonnull) {
         @\chmod($this->url, $this->filePermission);
       }
 
       \restore_error_handler();
 
-      if (null === $this->stream) {
+      if ($this->stream is null) {
         throw new Log\Exception\UnexpectedValueException(Str\format(
           'The stream or file "%s" could not be opened: %s',
           $this->url,
@@ -115,7 +115,7 @@ class StreamHandler extends AbstractHandler {
   private function getDirFromStream(string $stream): ?string {
     $pos = Str\search($stream, '://');
 
-    if (null === $pos) {
+    if ($pos is null) {
       return \dirname($stream);
     }
 
@@ -133,7 +133,7 @@ class StreamHandler extends AbstractHandler {
     }
 
     $dir = $this->getDirFromStream($this->url);
-    if (null !== $dir && !\is_dir($dir)) {
+    if ($dir is nonnull && !\is_dir($dir)) {
       $this->errorMessage = null;
       \set_error_handler([$this, 'customErrorHandler']);
       $status = \mkdir($dir, 0777, true);

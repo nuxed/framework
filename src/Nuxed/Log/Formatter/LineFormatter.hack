@@ -27,7 +27,7 @@ class LineFormatter implements IFormatter {
     bool $ignoreEmptyContextAndExtra = true,
   ) {
     $this->dateFormat = $dateFormat ?? static::SIMPLE_DATE;
-    $this->format = $format === null ? static::SIMPLE_FORMAT : $format;
+    $this->format = $format is null ? static::SIMPLE_FORMAT : $format;
     $this->ignoreEmptyContextAndExtra = $ignoreEmptyContextAndExtra;
     $this->allowInlineLineBreaks = $allowInlineLineBreaks;
   }
@@ -44,14 +44,14 @@ class LineFormatter implements IFormatter {
     $output = $this->format;
 
     foreach ($record['extra'] as $var => $val) {
-      if (null !== Str\search($output, '%extra.'.$var.'%')) {
+      if (Str\search($output, '%extra.'.$var.'%') is nonnull) {
         $output = \strtr($output, '%extra.'.$var.'%', $this->stringify($val));
         unset($record['extra'][$var]);
       }
     }
 
     foreach ($record['context'] as $var => $val) {
-      if (null !== Str\search($output, '%context.'.$var.'%')) {
+      if (Str\search($output, '%context.'.$var.'%') is nonnull) {
         $output = \strtr($output, '%context.'.$var.'%', $this->stringify($val));
         unset($record['context'][$var]);
       }
@@ -78,7 +78,7 @@ class LineFormatter implements IFormatter {
     $output = \strtr($output, $replaces);
 
     // remove leftover %context.xxx% if any
-    if (null !== Str\search($output, '%')) {
+    if (Str\search($output, '%') is nonnull) {
       $output = \preg_replace('/%(?:extra|context)\..+?%/', '', $output);
     }
 

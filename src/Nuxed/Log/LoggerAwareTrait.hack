@@ -20,7 +20,7 @@ trait LoggerAwareTrait implements ILoggerAware {
    * Gets a logger.
    */
   protected function getLogger(): ILogger {
-    if (null === $this->logger) {
+    if ($this->logger is null) {
       $this->logger = new NullLogger();
     }
 
