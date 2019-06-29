@@ -149,7 +149,7 @@ abstract class AbstractStore implements IStore {
       return $this->namespace.$key;
     }
     $id = $this->namespace.$key;
-    $max = $this->maxIdLength ;
+    $max = $this->maxIdLength;
     if (Str\length($id) > $max) {
       // Use MD5 to favor speed over security, which is not an issue here
       $this->ids[$key] = $id = Str\splice(
