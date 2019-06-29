@@ -141,7 +141,7 @@ abstract class HttpClient implements IHttpClient {
     ?Message\Uri $base,
   ): Message\Uri {
     if (
-      null !== $base &&
+      $base is nonnull &&
       '' === ($base->getScheme() ?? '').($base->getAuthority() ?? '')
     ) {
       throw new Exception\InvalidArgumentException(Str\format(
@@ -149,7 +149,7 @@ abstract class HttpClient implements IHttpClient {
         $base->toString(),
       ));
     }
-    if (null === $base && '' === $url->getScheme().$url->getAuthority()) {
+    if ($base is null && '' === $url->getScheme().$url->getAuthority()) {
       throw new Exception\InvalidArgumentException(Str\format(
         'Invalid URL: no "base_uri" option was provided and host or scheme is missing in "%s".',
         $url->toString(),

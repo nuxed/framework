@@ -125,7 +125,7 @@ final class CurlHttpClient extends HttpClient {
 
     $ch = \curl_init();
     foreach ($curlOptions as $opt => $value) {
-      if (null !== $value) {
+      if ($value is nonnull) {
         $set = \curl_setopt($ch, $opt, $value);
         if (!$set && \CURLOPT_CERTINFO !== $opt) {
           $const = (string)(
