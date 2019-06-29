@@ -11,7 +11,7 @@ function stringify(mixed $value): string {
     $value = $value is int ? $value : Str\format_number($value, 1);
   } else if ($value is resource) {
     $value = 'resource['.\get_resource_type($value).']';
-  } else if (null === $value) {
+  } else if ($value is null) {
     $value = 'null';
   } else if (\is_object($value) && !$value is Container<_>) {
     if ($value is \Throwable) {
