@@ -1,7 +1,6 @@
 namespace Nuxed\Cache\Serializer;
 
-
-class DefaultSerializer implements ISerializer {
+class NativeSerializer implements ISerializer {
   /**
    * Serialize a value.
    *

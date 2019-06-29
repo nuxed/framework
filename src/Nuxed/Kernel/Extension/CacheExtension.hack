@@ -124,8 +124,8 @@ final class CacheExtension extends AbstractExtension {
     );
 
     $builder->add(
-      Cache\Serializer\DefaultSerializer::class,
-      Container\factory(($_) ==> new Cache\Serializer\DefaultSerializer()),
+      Cache\Serializer\NativeSerializer::class,
+      Container\factory(($_) ==> new Cache\Serializer\NativeSerializer()),
       true,
     );
 
@@ -136,7 +136,7 @@ final class CacheExtension extends AbstractExtension {
           Shapes::idx(
             $this->config,
             'serializer',
-            Cache\Serializer\DefaultSerializer::class,
+            Cache\Serializer\NativeSerializer::class,
           ),
         ),
       ),

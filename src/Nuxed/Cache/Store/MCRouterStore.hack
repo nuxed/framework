@@ -9,7 +9,7 @@ class MCRouterStore extends AbstractStore {
     string $namespace = '',
     int $defaultTtl = 0,
     protected Serializer\ISerializer $serializer =
-      new Serializer\DefaultSerializer(),
+      new Serializer\NativeSerializer(),
   ) {
     parent::__construct($namespace, $defaultTtl);
   }
