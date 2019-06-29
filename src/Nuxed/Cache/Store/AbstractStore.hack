@@ -86,6 +86,10 @@ abstract class AbstractStore implements IStore {
       $def = true;
     }
 
+    if (!await $this->doContains($id)) {
+      return $def;
+    }
+
     return await $this->doDelete($id) || $def;
   }
 
@@ -145,7 +149,7 @@ abstract class AbstractStore implements IStore {
       return $this->namespace.$key;
     }
     $id = $this->namespace.$key;
-    $max = $this->maxIdLength as int;
+    $max = $this->maxIdLength ;
     if (Str\length($id) > $max) {
       // Use MD5 to favor speed over security, which is not an issue here
       $this->ids[$key] = $id = Str\splice(

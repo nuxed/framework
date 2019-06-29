@@ -68,10 +68,6 @@ class FilesystemStore extends AbstractStore {
 
   <<__Override>>
   protected async function doDelete(string $id): Awaitable<bool> {
-    if (!await $this->doContains($id)) {
-      return false;
-    }
-
     $id = $this->getFilename($id);
     $file = await $this->folder->read($id, Io\File::class);
     await $file->delete();
