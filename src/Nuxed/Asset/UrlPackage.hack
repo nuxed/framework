@@ -112,7 +112,7 @@ class UrlPackage extends Package {
     foreach ($urls as $url) {
       if (Str\starts_with($url, 'https://') || Str\starts_with($url, '//')) {
         $sslUrls[] = $url;
-      } else if (null === \parse_url($url, \PHP_URL_SCHEME)) {
+      } else if (\parse_url($url, \PHP_URL_SCHEME) is null) {
         throw new Exception\InvalidArgumentException(
           Str\format('"%s" is not a valid URL', $url),
         );

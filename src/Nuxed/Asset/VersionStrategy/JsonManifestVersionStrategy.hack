@@ -38,7 +38,7 @@ class JsonManifestVersionStrategy implements IVersionStrategy {
   }
 
   private function getManifestPath(string $path): ?string {
-    if (null === $this->manifestData) {
+    if ($this->manifestData is null) {
       if (!$this->manifest->exists()) {
         throw new Exception\RuntimeException(Str\format(
           'Asset manifest file "%s" does not exist.',

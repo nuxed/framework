@@ -43,8 +43,8 @@ class Packages implements IPackage {
    * @throws LogicException           If no default package is defined
    */
   public function getPackage(?string $name = null): IPackage {
-    if (null === $name) {
-      if (null === $this->defaultPackage) {
+    if ($name is null) {
+      if ($this->defaultPackage is null) {
         throw new Exception\LogicException(
           'There is no default asset package, configure one first.',
         );
