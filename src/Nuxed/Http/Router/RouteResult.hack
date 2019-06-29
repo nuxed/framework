@@ -90,7 +90,7 @@ final class RouteResult {
       return null;
     }
 
-    if (null === $this->matchedRouteName && $this->route is Route) {
+    if ($this->matchedRouteName is null && $this->route is Route) {
       $this->matchedRouteName = $this->route->getName();
     }
 
@@ -117,7 +117,7 @@ final class RouteResult {
    * Does the result represent failure to route due to HTTP method?
    */
   public function isMethodFailure(): bool {
-    if ($this->isSuccess() || $this->allowedMethods === null) {
+    if ($this->isSuccess() || $this->allowedMethods is null) {
       return false;
     }
 
@@ -133,7 +133,7 @@ final class RouteResult {
     if ($this->isSuccess()) {
       $route = $this->getMatchedRoute();
 
-      if (null !== $route) {
+      if ($route is nonnull) {
         return $route->getAllowedMethods();
       }
 

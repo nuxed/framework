@@ -91,7 +91,7 @@ abstract class AbstractSessionPersistence implements ISessionPersistence {
     $cacheLimiter = $this->cacheLimiter;
 
     if (
-      null === $cacheLimiter || $this->responseAlreadyHasCacheHeaders($response)
+      $cacheLimiter is null || $this->responseAlreadyHasCacheHeaders($response)
     ) {
       return $response;
     }

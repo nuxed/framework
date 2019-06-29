@@ -56,7 +56,7 @@ class ImplicitHeadMiddleware implements Server\IMiddleware {
       return await $handler->handle($request);
     }
 
-    if (null !== $result->getMatchedRoute()) {
+    if ($result->getMatchedRoute() is nonnull) {
       return await $handler->handle($request);
     }
 

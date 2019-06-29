@@ -154,7 +154,7 @@ trait RouteCollectorTrait implements IRouteCollector {
           return false;
         }
 
-        if ($methods === null) {
+        if ($methods is null) {
           return true;
         }
 
@@ -177,7 +177,7 @@ trait RouteCollectorTrait implements IRouteCollector {
         'Duplicate route detected; path "%s" answering to methods [%s]%s',
         $match->getPath(),
         Str\join($allowedMethods, ','),
-        $name !== null ? Str\format(', with name "%s"', $name) : '',
+        $name is nonnull ? Str\format(', with name "%s"', $name) : '',
       ));
     }
   }

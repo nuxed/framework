@@ -24,12 +24,12 @@ class Route {
     ?Container<string> $methods = null,
     ?string $name = null,
   ) {
-    if (null !== $methods) {
+    if ($methods is nonnull) {
       $this->methods = $this->validateHttpMethods($methods);
     }
 
-    if (null === $name) {
-      $name = $this->methods === null
+    if ($name is null) {
+      $name = $this->methods is null
         ? $path
         : $path.'^'.Str\join($this->methods, self::HTTP_METHOD_SEPARATOR);
     }
@@ -71,7 +71,7 @@ class Route {
   public function allowsMethod(string $method): bool {
     $method = Str\uppercase($method);
 
-    if (null === $this->methods || C\contains($this->methods, $method)) {
+    if ($this->methods is null || C\contains($this->methods, $method)) {
       return true;
     }
 
