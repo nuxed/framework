@@ -1,8 +1,9 @@
 namespace Nuxed\Stopwatch;
 
 use namespace HH\Lib\{C, Str, Vec};
+use namespace Nuxed\Contract;
 
-final class Stopwatch {
+final class Stopwatch implements Contract\IReset {
   private dict<string, Section> $sections = dict[];
   private vec<Section> $activeSections = vec[];
 
@@ -26,7 +27,7 @@ final class Stopwatch {
    */
   public function openSection(?string $id = null): void {
     $current = C\last($this->activeSections) as Section;
-    if (null !== $id && null === $current->get($id)) {
+    if ($id is nonnull && $current->get($id) is null) {
       throw new Exception\LogicException(Str\format(
         'The section "%s" has been started at an other level and can not be opened.',
         $id,
