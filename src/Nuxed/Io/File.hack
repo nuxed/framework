@@ -96,7 +96,7 @@ final class File extends Node {
 
     $folder = $this->parent();
 
-    if (null === $folder) {
+    if ($folder is null) {
       return false;
     }
 
