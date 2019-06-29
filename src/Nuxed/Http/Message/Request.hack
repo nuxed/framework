@@ -2,7 +2,9 @@ namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\{C, Dict};
 
-class Request extends AbstractRequest {
+class Request {
+  use RequestTrait;
+
   public function __construct(
     string $method,
     Uri $uri,

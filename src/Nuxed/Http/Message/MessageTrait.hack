@@ -5,7 +5,8 @@ use namespace HH\Lib\{C, Regex, Str, Vec};
 /**
  * Trait implementing functionality common to requests and responses.
  */
-abstract class Message {
+ <<__Sealed(RequestTrait::class, Response::class)>>
+trait MessageTrait {
 
   /** @var dict<string, vec<string>> Map of all registered headers, as original name => Set of values */
   protected dict<string, vec<string>> $headers = dict[];

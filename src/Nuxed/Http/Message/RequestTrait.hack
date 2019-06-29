@@ -2,7 +2,10 @@ namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\Regex;
 
-abstract class AbstractRequest extends Message {
+<<__Sealed(Request::class)>>
+trait RequestTrait {
+  use MessageTrait;
+
   protected string $method;
 
   protected ?string $requestTarget;

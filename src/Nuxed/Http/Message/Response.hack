@@ -2,7 +2,8 @@ namespace Nuxed\Http\Message;
 
 use namespace HH\Lib\C;
 
-class Response extends Message {
+class Response {
+  use MessageTrait;
 
   /** Map of standard HTTP status code/reason phrases */
   public static dict<int, string> $phrases = dict[
