@@ -5,12 +5,12 @@ use namespace HH\Lib\{C, Str};
 
 type IServiceContainer = His\Container\ContainerInterface;
 
-
-final class ServiceContainer implements His\Container\ContainerInterface {
-  private vec<IServiceContainer> $delegates;
+<<__Sealed(ReflectionServiceContainer::class), __ConsistentConstruct>>
+class ServiceContainer implements His\Container\ContainerInterface {
+  protected vec<IServiceContainer> $delegates;
 
   public function __construct(
-    private KeyedContainer<string, ServiceDefinition<mixed>> $definitions =
+    protected KeyedContainer<string, ServiceDefinition<mixed>> $definitions =
       dict[],
     Container<IServiceContainer> $delegates = vec[],
   ) {

@@ -51,7 +51,8 @@ final class ContainerBuilder {
 
   public function build(
     Container<IServiceContainer> $delegates = vec[],
-  ): ServiceContainer {
+    bool $reflection = true
+  ): IServiceContainer {
     $definitions = Dict\map(
       $this->definitions,
       ($definition) ==> {
@@ -60,7 +61,11 @@ final class ContainerBuilder {
       },
     );
 
-    return new ServiceContainer(
+    $class = $reflection
+      ? ReflectionServiceContainer::class
+      : ServiceContainer::class;
+
+    return new $class(
       /* HH_IGNORE_ERROR[4110] */
       $definitions,
       $delegates,
