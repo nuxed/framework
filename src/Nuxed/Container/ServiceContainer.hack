@@ -5,8 +5,7 @@ use namespace HH\Lib\{C, Str};
 
 type IServiceContainer = His\Container\ContainerInterface;
 
-<<__Sealed(ReflectionServiceContainer::class), __ConsistentConstruct>>
-class ServiceContainer implements His\Container\ContainerInterface {
+final class ServiceContainer implements His\Container\ContainerInterface {
   protected vec<IServiceContainer> $delegates;
 
   public function __construct(

@@ -1,15 +1,19 @@
 namespace Nuxed\Container;
 
+use namespace His;
 use namespace HH\Lib\Str;
 
-final class ReflectionServiceContainer extends ServiceContainer {
+final class ReflectionServiceContainer implements His\Container\ContainerInterface {
   private ?string $resolving = null;
   private ?string $current = null;
 
-  <<__Override>>
+  public function __construct(
+    private His\Container\ContainerInterface $inner = new ServiceContainer()
+  ) {}
+
   public function get<T>(typename<T> $service): T {
-    if (parent::has($service)) {
-      return parent::get($service);
+    if ($this->inner->has($service)) {
+      return $this->inner->get($service);
     }
 
     if ($this->resolving === $service) {
@@ -72,8 +76,7 @@ final class ReflectionServiceContainer extends ServiceContainer {
     return $reflection->newInstance(...$arguments);
   }
 
-  <<__Override>>
   public function has<T>(typename<T> $service): bool {
-    return parent::has($service) || \class_exists($service);
+    return $this->inner->has($service) || \class_exists($service);
   }
 }
