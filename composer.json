@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "hhvm": "^4.8",
+        "hhvm": "^4.12",
         "hhvm/hsl": "^4.7",
         "hhvm/hsl-experimental": "^4.7",
         "hhvm/hhvm-autoload": "^2.0",
@@ -34,7 +34,7 @@
         "his/container": "^0.1"
     },
     "require-dev": {
-        "hhvm/hhast": "^4.11",
+        "hhvm/hhast": "^4.12",
         "facebook/fbexpect": "^2.4",
         "hhvm/hacktest": "^1.4"
     },

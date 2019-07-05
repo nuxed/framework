@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0fc046a87d47fb3b1ac54831baa6ec42",
+    "content-hash": "67e2800360fb4b2fc422d66c78cc5ed2",
     "packages": [
         {
             "name": "azjezz/http-normalizer",
@@ -553,22 +553,22 @@
         },
         {
             "name": "hhvm/hhast",
-            "version": "v4.11.0",
+            "version": "v4.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hhast.git",
-                "reference": "e9fb7f6e165cc8cad3bff2ce8943e85f8295543d"
+                "reference": "eb60eb9eae4223c89a1f6c7c72dc22a03a15912e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hhast/zipball/e9fb7f6e165cc8cad3bff2ce8943e85f8295543d",
-                "reference": "e9fb7f6e165cc8cad3bff2ce8943e85f8295543d",
+                "url": "https://api.github.com/repos/hhvm/hhast/zipball/eb60eb9eae4223c89a1f6c7c72dc22a03a15912e",
+                "reference": "eb60eb9eae4223c89a1f6c7c72dc22a03a15912e",
                 "shasum": ""
             },
             "require": {
                 "facebook/difflib": "^1.0.0",
                 "facebook/hh-clilib": "^2.0.0",
-                "hhvm": "^4.8",
+                "hhvm": "^4.12",
                 "hhvm/hhvm-autoload": "^2.0.4",
                 "hhvm/hsl": "^4.0",
                 "hhvm/hsl-experimental": "^4.5",
@@ -597,7 +597,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2019-06-25T16:20:48+00:00"
+            "time": "2019-07-01T16:55:54+00:00"
         }
     ],
     "aliases": [],
@@ -606,7 +606,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "hhvm": "^4.8"
+        "hhvm": "^4.12"
     },
     "platform-dev": []
 }
