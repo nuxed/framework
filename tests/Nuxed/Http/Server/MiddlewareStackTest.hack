@@ -94,7 +94,7 @@ class MiddlewareStackTest extends HackTest {
     $clone->stack(Server\cm(($req, $next) ==> $next->handle($req)));
 
     $reflection = new ReflectionClass(Server\MiddlewareStack::class)
-      |> $$->getProperty('pipeline');
+      |> $$->getProperty('stack');
     $reflection->setAccessible(true);
     $pipeline = $reflection->getValue($middleware);
     $clonePipeline = $reflection->getValue($clone);
