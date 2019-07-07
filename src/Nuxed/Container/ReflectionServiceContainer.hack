@@ -3,12 +3,13 @@ namespace Nuxed\Container;
 use namespace His;
 use namespace HH\Lib\Str;
 
-final class ReflectionServiceContainer implements His\Container\ContainerInterface {
+final class ReflectionServiceContainer
+  implements His\Container\ContainerInterface {
   private ?string $resolving = null;
   private ?string $current = null;
 
   public function __construct(
-    private His\Container\ContainerInterface $inner = new ServiceContainer()
+    private His\Container\ContainerInterface $inner = new ServiceContainer(),
   ) {}
 
   public function get<T>(typename<T> $service): T {
@@ -38,7 +39,9 @@ final class ReflectionServiceContainer implements His\Container\ContainerInterfa
     }
 
     $constructor = $reflection->getConstructor();
-    if ($constructor is null || $reflection->isSubclassOf(Service\Newable::class)) {
+    if (
+      $constructor is null || $reflection->isSubclassOf(Service\Newable::class)
+    ) {
       if ($service === $this->resolving) {
         $this->resolving = null;
       }
