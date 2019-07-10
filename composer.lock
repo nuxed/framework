@@ -320,16 +320,16 @@
         },
         {
             "name": "hhvm/type-assert",
-            "version": "v3.5.0",
+            "version": "v3.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/type-assert.git",
-                "reference": "c6b4e35c2029722b8bc3d2ff0b6d2c0bca45c466"
+                "reference": "c389539c34ec9b0b8aa8240c2fb2d7a3cbfad0db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/type-assert/zipball/c6b4e35c2029722b8bc3d2ff0b6d2c0bca45c466",
-                "reference": "c6b4e35c2029722b8bc3d2ff0b6d2c0bca45c466",
+                "url": "https://api.github.com/repos/hhvm/type-assert/zipball/c389539c34ec9b0b8aa8240c2fb2d7a3cbfad0db",
+                "reference": "c389539c34ec9b0b8aa8240c2fb2d7a3cbfad0db",
                 "shasum": ""
             },
             "require": {
@@ -357,7 +357,7 @@
                 "TypeAssert",
                 "hack"
             ],
-            "time": "2019-06-27T16:14:49+00:00"
+            "time": "2019-07-08T21:55:05+00:00"
         },
         {
             "name": "his/container",
