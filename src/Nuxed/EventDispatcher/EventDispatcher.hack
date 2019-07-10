@@ -1,74 +1,74 @@
 namespace Nuxed\EventDispatcher;
 
+use namespace HH\Lib;
+
 final class EventDispatcher implements IEventDispatcher {
-  private dict<
-    classname<IEvent>,
-    \SplPriorityQueue<(function(IEvent): Awaitable<void>)>,
-  > $listeners = dict[];
+  public function __construct(
+    private ListenerProvider\IListenerProvider $listenerProvider,
+  ) {}
 
   /**
-   * Register an event listener with the dispatcher.
+   * Provide all relevant listeners with an event to process.
+   *
+   * If a Throwable is caught when executing the listener loop, it is cast
+   * to an ErrorEvent, and then the method calls itself with that instance,
+   * re-throwing the original Throwable on completion.
+   *
+   * In the case that a Throwable is caught for an ErrorEvent, we re-throw
+   * to prevent recursion.
+   *
+   * @template T as IEvent
+   *
+   * @return T The Event that was passed, now modified by listeners.
    */
-  public function on<TEvent as IEvent>(
-    classname<TEvent> $event,
-    (function(TEvent): Awaitable<void>) $listener,
-    int $priority = 0,
-  ): void {
-    $listeners = $this->listeners[$event] ??
-      new \SplPriorityQueue<(function(IEvent): Awaitable<void>)>();
-    $listeners->insert($listener, $priority);
-    $this->listeners[$event] = $listeners;
-  }
-
-  /**
-   * Register an event subscriber with the dispatcher.
-   */
-  public function subscribe(IEventSubscriber $subscriber): void {
-    $subscriber->subscribe($this);
-  }
-
-  /**
-   * Dispatch an event and call the listeners.
-   */
-  public async function dispatch<TEvent as IEvent>(
-    TEvent $event,
-  ): Awaitable<TEvent> {
-    $ref = $event;
-    if ($ref is IStoppableEvent && $ref->isPropagationStopped()) {
-      // event is already stopped.
-      return $event;
+  public async function dispatch<reify T as IEvent>(T $event): Awaitable<T> {
+    $in = $event;
+    if ($event is IStoppableEvent && $event->isPropagationStopped()) {
+      return $in;
     }
 
-    $name = \get_class($ref);
-    $listeners = $this->listeners[$name] ?? vec[];
-    $stopped = false;
-    $lastOperation = async {
-    };
+    $listeners = $this->listenerProvider->getListeners<T>($event);
+    $stopped = new Lib\Ref(false);
+    $lastOperation = async {};
 
-    foreach ($listeners as $listener) {
-      if ($stopped) {
+    foreach ($listeners await as $listener) {
+      if ($stopped->value) {
         break;
       }
 
       $lastOperation = async {
         await $lastOperation;
-        if ($ref is IStoppableEvent && $ref->isPropagationStopped()) {
-          $stopped = true;
+        if ($event is IStoppableEvent && $event->isPropagationStopped()) {
+          $stopped->value = true;
           return;
         }
 
-        return await $listener($ref);
+        try {
+          await $listener->process($event);
+        } catch (\Exception $e) {
+          await $this->handleCaughtException<T>($e, $event, $listener);
+        }
       };
     }
 
     await $lastOperation;
-    return $event;
+    return $in;
   }
 
-  /**
-   * Remove a set of listeners from the dispatcher.
-   */
-  public function forget(classname<IEvent> $event): void {
-    unset($this->listeners[$event]);
+  private async function handleCaughtException<reify T as IEvent>(
+    \Exception $e,
+    T $event,
+    IEventListener<T> $listener,
+  ): Awaitable<noreturn> {
+    if ($event is ErrorEvent<IEvent>) {
+      throw $event->getException();
+    }
+
+    await $this->dispatch<ErrorEvent<T>>(
+      new ErrorEvent<T>($event, $listener, $e),
+    );
+
+    // Re-throw the original exception, per the spec.
+    throw $e;
   }
 }
