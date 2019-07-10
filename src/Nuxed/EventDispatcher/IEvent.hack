@@ -7,5 +7,4 @@ namespace Nuxed\EventDispatcher;
  * want. The interface MUST be implemented, however, to provide type-safety
  * to both listeners as well as the dispatcher.
  */
-interface IEvent {
-}
+interface IEvent {}

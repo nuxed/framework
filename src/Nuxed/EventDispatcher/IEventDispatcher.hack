@@ -1,27 +1,15 @@
 namespace Nuxed\EventDispatcher;
 
+/**
+ * Defines a dispatcher for events.
+ */
 interface IEventDispatcher {
   /**
-   * Register an event listener with the dispatcher.
+   * Provide all relevant listeners with an event to process.
+   *
+   * @template T as IEvent
+   *
+   * @return T The Event that was passed, now modified by listeners.
    */
-  public function on<TEvent as IEvent>(
-    classname<TEvent> $event,
-    (function(TEvent): Awaitable<void>) $listener,
-    int $priority = 0,
-  ): void;
-
-  /**
-   * Register an event subscriber with the dispatcher.
-   */
-  public function subscribe(IEventSubscriber $subscriber): void;
-
-  /**
-   * Dispatch an event and call the listeners.
-   */
-  public function dispatch<TEvent as IEvent>(TEvent $event): Awaitable<TEvent>;
-
-  /**
-   * Remove a set of listeners from the dispatcher.
-   */
-  public function forget(classname<IEvent> $event): void;
+  public function dispatch<T as IEvent>(T $event): Awaitable<T>;
 }
