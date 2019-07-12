@@ -1,12 +1,12 @@
 namespace Nuxed\Cache\Store;
 
-use namespace Nuxed\Io;
+use namespace Nuxed\Filesystem;
 use namespace HH\Lib\Str;
 use namespace Nuxed\Cache\Serializer;
 
 class FilesystemStore extends AbstractStore {
   const FILE_SUFFIX = '.nu.cache';
-  protected Io\Folder $folder;
+  protected Filesystem\Folder $folder;
 
   public function __construct(
     string $cache_dir,
@@ -15,7 +15,7 @@ class FilesystemStore extends AbstractStore {
     protected Serializer\ISerializer $serializer =
       new Serializer\NativeSerializer(),
   ) {
-    $this->folder = new Io\Folder($cache_dir, true);
+    $this->folder = new Filesystem\Folder($cache_dir, true);
     parent::__construct($namespace, $defaultTtl);
   }
 
@@ -32,7 +32,7 @@ class FilesystemStore extends AbstractStore {
     }
 
     if ($this->folder->contains($name)) {
-      $file = await $this->folder->read($name, Io\File::class);
+      $file = await $this->folder->read($name, Filesystem\File::class);
     } else {
       $file = await $this->folder->touch($name);
     }
@@ -49,7 +49,7 @@ class FilesystemStore extends AbstractStore {
     }
 
     $time = \time();
-    $file = await $this->folder->read($name, Io\File::class);
+    $file = await $this->folder->read($name, Filesystem\File::class);
     $cache = $this->serializer->unserialize(await $file->read()) as
       (dynamic, int);
     $expiry = $cache[1];
@@ -69,7 +69,7 @@ class FilesystemStore extends AbstractStore {
   <<__Override>>
   protected async function doDelete(string $id): Awaitable<bool> {
     $id = $this->getFilename($id);
-    $file = await $this->folder->read($id, Io\File::class);
+    $file = await $this->folder->read($id, Filesystem\File::class);
     await $file->delete();
     return true;
   }
@@ -80,7 +80,7 @@ class FilesystemStore extends AbstractStore {
       return null;
     }
     $id = $this->getFilename($id);
-    $file = await $this->folder->read($id, Io\File::class);
+    $file = await $this->folder->read($id, Filesystem\File::class);
     $cache = $this->serializer->unserialize(await $file->read()) as
       (dynamic, int);
     return $cache[0];
@@ -95,7 +95,7 @@ class FilesystemStore extends AbstractStore {
     if (!$this->folder->contains($namespace)) {
       return true;
     }
-    $cache = await $this->folder->read($namespace, Io\Folder::class);
+    $cache = await $this->folder->read($namespace, Filesystem\Folder::class);
     await $cache->flush();
     return true;
   }

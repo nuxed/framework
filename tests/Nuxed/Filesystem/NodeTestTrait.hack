@@ -1,7 +1,7 @@
-namespace Nuxed\Test\Io;
+namespace Nuxed\Test\Filesystem;
 
 use namespace HH\Asio;
-use namespace Nuxed\Io;
+use namespace Nuxed\Filesystem;
 use namespace HH\Lib\C;
 use namespace HH\Lib\Vec;
 use type Facebook\HackTest\HackTest;
@@ -16,7 +16,7 @@ trait NodeTestTrait {
   require extends HackTest;
 
   <<DataProvider('provideNodes')>>
-  public async function testChmod(Io\Node $node): Awaitable<void> {
+  public async function testChmod(Filesystem\Node $node): Awaitable<void> {
     try {
       $ret = await $node->chmod(0111);
       expect($ret)->toBeTrue();
@@ -51,11 +51,11 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testAccessTime(Io\Node $node): Awaitable<void> {
+  public async function testAccessTime(Filesystem\Node $node): Awaitable<void> {
     $time1 = (int)microtime(true);
     expect($node->accessTime())->toBeLessThanOrEqualTo($time1);
 
-    if ($node is Io\File && getenv('TEST_LONG_RUN') !== false) {
+    if ($node is Filesystem\File && getenv('TEST_LONG_RUN') !== false) {
       await Asio\usleep(10000000);
       await $node->read();
       $time2 = (int)microtime(true);
@@ -65,17 +65,17 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testAccessTimeThrowsIfFileIsMissing(Io\Node $node): void {
+  public function testAccessTimeThrowsIfFileIsMissing(Filesystem\Node $node): void {
     expect(() ==> $node->accessTime())
-      ->toThrow(Io\Exception\MissingNodeException::class);
+      ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testChangeTime(Io\Node $node): Awaitable<void> {
+  public async function testChangeTime(Filesystem\Node $node): Awaitable<void> {
     $time1 = (int)microtime(true);
     expect($node->changeTime())->toBeLessThanOrEqualTo($time1);
 
-    if ($node is Io\File && getenv('TEST_LONG_RUN') !== false) {
+    if ($node is Filesystem\File && getenv('TEST_LONG_RUN') !== false) {
       await Asio\usleep(10000000);
       // change node
       await $node->write('foo');
@@ -86,30 +86,30 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testChangeTimeThrowsFileIsMissing(Io\Node $node): void {
+  public function testChangeTimeThrowsFileIsMissing(Filesystem\Node $node): void {
     expect(() ==> $node->changeTime())
-      ->toThrow(Io\Exception\MissingNodeException::class);
+      ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideNodes')>>
-  public function testBasename(Io\Node $node): void {
+  public function testBasename(Filesystem\Node $node): void {
     expect($node->basename())->toBeSame($node->path()->basename());
   }
 
   <<DataProvider('provideNodes')>>
-  public function testName(Io\Node $node): void {
+  public function testName(Filesystem\Node $node): void {
     expect($node->name())->toBeSame($node->path()->name());
   }
 
   <<DataProvider('provideNodes')>>
-  public function testDir(Io\Node $node): void {
+  public function testDir(Filesystem\Node $node): void {
     expect($node->dir()->toString())->toBeSame(
       $node->path()->parent()->toString(),
     );
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testRename(Io\Node $node): Awaitable<void> {
+  public async function testRename(Filesystem\Node $node): Awaitable<void> {
     $name = static::createPath()->name();
     $ret = await $node->rename($name);
     expect($ret)->toBeTrue();
@@ -119,39 +119,39 @@ trait NodeTestTrait {
 
   <<DataProvider('provideMissingNodes')>>
   public async function testRenameThrowsFileIsMissing(
-    Io\Node $missing,
+    Filesystem\Node $missing,
   ): Awaitable<void> {
     expect(() ==> $missing->rename('foo'))
-      ->toThrow(Io\Exception\MissingNodeException::class);
+      ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideExistingNodesPair')>>
   public async function testRenameThrowsIfTargetExistsWithoutOverwrite(
-    Io\Node $node,
-    Io\Node $another,
+    Filesystem\Node $node,
+    Filesystem\Node $another,
   ): Awaitable<void> {
     expect(async () ==> {
       await $node->rename($another->basename(), false);
-    })->toThrow(Io\Exception\ExistingNodeException::class, 'already exists');
+    })->toThrow(Filesystem\Exception\ExistingNodeException::class, 'already exists');
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testRenameEarlyReturn(Io\Node $node): Awaitable<void> {
+  public async function testRenameEarlyReturn(Filesystem\Node $node): Awaitable<void> {
     $res = await $node->rename($node->basename());
     expect($res)->toBeTrue();
   }
 
   <<DataProvider('provideExistingNodesPair')>>
   public async function testRenameOverwrite(
-    Io\Node $node,
-    Io\Node $another,
+    Filesystem\Node $node,
+    Filesystem\Node $another,
   ): Awaitable<void> {
     $res = await $node->rename($another->basename(), true);
     expect($res)->toBeTrue();
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testWritable(Io\Node $node): Awaitable<void> {
+  public async function testWritable(Filesystem\Node $node): Awaitable<void> {
     $this->markAsSkippedIfRoot();
     // write only
     await $node->chmod(0222);
@@ -166,7 +166,7 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testReadable(Io\Node $node): Awaitable<void> {
+  public async function testReadable(Filesystem\Node $node): Awaitable<void> {
     $this->markAsSkippedIfRoot();
     // read only
     await $node->chmod(0444);
@@ -181,7 +181,7 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testExecutable(Io\Node $node): Awaitable<void> {
+  public async function testExecutable(Filesystem\Node $node): Awaitable<void> {
     $this->markAsSkippedIfRoot();
     // execute only
     await $node->chmod(0111);
@@ -196,7 +196,7 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testChown(Io\Node $node): Awaitable<void> {
+  public async function testChown(Filesystem\Node $node): Awaitable<void> {
     $this->markAsSkippedIfNotRoot();
     $ret = await $node->chown(666, false);
     expect($ret)->toBeTrue();
@@ -204,13 +204,13 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testChownThrowsIfNodeDoesntExist(Io\Node $node): void {
+  public function testChownThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
     expect(() ==> $node->chown(666))
-      ->toThrow(Io\Exception\MissingNodeException::class);
+      ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testChgrp(Io\Node $node): Awaitable<void> {
+  public async function testChgrp(Filesystem\Node $node): Awaitable<void> {
     $this->markAsSkippedIfNotRoot();
     $ret = await $node->chgrp(666, false);
     expect($ret)->toBeTrue();
@@ -218,35 +218,35 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testChgrpThrowsIfNodeDoesntExist(Io\Node $node): void {
+  public function testChgrpThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
     expect(() ==> $node->chgrp(666))
-      ->toThrow(Io\Exception\MissingNodeException::class);
+      ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testGroupThrowsIfNodeDoesntExist(Io\Node $node): void {
+  public function testGroupThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
     expect(() ==> $node->group())
-      ->toThrow(Io\Exception\MissingNodeException::class);
+      ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testOwnerThrowsIfNodeDoesntExist(Io\Node $node): void {
+  public function testOwnerThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
     expect(() ==> $node->owner())
-      ->toThrow(Io\Exception\MissingNodeException::class);
+      ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testPermissionsThrowsIfNodeDoesntExist(Io\Node $node): void {
+  public function testPermissionsThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
     expect(() ==> $node->permissions())
-      ->toThrow(Io\Exception\MissingNodeException::class);
+      ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   // Data providers
 
-  abstract public function provideNodes(): Container<(Io\Node)>;
-  abstract public function provideMissingNodes(): Container<(Io\Node)>;
+  abstract public function provideNodes(): Container<(Filesystem\Node)>;
+  abstract public function provideMissingNodes(): Container<(Filesystem\Node)>;
 
-  public function provideNodesPair(): Container<(Io\Node, Io\Node)> {
+  public function provideNodesPair(): Container<(Filesystem\Node, Filesystem\Node)> {
     $nodes = vec($this->provideNodes());
     $missing = vec($this->provideMissingNodes());
     if (C\count($missing) > C\count($nodes)) {
@@ -263,7 +263,7 @@ trait NodeTestTrait {
     return $ret;
   }
 
-  public function provideExistingNodesPair(): Container<(Io\Node, Io\Node)> {
+  public function provideExistingNodesPair(): Container<(Filesystem\Node, Filesystem\Node)> {
     $a = vec($this->provideNodes());
     $b = Vec\reverse($this->provideNodes());
     $ret = vec[];
@@ -275,7 +275,7 @@ trait NodeTestTrait {
     return $ret;
   }
 
-  public function provideMissingNodesPair(): Container<(Io\Node, Io\Node)> {
+  public function provideMissingNodesPair(): Container<(Filesystem\Node, Filesystem\Node)> {
     $a = vec($this->provideMissingNodes());
     $b = Vec\reverse($this->provideMissingNodes());
 

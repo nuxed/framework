@@ -1,4 +1,4 @@
-namespace Nuxed\Io;
+namespace Nuxed\Filesystem;
 
 use namespace HH\Lib\{C, Str, Vec};
 use type HH\InvariantException;

@@ -1,7 +1,6 @@
-namespace Nuxed\Test\Io;
+namespace Nuxed\Test\Filesystem;
 
-use namespace Nuxed\Io;
-use namespace HH\Lib\Experimental\Filesystem;
+use namespace Nuxed\Filesystem;
 use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
@@ -14,9 +13,9 @@ class PathTest extends HackTest {
   use IoTestTrait;
 
   public function testCreate(): void {
-    expect(Io\Path::create('/foo/bar')->toString())->toBeSame('/foo/bar');
-    $path = Io\Path::create('/foo/bar');
-    expect(Io\Path::create($path))->toBeSame($path);
+    expect(Filesystem\Path::create('/foo/bar')->toString())->toBeSame('/foo/bar');
+    $path = Filesystem\Path::create('/foo/bar');
+    expect(Filesystem\Path::create($path))->toBeSame($path);
   }
 
   <<DataProvider('provideToStringAndMagicToStringData')>>
@@ -24,7 +23,7 @@ class PathTest extends HackTest {
     string $path,
     string $realpath,
   ): void {
-    $path = Io\Path::create($path);
+    $path = Filesystem\Path::create($path);
     expect($path->toString())->toBeSame($realpath);
     expect((string)$path)->toBeSame($realpath);
   }
@@ -41,7 +40,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideExtensionData')>>
   public function testExtension(string $path, string $extension): void {
-    expect(Io\Path::create($path)->extension())->toBeSame($extension);
+    expect(Filesystem\Path::create($path)->extension())->toBeSame($extension);
   }
 
   public function provideExtensionData(): Container<(string, string)> {
@@ -58,7 +57,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideIsAbsoluteData')>>
   public function testIsAbsolute(string $path, bool $isAbsolute): void {
-    expect(Io\Path::create($path)->isAbsolute())->toBeSame($isAbsolute);
+    expect(Filesystem\Path::create($path)->isAbsolute())->toBeSame($isAbsolute);
   }
 
   public function provideIsAbsoluteData(): Container<(string, bool)> {
@@ -77,7 +76,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideIsRelativeData')>>
   public function testIsRelative(string $path, bool $expected): void {
-    expect(Io\Path::create($path)->isRelative())->toBeSame($expected);
+    expect(Filesystem\Path::create($path)->isRelative())->toBeSame($expected);
   }
 
   public function provideIsRelativeData(): Container<(string, bool)> {
@@ -100,7 +99,7 @@ class PathTest extends HackTest {
     bool $above,
     string $expected,
   ): void {
-    expect(Io\Path::join($parts, $above)->toString())->toBeSame($expected);
+    expect(Filesystem\Path::join($parts, $above)->toString())->toBeSame($expected);
   }
 
   public function provideJoinData(
@@ -125,7 +124,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideNormalizeData')>>
   public function testNormalize(string $path, ?string $expected): void {
-    expect(Io\Path::normalize($path))->toBeSame($expected);
+    expect(Filesystem\Path::normalize($path))->toBeSame($expected);
   }
 
   public function provideNormalizeData(): Container<(string, ?string)> {
@@ -147,7 +146,7 @@ class PathTest extends HackTest {
     bool $endSlash,
     string $expected,
   ): void {
-    expect(Io\Path::standard($path, $endSlash))->toBeSame($expected);
+    expect(Filesystem\Path::standard($path, $endSlash))->toBeSame($expected);
   }
 
   public function provideStandardData(): Container<(string, bool, string)> {
@@ -168,7 +167,7 @@ class PathTest extends HackTest {
     string $to,
     string $expected,
   ): void {
-    expect(Io\Path::create($path)->relativeTo(Io\Path::create($to))->toString())
+    expect(Filesystem\Path::create($path)->relativeTo(Filesystem\Path::create($to))->toString())
       ->toBeSame($expected);
   }
 
@@ -185,37 +184,37 @@ class PathTest extends HackTest {
     // absolute + absolute
     expect(
       () ==>
-        Io\Path::create('foo/bar')->relativeTo(Io\Path::create('foo/bar/baz')),
+        Filesystem\Path::create('foo/bar')->relativeTo(Filesystem\Path::create('foo/bar/baz')),
     )
       ->toThrow(
-        Io\Exception\InvalidPathException::class,
+        Filesystem\Exception\InvalidPathException::class,
         'Cannot determine relative path without two absolute paths.',
       );
 
     // relative + absolute
     expect(
       () ==>
-        Io\Path::create('/foo/bar')->relativeTo(Io\Path::create('foo/bar/baz')),
+        Filesystem\Path::create('/foo/bar')->relativeTo(Filesystem\Path::create('foo/bar/baz')),
     )
       ->toThrow(
-        Io\Exception\InvalidPathException::class,
+        Filesystem\Exception\InvalidPathException::class,
         'Cannot determine relative path without two absolute paths.',
       );
 
     // absolute + relative
     expect(
       () ==>
-        Io\Path::create('foo/bar')->relativeTo(Io\Path::create('/foo/bar/baz')),
+        Filesystem\Path::create('foo/bar')->relativeTo(Filesystem\Path::create('/foo/bar/baz')),
     )
       ->toThrow(
-        Io\Exception\InvalidPathException::class,
+        Filesystem\Exception\InvalidPathException::class,
         'Cannot determine relative path without two absolute paths.',
       );
   }
 
   <<DataProvider('provideIsDirectoryData')>>
   public function testIsDirectory(string $path, bool $expected): void {
-    expect(Io\Path::create($path)->isFolder())->toBeSame($expected);
+    expect(Filesystem\Path::create($path)->isFolder())->toBeSame($expected);
   }
 
   public function provideIsDirectoryData(): Container<(string, bool)> {
@@ -231,7 +230,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideIsFileData')>>
   public function testIsFile(string $path, bool $expected): void {
-    expect(Io\Path::create($path)->isFile())->toBeSame($expected);
+    expect(Filesystem\Path::create($path)->isFile())->toBeSame($expected);
   }
 
   public function provideIsFileData(): Container<(string, bool)> {
@@ -248,7 +247,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideIsSymlinkData')>>
   public function testIsSymlink(string $path, bool $expected): void {
-    expect(Io\Path::create($path)->isSymlink())->toBeSame($expected);
+    expect(Filesystem\Path::create($path)->isSymlink())->toBeSame($expected);
   }
 
   public function provideIsSymlinkData(): Container<(string, bool)> {
@@ -269,7 +268,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideExistsData')>>
   public function testExists(string $path, bool $expected): void {
-    expect(Io\Path::create($path)->exists())->toBeSame($expected);
+    expect(Filesystem\Path::create($path)->exists())->toBeSame($expected);
   }
 
   public function provideExistsData(): Container<(string, bool)> {
@@ -288,7 +287,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideParentData')>>
   public function testParent(string $path, string $expected): void {
-    expect(Io\Path::create($path)->parent()->toString())->toBeSame($expected);
+    expect(Filesystem\Path::create($path)->parent()->toString())->toBeSame($expected);
   }
 
   public function provideParentData(): Container<(string, string)> {
@@ -302,7 +301,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideBasenameData')>>
   public function testBasename(string $path, string $expected): void {
-    expect(Io\Path::create($path)->basename())->toBeSame($expected);
+    expect(Filesystem\Path::create($path)->basename())->toBeSame($expected);
   }
 
   public function provideBasenameData(): Container<(string, string)> {
@@ -319,7 +318,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideNameData')>>
   public function testName(string $path, string $expected): void {
-    expect(Io\Path::create($path)->name())->toBeSame($expected);
+    expect(Filesystem\Path::create($path)->name())->toBeSame($expected);
   }
 
   public function provideNameData(): Container<(string, string)> {
@@ -336,7 +335,7 @@ class PathTest extends HackTest {
 
   <<DataProvider('providePartsData')>>
   public function testParts(string $path, Container<string> $expected): void {
-    expect(vec(Io\Path::create($path)->parts()))->toBeSame(vec($expected));
+    expect(vec(Filesystem\Path::create($path)->parts()))->toBeSame(vec($expected));
   }
 
   public function providePartsData(): Container<(string, Container<string>)> {
@@ -356,7 +355,7 @@ class PathTest extends HackTest {
     string $other,
     int $expected,
   ): void {
-    $path = Io\Path::create($path);
+    $path = Filesystem\Path::create($path);
     expect($path->compare($other))->toBeSame($expected);
   }
 
@@ -366,10 +365,10 @@ class PathTest extends HackTest {
       // last `/` should be removed
       tuple('/foo', '/foo/', 0),
       // same directory path
-      tuple(__DIR__, __DIR__.'/../Io/', 0),
+      tuple(__DIR__, __DIR__.'/../Filesystem/', 0),
       tuple('/foo\\bar', '/foo/bar/', 0),
-      tuple(__DIR__, __DIR__.'/..', 3),
-      tuple(__DIR__.'/..', __DIR__, -3),
+      tuple(__DIR__, __DIR__.'/..', 11),
+      tuple(__DIR__.'/..', __DIR__, -11),
     ];
   }
 }

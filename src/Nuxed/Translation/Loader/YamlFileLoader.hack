@@ -1,6 +1,6 @@
 namespace Nuxed\Translation\Loader;
 
-use namespace Nuxed\Io;
+use namespace Nuxed\Filesystem;
 use namespace HH\Lib\Str;
 use namespace Facebook\TypeSpec;
 use namespace Nuxed\Translation\Exception;
@@ -8,7 +8,7 @@ use namespace Nuxed\Translation\Exception;
 final class YamlFileLoader extends FileLoader {
   <<__Override>>
   public function loadResource(
-    Io\Path $resource,
+    Filesystem\Path $resource,
   ): KeyedContainer<string, mixed> {
     if (!\function_exists('yaml_parse_file')) {
       throw new Exception\LogicException(

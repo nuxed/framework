@@ -1,8 +1,8 @@
-namespace Nuxed\Io;
+namespace Nuxed\Filesystem;
 
 use namespace HH\Asio;
 use namespace HH\Lib\{C, Regex, Str, Vec};
-use type Nuxed\Io\Exception\InvalidPathException;
+use type Nuxed\Filesystem\Exception\InvalidPathException;
 
 final class Folder extends Node {
   /**

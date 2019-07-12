@@ -1,4 +1,4 @@
-namespace Nuxed\Io;
+namespace Nuxed\Filesystem;
 
 use namespace HH\Asio;
 use namespace HH\Lib\{Regex, Str};

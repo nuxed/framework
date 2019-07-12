@@ -7,3 +7,6 @@ vendor/
 
 # HHAST parser cache files
 *.hhast.parser-cache
+
+# Temporary directory used for tests.
+tests/tmp/
