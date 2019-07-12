@@ -1,4 +1,4 @@
-namespace Nuxed\Io\Exception;
+namespace Nuxed\Filesystem\Exception;
 
 /**
  * Exception thrown when a target node destination already exists.

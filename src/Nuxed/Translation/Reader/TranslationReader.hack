@@ -2,7 +2,7 @@ namespace Nuxed\Translation\Reader;
 
 use namespace HH\Asio;
 use namespace HH\Lib\Str;
-use namespace Nuxed\{Io, Translation};
+use namespace Nuxed\{Filesystem, Translation};
 use namespace Nuxed\Translation\Loader;
 
 /**
@@ -33,7 +33,7 @@ final class TranslationReader implements ITranslationReader {
     Translation\MessageCatalogue $catalogue,
   ): void {
     try {
-      $folder = Io\Node::load($directory) as Io\Folder;
+      $folder = Filesystem\Node::load($directory) as Filesystem\Folder;
     } catch (\Throwable $e) {
       return;
     }

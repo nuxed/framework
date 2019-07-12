@@ -1,6 +1,6 @@
-namespace Nuxed\Test\Io;
+namespace Nuxed\Test\Filesystem;
 
-use namespace Nuxed\Io;
+use namespace Nuxed\Filesystem;
 use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
 use function Facebook\FBExpect\expect;
@@ -8,7 +8,7 @@ use function Facebook\FBExpect\expect;
 class LinesTest extends HackTest {
   <<DataProvider('provideCountData')>>
   public function testCount(Container<string> $lines, int $expected): void {
-    $lines = new Io\Lines($lines);
+    $lines = new Filesystem\Lines($lines);
     expect($lines->count())->toBeSame($expected);
   }
 
@@ -23,7 +23,7 @@ class LinesTest extends HackTest {
 
   <<DataProvider('provideFirstData')>>
   public function testFirst(Container<string> $lines, string $expected): void {
-    $lines = new Io\Lines($lines);
+    $lines = new Filesystem\Lines($lines);
     expect($lines->first())->toBeSame($expected);
   }
 
@@ -37,10 +37,10 @@ class LinesTest extends HackTest {
   }
 
   public function testFirstThrowsForEmptyLines(): void {
-    $lines = new Io\Lines(vec[]);
+    $lines = new Filesystem\Lines(vec[]);
     expect(() ==> $lines->first())
       ->toThrow(
-        Io\Exception\OutOfRangeException::class,
+        Filesystem\Exception\OutOfRangeException::class,
         'Lines instance is empty.',
       );
   }
@@ -51,7 +51,7 @@ class LinesTest extends HackTest {
     string $expectedFirst,
     Container<string> $expectedRest,
   ): void {
-    $lines = new Io\Lines($lines);
+    $lines = new Filesystem\Lines($lines);
     list($first, $rest) = $lines->jump();
     expect($first)
       ->toBeSame($expectedFirst);
@@ -71,7 +71,7 @@ class LinesTest extends HackTest {
 
   <<DataProvider('provideBlankData')>>
   public function testBlank(string $line, bool $expected): void {
-    Io\Lines::blank($line)
+    Filesystem\Lines::blank($line)
       |> expect($$)->toBeSame($expected);
   }
 
@@ -99,7 +99,7 @@ class LinesTest extends HackTest {
     Container<string> $lines,
     string $expected,
   ): void {
-    new Io\Lines($lines)
+    new Filesystem\Lines($lines)
       |> $$->toString()
       |> expect($$)->toBeSame($expected);
   }
@@ -118,7 +118,7 @@ bar',
   }
 
   public function testLinesIsIterator(): void {
-    $lines = new Io\Lines(vec['foo', 'bar']);
+    $lines = new Filesystem\Lines(vec['foo', 'bar']);
     $result = vec[];
     foreach ($lines as $line) {
       $result[] = $line;

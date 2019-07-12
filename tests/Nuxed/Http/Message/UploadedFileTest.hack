@@ -1,6 +1,6 @@
 namespace Nuxed\Test\Http\Message;
 
-use namespace Nuxed\Io;
+use namespace Nuxed\Filesystem;
 use namespace Nuxed\Http\Message;
 use type Facebook\HackTest\HackTest;
 use type Facebook\HackTest\DataProvider;
@@ -26,7 +26,7 @@ class UploadedFileTest extends HackTest {
       'filename.txt',
       'text/plain',
     );
-    $to = await Io\File::temporary('test');
+    $to = await Filesystem\File::temporary('test');
     expect($upload->getSize())->toBePHPEqual(8);
     expect($upload->getClientFilename())->toBePHPEqual('filename.txt');
     expect($upload->getClientMediaType())->toBePHPEqual('text/plain');
@@ -43,7 +43,7 @@ class UploadedFileTest extends HackTest {
       0,
       Message\UploadedFileError::ERROR_OK,
     );
-    $to = await Io\File::temporary('test');
+    $to = await Filesystem\File::temporary('test');
     await $upload->moveTo($to->path()->toString());
     expect($to->exists())->toBeTrue();
     expect(() ==> $upload->moveTo($to->path()->toString()))
@@ -60,7 +60,7 @@ class UploadedFileTest extends HackTest {
       0,
       Message\UploadedFileError::ERROR_OK,
     );
-    $to = await Io\File::temporary('test');
+    $to = await Filesystem\File::temporary('test');
     await $upload->moveTo($to->path()->toString());
     expect(() ==> {
       $upload->getStream();
@@ -96,7 +96,7 @@ class UploadedFileTest extends HackTest {
   ): void {
     $uploadedFile = new Message\UploadedFile(Message\stream(''), 0, $status);
     expect(async () ==> {
-      $to = await Io\File::temporary('test');
+      $to = await Filesystem\File::temporary('test');
       await $uploadedFile->moveTo($to->path()->toString());
     })->toThrow(
       Message\Exception\UploadedFileErrorException::class,

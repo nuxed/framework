@@ -1,6 +1,6 @@
 namespace Nuxed\Translation\Loader;
 
-use namespace Nuxed\{Io, Translation};
+use namespace Nuxed\{Filesystem, Translation};
 use namespace HH\Lib\Str;
 use namespace Nuxed\Translation\Exception;
 
@@ -10,7 +10,7 @@ abstract class FileLoader implements ILoader<string> {
     string $locale,
     string $domain = 'messages',
   ): Translation\MessageCatalogue {
-    $resource = Io\Path::create($resource);
+    $resource = Filesystem\Path::create($resource);
     if (!$resource->exists()) {
       throw new Exception\NotFoundResourceException(
         Str\format('File (%s) not found.', $resource->toString()),
@@ -25,6 +25,6 @@ abstract class FileLoader implements ILoader<string> {
    * @return tree<arraykey, string>
    */
   abstract protected function loadResource(
-    Io\Path $resource,
+    Filesystem\Path $resource,
   ): KeyedContainer<string, mixed>;
 }

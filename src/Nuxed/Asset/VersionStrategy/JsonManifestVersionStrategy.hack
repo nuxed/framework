@@ -2,7 +2,7 @@ namespace Nuxed\Asset\VersionStrategy;
 
 use namespace HH\Asio;
 use namespace HH\Lib\Str;
-use namespace Nuxed\Io;
+use namespace Nuxed\Filesystem;
 use namespace Nuxed\Util\Json;
 use namespace Nuxed\Asset\Exception;
 
@@ -21,7 +21,7 @@ class JsonManifestVersionStrategy implements IVersionStrategy {
   const type TManifest = KeyedContainer<string, string>;
   private ?KeyedContainer<string, string> $manifestData;
 
-  public function __construct(private Io\File $manifest) {
+  public function __construct(private Filesystem\File $manifest) {
   }
 
   /**

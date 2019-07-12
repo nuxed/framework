@@ -1,4 +1,4 @@
-namespace Nuxed\Io;
+namespace Nuxed\Filesystem;
 
 enum OperationType: int {
   /*

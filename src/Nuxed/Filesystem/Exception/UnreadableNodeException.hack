@@ -1,4 +1,4 @@
-namespace Nuxed\Io\Exception;
+namespace Nuxed\Filesystem\Exception;
 
 /**
  * Exception throw when trying to read or retrieve

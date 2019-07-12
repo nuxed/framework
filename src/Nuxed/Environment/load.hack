@@ -1,13 +1,13 @@
 namespace Nuxed\Environment;
 
-use namespace Nuxed\Io;
+use namespace Nuxed\Filesystem;
 use namespace HH\Lib\Str;
 
 /**
  * Load a .env file into the current environment.
  */
 async function load(string $file, bool $override = false): Awaitable<void> {
-  $file = new Io\File($file, false);
+  $file = new Filesystem\File($file, false);
   $lines = await $file->lines();
   foreach ($lines as $line) {
     $trimmed = Str\trim($line);

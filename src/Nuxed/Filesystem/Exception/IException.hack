@@ -1,4 +1,4 @@
-namespace Nuxed\Io\Exception;
+namespace Nuxed\Filesystem\Exception;
 
 interface IException {
   require extends \Exception;
