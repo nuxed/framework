@@ -22,19 +22,19 @@
         }
     ],
     "require": {
-        "hhvm": "^4.12",
+        "hhvm": "^4.14",
         "hhvm/hsl": "^4.7",
         "hhvm/hsl-experimental": "^4.7",
         "hhvm/hhvm-autoload": "^2.0",
         "hhvm/type-assert": "^3.4",
         "azjezz/http-normalizer": "^0.2",
         "facebook/fbmarkdown": "^1.5",
-        "facebook/hack-router": "^0.18",
+        "facebook/hack-router": "^0.19",
         "facebook/xhp-lib": "^2.9",
         "his/container": "^0.1"
     },
     "require-dev": {
-        "hhvm/hhast": "^4.12",
+        "hhvm/hhast": "^4.14",
         "facebook/fbexpect": "^2.4",
         "hhvm/hacktest": "^1.4"
     },

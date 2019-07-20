@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "67e2800360fb4b2fc422d66c78cc5ed2",
+    "content-hash": "d3ff8ffc5173a6ac1fa6e635123318ed",
     "packages": [
         {
             "name": "azjezz/http-normalizer",
@@ -43,20 +43,20 @@
         },
         {
             "name": "facebook/fbmarkdown",
-            "version": "v1.5.1",
+            "version": "v1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/fbmarkdown.git",
-                "reference": "6babf946014e5665c34cd943d376318e5b350d1b"
+                "reference": "4c7ccdf98092d64ff999480393f5c8469b476839"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/fbmarkdown/zipball/6babf946014e5665c34cd943d376318e5b350d1b",
-                "reference": "6babf946014e5665c34cd943d376318e5b350d1b",
+                "url": "https://api.github.com/repos/hhvm/fbmarkdown/zipball/4c7ccdf98092d64ff999480393f5c8469b476839",
+                "reference": "4c7ccdf98092d64ff999480393f5c8469b476839",
                 "shasum": ""
             },
             "require": {
-                "hhvm": "^4.0",
+                "hhvm": "^4.13",
                 "hhvm/hsl": "^4.0",
                 "hhvm/type-assert": "^3.1"
             },
@@ -83,7 +83,7 @@
                 "hack",
                 "markdown"
             ],
-            "time": "2019-03-26T20:30:14+00:00"
+            "time": "2019-07-12T22:17:31+00:00"
         },
         {
             "name": "facebook/hack-http-request-response-interfaces",
@@ -113,21 +113,21 @@
         },
         {
             "name": "facebook/hack-router",
-            "version": "v0.18.4",
+            "version": "v0.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hack-router.git",
-                "reference": "d22d3e279e27d5c73e7fa57ec580ee54ee5fcb16"
+                "reference": "9bb2f657d31cc8cf49cafa9189fd04fd19574d1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hack-router/zipball/d22d3e279e27d5c73e7fa57ec580ee54ee5fcb16",
-                "reference": "d22d3e279e27d5c73e7fa57ec580ee54ee5fcb16",
+                "url": "https://api.github.com/repos/hhvm/hack-router/zipball/9bb2f657d31cc8cf49cafa9189fd04fd19574d1a",
+                "reference": "9bb2f657d31cc8cf49cafa9189fd04fd19574d1a",
                 "shasum": ""
             },
             "require": {
                 "facebook/hack-http-request-response-interfaces": "^0.2",
-                "hhvm": "^4.0",
+                "hhvm": "^4.13",
                 "hhvm/hsl": "^4.0.0"
             },
             "require-dev": {
@@ -155,24 +155,24 @@
                 "router",
                 "routing"
             ],
-            "time": "2019-03-26T21:18:43+00:00"
+            "time": "2019-07-15T21:56:40+00:00"
         },
         {
             "name": "facebook/xhp-lib",
-            "version": "v2.9.5",
+            "version": "v2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/xhp-lib.git",
-                "reference": "fef70b6108bf1b193318739a5b6d33c3a345f0f8"
+                "reference": "c718fe4976e7d4bbd7563a643f90558dbfb7714b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/xhp-lib/zipball/fef70b6108bf1b193318739a5b6d33c3a345f0f8",
-                "reference": "fef70b6108bf1b193318739a5b6d33c3a345f0f8",
+                "url": "https://api.github.com/repos/hhvm/xhp-lib/zipball/c718fe4976e7d4bbd7563a643f90558dbfb7714b",
+                "reference": "c718fe4976e7d4bbd7563a643f90558dbfb7714b",
                 "shasum": ""
             },
             "require": {
-                "hhvm": "^4.0.0",
+                "hhvm": "^4.13.0",
                 "hhvm/type-assert": "^3.0"
             },
             "require-dev": {
@@ -198,25 +198,25 @@
                 "hhvm",
                 "xhp"
             ],
-            "time": "2019-06-24T21:16:25+00:00"
+            "time": "2019-07-15T21:04:03+00:00"
         },
         {
             "name": "hhvm/hhvm-autoload",
-            "version": "v2.0.6",
+            "version": "v2.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hhvm-autoload.git",
-                "reference": "4f510960e71adcad661c33ae355d0d9670d9c805"
+                "reference": "90ae06b927e314af5e49ed6347f25802a8c02cf9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hhvm-autoload/zipball/4f510960e71adcad661c33ae355d0d9670d9c805",
-                "reference": "4f510960e71adcad661c33ae355d0d9670d9c805",
+                "url": "https://api.github.com/repos/hhvm/hhvm-autoload/zipball/90ae06b927e314af5e49ed6347f25802a8c02cf9",
+                "reference": "90ae06b927e314af5e49ed6347f25802a8c02cf9",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.0",
-                "hhvm": "^4.0",
+                "hhvm": "^4.5",
                 "hhvm/hsl": "^4.0"
             },
             "replace": {
@@ -245,7 +245,7 @@
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
-            "time": "2019-03-26T17:57:44+00:00"
+            "time": "2019-07-19T15:42:43+00:00"
         },
         {
             "name": "hhvm/hsl",
@@ -320,20 +320,20 @@
         },
         {
             "name": "hhvm/type-assert",
-            "version": "v3.5.1",
+            "version": "v3.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/type-assert.git",
-                "reference": "c389539c34ec9b0b8aa8240c2fb2d7a3cbfad0db"
+                "reference": "2b12b45aef9f7ca45f17b46561ea9aa4ed32d870"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/type-assert/zipball/c389539c34ec9b0b8aa8240c2fb2d7a3cbfad0db",
-                "reference": "c389539c34ec9b0b8aa8240c2fb2d7a3cbfad0db",
+                "url": "https://api.github.com/repos/hhvm/type-assert/zipball/2b12b45aef9f7ca45f17b46561ea9aa4ed32d870",
+                "reference": "2b12b45aef9f7ca45f17b46561ea9aa4ed32d870",
                 "shasum": ""
             },
             "require": {
-                "hhvm": "^4.10",
+                "hhvm": "^4.13",
                 "hhvm/hsl": "^4.0"
             },
             "require-dev": {
@@ -357,7 +357,7 @@
                 "TypeAssert",
                 "hack"
             ],
-            "time": "2019-07-08T21:55:05+00:00"
+            "time": "2019-07-18T18:26:13+00:00"
         },
         {
             "name": "his/container",
@@ -443,21 +443,21 @@
         },
         {
             "name": "facebook/fbexpect",
-            "version": "v2.5.8",
+            "version": "v2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/fbexpect.git",
-                "reference": "93dbffbbf6fe07d0e947befac9653139bb51f94a"
+                "reference": "734f566f064c2ec923054b4104046d7a77dd291f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/fbexpect/zipball/93dbffbbf6fe07d0e947befac9653139bb51f94a",
-                "reference": "93dbffbbf6fe07d0e947befac9653139bb51f94a",
+                "url": "https://api.github.com/repos/hhvm/fbexpect/zipball/734f566f064c2ec923054b4104046d7a77dd291f",
+                "reference": "734f566f064c2ec923054b4104046d7a77dd291f",
                 "shasum": ""
             },
             "require": {
                 "facebook/difflib": "^1.0.0",
-                "hhvm": "^4.1",
+                "hhvm": "^4.13",
                 "hhvm/hacktest": "^1.0",
                 "hhvm/hsl": "^4.0"
             },
@@ -471,23 +471,24 @@
                 "MIT"
             ],
             "description": "Unit test helpers for Facebook projects",
-            "time": "2019-05-28T22:10:51+00:00"
+            "time": "2019-07-12T22:12:09+00:00"
         },
         {
             "name": "facebook/hh-clilib",
-            "version": "v2.1.1",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hh-clilib.git",
-                "reference": "9d6b1a8686951da24ab68ffeba25ae85d1788408"
+                "reference": "546265be7aa1d033f07f6b05e8c949703a0aa647"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hh-clilib/zipball/9d6b1a8686951da24ab68ffeba25ae85d1788408",
-                "reference": "9d6b1a8686951da24ab68ffeba25ae85d1788408",
+                "url": "https://api.github.com/repos/hhvm/hh-clilib/zipball/546265be7aa1d033f07f6b05e8c949703a0aa647",
+                "reference": "546265be7aa1d033f07f6b05e8c949703a0aa647",
                 "shasum": ""
             },
             "require": {
+                "hhvm": "^4.13",
                 "hhvm/hsl": "^4.0",
                 "hhvm/hsl-experimental": "^4.0",
                 "hhvm/type-assert": "^3.2"
@@ -507,25 +508,25 @@
             "license": [
                 "MIT"
             ],
-            "time": "2019-03-26T18:31:27+00:00"
+            "time": "2019-07-18T18:35:31+00:00"
         },
         {
             "name": "hhvm/hacktest",
-            "version": "v1.5.2",
+            "version": "v1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hacktest.git",
-                "reference": "c89fa2d0d40a74d2cf0dbef13f66219fb702c0f9"
+                "reference": "72ab3990a6d4480d9f3a5be61c675b796d1d1314"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hacktest/zipball/c89fa2d0d40a74d2cf0dbef13f66219fb702c0f9",
-                "reference": "c89fa2d0d40a74d2cf0dbef13f66219fb702c0f9",
+                "url": "https://api.github.com/repos/hhvm/hacktest/zipball/72ab3990a6d4480d9f3a5be61c675b796d1d1314",
+                "reference": "72ab3990a6d4480d9f3a5be61c675b796d1d1314",
                 "shasum": ""
             },
             "require": {
                 "facebook/hh-clilib": "^2.0.0",
-                "hhvm": "^4.1",
+                "hhvm": "^4.6",
                 "hhvm/hhvm-autoload": "^2.0.2",
                 "hhvm/hsl": "^4.0",
                 "hhvm/type-assert": "^3.2"
@@ -549,26 +550,26 @@
                 "MIT"
             ],
             "description": "The Hack Test Library",
-            "time": "2019-05-13T15:56:32+00:00"
+            "time": "2019-07-18T18:28:33+00:00"
         },
         {
             "name": "hhvm/hhast",
-            "version": "v4.12.0",
+            "version": "v4.14.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hhast.git",
-                "reference": "eb60eb9eae4223c89a1f6c7c72dc22a03a15912e"
+                "reference": "0ee817792427934f5d09cb95fb38110c1b66ebdc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hhast/zipball/eb60eb9eae4223c89a1f6c7c72dc22a03a15912e",
-                "reference": "eb60eb9eae4223c89a1f6c7c72dc22a03a15912e",
+                "url": "https://api.github.com/repos/hhvm/hhast/zipball/0ee817792427934f5d09cb95fb38110c1b66ebdc",
+                "reference": "0ee817792427934f5d09cb95fb38110c1b66ebdc",
                 "shasum": ""
             },
             "require": {
                 "facebook/difflib": "^1.0.0",
                 "facebook/hh-clilib": "^2.0.0",
-                "hhvm": "^4.12",
+                "hhvm": "^4.14",
                 "hhvm/hhvm-autoload": "^2.0.4",
                 "hhvm/hsl": "^4.0",
                 "hhvm/hsl-experimental": "^4.5",
@@ -597,7 +598,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2019-07-01T16:55:54+00:00"
+            "time": "2019-07-19T19:15:05+00:00"
         }
     ],
     "aliases": [],
@@ -606,7 +607,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "hhvm": "^4.12"
+        "hhvm": "^4.14"
     },
     "platform-dev": []
 }
