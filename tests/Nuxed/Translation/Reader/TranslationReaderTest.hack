@@ -59,11 +59,6 @@ class TranslationReaderTest extends HackTest\HackTest {
       tuple('json', new Loader\JsonFileLoader()),
     ];
 
-    if (\function_exists('yaml_parse_file')) {
-      $loaders[] = tuple('yaml', new Loader\YamlFileLoader());
-      $loaders[] = tuple('yml', new Loader\YamlFileLoader());
-    }
-
     return $loaders;
   }
 }
