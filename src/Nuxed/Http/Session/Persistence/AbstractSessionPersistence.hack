@@ -175,10 +175,7 @@ abstract class AbstractSessionPersistence implements ISessionPersistence {
 
   protected function getPersistenceDuration(Session\Session $session): int {
     $duration = $this->cookieOptions['lifetime'] ?? 0;
-    if (
-      $session instanceof Session\Session &&
-      $session->contains(Session\Session::SESSION_AGE_KEY)
-    ) {
+    if ($session->contains(Session\Session::SESSION_AGE_KEY)) {
       $duration = $session->age();
     }
 
