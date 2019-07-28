@@ -29,7 +29,7 @@ class RandomizedListenerProvider implements IRandomizedListenerProvider {
   >(T $event): AsyncIterator<EventDispatcher\IEventListener<T>> {
     $listeners = vec[];
     foreach ($this->listeners as $type => $eventListeners) {
-      if ($event instanceof $type) {
+      if (\is_a($event, $type)) {
         $listeners = Vec\concat($listeners, $eventListeners);
       }
     }

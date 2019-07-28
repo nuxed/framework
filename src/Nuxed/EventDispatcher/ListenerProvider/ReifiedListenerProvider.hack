@@ -32,7 +32,7 @@ class ReifiedListenerProvider implements IReifiedListenerProvider {
     reify T as EventDispatcher\IEvent,
   >(T $event): AsyncIterator<EventDispatcher\IEventListener<T>> {
     foreach ($this->listeners as $type => $listeners) {
-      if ($event instanceof $type) {
+      if (\is_a($event, $type)) {
         foreach ($listeners as $listener) {
           /* HH_FIXME[4110] */
           yield $listener;

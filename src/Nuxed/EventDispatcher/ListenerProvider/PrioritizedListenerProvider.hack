@@ -39,7 +39,7 @@ class PrioritizedListenerProvider implements IPrioritizedListenerProvider {
 
     foreach ($priorities as $priority) {
       foreach ($this->listeners[$priority] as $eventName => $listeners) {
-        if ($event instanceof $eventName) {
+        if (\is_a($event, $eventName)) {
           foreach ($listeners as $listener) {
             /* HH_FIXME[4110] */
             yield $listener;
