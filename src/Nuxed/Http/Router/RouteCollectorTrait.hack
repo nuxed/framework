@@ -148,7 +148,7 @@ trait RouteCollectorTrait implements IRouteCollector {
     ?Container<string> $methods = null,
   ): void {
     $matches = Vec\filter(
-      $this->routes,
+      $this->getRoutes(),
       (Route $route) ==> {
         if ($path !== $route->getPath()) {
           return false;
