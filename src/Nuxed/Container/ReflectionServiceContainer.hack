@@ -80,6 +80,13 @@ final class ReflectionServiceContainer
   }
 
   public function has<T>(typename<T> $service): bool {
-    return $this->inner->has($service) || \class_exists($service);
+    if ($this->inner->has($service)) {
+      return true;
+    } else if (!\class_exists($service, true)) {
+      return false;
+    }
+
+    $reflection = new \ReflectionClass($service);
+    return $reflection->isInstantiable() && !$reflection->isInternal();
   }
 }
