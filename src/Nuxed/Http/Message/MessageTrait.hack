@@ -182,7 +182,7 @@ trait MessageTrait {
 
     if (0 === C\count($values)) {
       throw new Exception\InvalidArgumentException(
-        'Header values must be a vector of strings, empty vector given.',
+        'Header values must be a container of strings, empty container given.',
       );
     }
 
