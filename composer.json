@@ -34,7 +34,7 @@
         "his/container": "^0.1"
     },
     "require-dev": {
-        "hhvm/hhast": "^4.14",
+        "hhvm/hhast": "^4.15",
         "facebook/fbexpect": "^2.4",
         "hhvm/hacktest": "^1.4"
     },

@@ -249,20 +249,20 @@
         },
         {
             "name": "hhvm/hsl",
-            "version": "v4.7.0",
+            "version": "v4.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hsl.git",
-                "reference": "0150e1f860f6e695c022b0def700ccce46bb5999"
+                "reference": "261d255c3ef6833d7a7019923feb7ede392fd413"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hsl/zipball/0150e1f860f6e695c022b0def700ccce46bb5999",
-                "reference": "0150e1f860f6e695c022b0def700ccce46bb5999",
+                "url": "https://api.github.com/repos/hhvm/hsl/zipball/261d255c3ef6833d7a7019923feb7ede392fd413",
+                "reference": "261d255c3ef6833d7a7019923feb7ede392fd413",
                 "shasum": ""
             },
             "require": {
-                "hhvm": "^4.3"
+                "hhvm": "^4.10"
             },
             "require-dev": {
                 "facebook/fbexpect": "^2.5.1",
@@ -280,7 +280,7 @@
                 "MIT"
             ],
             "description": "The Hack Standard Library",
-            "time": "2019-05-31T16:46:29+00:00"
+            "time": "2019-08-07T20:42:15+00:00"
         },
         {
             "name": "hhvm/hsl-experimental",
@@ -555,16 +555,16 @@
         },
         {
             "name": "hhvm/hhast",
-            "version": "v4.15.0",
+            "version": "v4.15.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/hhast.git",
-                "reference": "6b127b01616bf61139b931200320c901815ecf83"
+                "reference": "82ac0e7f15ee67c4299335dbd02b62c12ae74f81"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/hhast/zipball/6b127b01616bf61139b931200320c901815ecf83",
-                "reference": "6b127b01616bf61139b931200320c901815ecf83",
+                "url": "https://api.github.com/repos/hhvm/hhast/zipball/82ac0e7f15ee67c4299335dbd02b62c12ae74f81",
+                "reference": "82ac0e7f15ee67c4299335dbd02b62c12ae74f81",
                 "shasum": ""
             },
             "require": {
@@ -599,7 +599,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2019-07-22T16:33:23+00:00"
+            "time": "2019-08-01T21:11:43+00:00"
         }
     ],
     "aliases": [],
