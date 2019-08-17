@@ -21,8 +21,13 @@ final class ServiceContainer implements His\Container\ContainerInterface {
       $def = $this->definitions[$service] as ServiceDefinition<_>;
 
       try {
-        /* HH_FIXME[4110] - we can't type hint the follwoing expression. */
-        return $def->resolve($this);
+        $object = $def->resolve($this);
+        if ($object is IServiceContainerAware) {
+          $object->setServiceContainer($this);
+        }
+
+        /* HH_FIXME[4110] - we can't type hint the follwoing statement. */
+        return $object;
       } catch (\Exception $e) {
         throw new Exception\ContainerException(
           Str\format(
@@ -41,7 +46,12 @@ final class ServiceContainer implements His\Container\ContainerInterface {
     foreach ($this->delegates as $container) {
       if ($container->has($service)) {
         try {
-          return $container->get($service);
+          $object = $container->get($service);
+          if ($object is IServiceContainerAware) {
+            $object->setServiceContainer($this);
+          }
+
+          return $object;
         } catch (\Exception $e) {
           throw new Exception\ContainerException(
             Str\format(

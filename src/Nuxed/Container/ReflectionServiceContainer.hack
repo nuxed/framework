@@ -14,7 +14,12 @@ final class ReflectionServiceContainer
 
   public function get<T>(typename<T> $service): T {
     if ($this->inner->has($service)) {
-      return $this->inner->get($service);
+      $object = $this->inner->get($service);
+      if ($object is IServiceContainerAware) {
+        $object->setServiceContainer($this);
+      }
+
+      return $object;
     }
 
     if ($this->resolving === $service) {
@@ -45,7 +50,12 @@ final class ReflectionServiceContainer
       if ($service === $this->resolving) {
         $this->resolving = null;
       }
-      return $reflection->newInstance();
+      $object = $reflection->newInstance();
+      if ($object is IServiceContainerAware) {
+        $object->setServiceContainer($this);
+      }
+
+      return $object;
     }
 
     $arguments = vec[];
@@ -76,7 +86,13 @@ final class ReflectionServiceContainer
       $this->resolving = null;
       $this->current = null;
     }
-    return $reflection->newInstance(...$arguments);
+
+    $object = $reflection->newInstance(...$arguments);
+    if ($object is IServiceContainerAware) {
+      $object->setServiceContainer($this);
+    }
+
+    return $object;
   }
 
   public function has<T>(typename<T> $service): bool {
