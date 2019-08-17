@@ -73,6 +73,8 @@ class Response {
 
   private int $statusCode = 200;
 
+  private ?string $charset = null;
+
   public function __construct(
     int $status = 200,
     KeyedContainer<string, Container<string>> $headers = dict[],
@@ -153,4 +155,22 @@ class Response {
     unset($new->cookies[$name]);
     return $new;
   }
+
+  /**
+   * Sets the response charset.
+   */
+  public function withCharset(string $charset): this {
+    $new = clone $this;
+    $new->charset = $charset;
+
+    return $new;
+  }
+
+  /**
+   * Retrieves the response charset.
+   */
+  public function getCharset(): ?string {
+    return $this->charset;
+  }
+
 }
