@@ -64,7 +64,7 @@ trait MessageTrait {
   public function withHeader(string $header, Container<string> $value): this {
     $value = $this->validateAndTrimHeader($header, $value);
 
-    $normalized = Str\lowercase($header);
+    $normalized = Str\replace(Str\lowercase($header), '_', '-');
 
     $new = clone $this;
 
@@ -97,7 +97,7 @@ trait MessageTrait {
   }
 
   public function withoutHeader(string $header): this {
-    $normalized = Str\lowercase($header);
+    $normalized = Str\replace(Str\lowercase($header), '_', '-');
 
     if (!C\contains_key($this->headerNames, $normalized)) {
       return $this;
@@ -138,7 +138,7 @@ trait MessageTrait {
     foreach ($headers as $header => $value) {
       $value = $this->validateAndTrimHeader($header, $value);
 
-      $normalized = Str\lowercase($header);
+      $normalized = Str\replace(Str\lowercase($header), '_', '-');
 
       if (C\contains_key($this->headerNames, $normalized)) {
         $header = $this->headerNames[$normalized];

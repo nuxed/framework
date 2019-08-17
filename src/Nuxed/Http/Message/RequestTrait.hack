@@ -1,6 +1,6 @@
 namespace Nuxed\Http\Message;
 
-use namespace HH\Lib\Regex;
+use namespace HH\Lib\{C, Regex, Str};
 
 <<__Sealed(Request::class)>>
 trait RequestTrait {
@@ -50,7 +50,7 @@ trait RequestTrait {
 
   public function withMethod(string $method): this {
     $new = clone $this;
-    $new->method = $method;
+    $new->method = Str\uppercase($method);
 
     return $new;
   }
