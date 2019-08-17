@@ -173,4 +173,84 @@ class Response {
     return $this->charset;
   }
 
+
+  /**
+   * Is response invalid?
+   *
+   * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+   */
+  final public function isInvalid(): bool {
+    return $this->statusCode < 100 || $this->statusCode >= 600;
+  }
+
+  /**
+   * Is response informative?
+   */
+  final public function isInformational(): bool {
+    return $this->statusCode >= 100 && $this->statusCode < 200;
+  }
+
+  /**
+   * Is response successful?
+   */
+  final public function isSuccessful(): bool {
+    return $this->statusCode >= 200 && $this->statusCode < 300;
+  }
+
+  /**
+   * Is the response a redirect?
+   */
+  final public function isRedirection(): bool {
+    return $this->statusCode >= 300 && $this->statusCode < 400;
+  }
+
+  /**
+   * Is there a client error?
+   */
+  final public function isClientError(): bool {
+    return $this->statusCode >= 400 && $this->statusCode < 500;
+  }
+
+  /**
+   * Was there a server side error?
+   */
+  final public function isServerError(): bool {
+    return $this->statusCode >= 500 && $this->statusCode < 600;
+  }
+
+  /**
+   * Is the response OK?
+   */
+  final public function isOk(): bool {
+    return 200 === $this->statusCode;
+  }
+
+  /**
+   * Is the response forbidden?
+   */
+  final public function isForbidden(): bool {
+    return 403 === $this->statusCode;
+  }
+
+  /**
+   * Is the response a not found error?
+   */
+  final public function isNotFound(): bool {
+    return 404 === $this->statusCode;
+  }
+
+  /**
+   * Is the response a redirect of some form?
+   */
+  final public function isRedirect(?string $location = null): bool {
+    return C\contains(vec[201, 301, 302, 303, 307, 308], $this->statusCode) &&
+      (null === $location || $location === $this->getHeaderLine('Location'));
+  }
+
+  /**
+   * Is the response empty?
+   */
+  final public function isEmpty(): bool {
+    return C\contains(vec[204, 304], $this->statusCode);
+  }
 }
