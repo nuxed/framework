@@ -55,6 +55,43 @@ trait RequestTrait {
     return $new;
   }
 
+  /**
+   * Checks whether or not the method is safe.
+   *
+   * @see https://tools.ietf.org/html/rfc7231#section-4.2.1
+   *
+   * @return bool
+   */
+  public function isMethodSafe(): bool {
+    return C\contains(
+      vec['GET', 'HEAD', 'OPTIONS', 'TRACE'],
+      $this->getMethod(),
+    );
+  }
+
+  /**
+   * Checks whether or not the method is idempotent.
+   *
+   * @return bool
+   */
+  public function isMethodIdempotent(): bool {
+    return C\contains(
+      vec['HEAD', 'GET', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'PURGE'],
+      $this->getMethod(),
+    );
+  }
+
+  /**
+   * Checks whether the method is cacheable or not.
+   *
+   * @see https://tools.ietf.org/html/rfc7231#section-4.2.3
+   *
+   * @return bool `true` for GET and HEAD, `false` otherwise
+   */
+  public function isMethodCacheable(): bool {
+    return C\contains(vec['GET', 'HEAD'], $this->getMethod());
+  }
+
   public function getUri(): Uri {
     return $this->uri;
   }
