@@ -244,7 +244,7 @@ class Response {
   }
 
   /**
-   * Returns the Date header as a DateTime instance.
+   * Returns the Date header as a DateTimeInterface instance.
    */
   final public function getDate(): ?\DateTimeInterface {
     return $this->getDateHeader('Date');
@@ -263,6 +263,10 @@ class Response {
   final public function getAge(): int {
     if ($this->hasHeader('Age')) {
       return (int)$this->getHeaderLine('Age');
+    }
+
+    if (!$this->hasHeader('Date')) {
+      return 0;
     }
 
     return Math\max(vec[
@@ -286,9 +290,13 @@ class Response {
   }
 
   /**
-   * Returns the value of the Expires header as a DateTime instance.
+   * Returns the value of the Expires header as a DateTimeInterface instance.
    */
   final public function getExpires(): ?\DateTimeInterface {
+    if (!$this->hasHeader('Expires')) {
+      return null;
+    }
+
     try {
       return $this->getDateHeader('Expires');
     } catch (\RuntimeException $e) {
@@ -446,7 +454,7 @@ class Response {
    * @see http://tools.ietf.org/html/rfc2616#section-10.3.5
    */
   final public function withoutModifications(): this {
-    $instance = $this->withStatus(304, static::$phrases[304])
+    $new = $this->withStatus(304, static::$phrases[304])
       ->withBody(stream(''));
 
     // remove headers that MUST NOT be included with 304 Not Modified responses
@@ -461,10 +469,10 @@ class Response {
         'Last-Modified',
       ] as $header
     ) {
-      $instance = $instance->withoutHeader($header);
+      $new = $instance->withoutHeader($header);
     }
 
-    return $this;
+    return $new;
   }
 
   /**
