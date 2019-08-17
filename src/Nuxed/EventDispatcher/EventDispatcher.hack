@@ -29,7 +29,8 @@ final class EventDispatcher implements IEventDispatcher {
 
     $listeners = $this->listenerProvider->getListeners<T>($event);
     $stopped = new Lib\Ref(false);
-    $lastOperation = async {};
+    $lastOperation = async {
+    };
 
     foreach ($listeners await as $listener) {
       if ($stopped->value) {

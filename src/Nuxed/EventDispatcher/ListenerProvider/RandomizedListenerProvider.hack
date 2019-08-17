@@ -24,9 +24,9 @@ class RandomizedListenerProvider implements IRandomizedListenerProvider {
     $this->listeners[$event] = $listeners;
   }
 
-  public async function getListeners<
-    reify T as EventDispatcher\IEvent,
-  >(T $event): AsyncIterator<EventDispatcher\IEventListener<T>> {
+  public async function getListeners<reify T as EventDispatcher\IEvent>(
+    T $event,
+  ): AsyncIterator<EventDispatcher\IEventListener<T>> {
     $listeners = vec[];
     foreach ($this->listeners as $type => $eventListeners) {
       if (\is_a($event, $type)) {

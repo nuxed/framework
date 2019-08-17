@@ -17,7 +17,7 @@ function f<T as IEvent>(
  */
 function lazy<T as IEvent>(
   Container\ContainerInterface $container,
-  classname<IEventListener<T>> $service
+  classname<IEventListener<T>> $service,
 ): IEventListener<T> {
   return f(($event) ==> {
     return $container->get($service)->process($event);

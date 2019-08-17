@@ -24,9 +24,9 @@ class AttachableListenerProvider implements IAttachableListenerProvider {
     $this->listeners[$event] = $listeners;
   }
 
-  public async function getListeners<
-    reify T as EventDispatcher\IEvent,
-  >(T $event): AsyncIterator<EventDispatcher\IEventListener<T>> {
+  public async function getListeners<reify T as EventDispatcher\IEvent>(
+    T $event,
+  ): AsyncIterator<EventDispatcher\IEventListener<T>> {
     foreach ($this->listeners as $type => $listeners) {
       if (\is_a($event, $type)) {
         foreach ($listeners as $listener) {
