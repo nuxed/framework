@@ -175,6 +175,47 @@ class Response {
 
 
   /**
+   * Returns true if the response includes a Vary header.
+   */
+  final public function hasVary(): bool {
+    return $this->hasHeader('Vary');
+  }
+
+  /**
+   * Returns an array of header names given in the Vary header.
+   */
+  final public function getVary(): Container<string> {
+    if (!$this->hasVary()) {
+      return vec[];
+    }
+
+    $vary = $this->getHeader('Vary');
+
+    $ret = vec[];
+    foreach ($vary as $item) {
+      $ret = Vec\concat($ret, Regex\split($item, re"/[\s,]+/"));
+    }
+
+    return $ret;
+  }
+
+  /**
+   * Sets the Vary header.
+   *
+   * @param bool         $replace Whether to replace the actual value or not (true by default)
+   */
+  final public function withVary(
+    Container<string> $headers,
+    bool $replace = true,
+  ): this {
+    if ($replace) {
+      return $this->withHeader('Vary', $headers);
+    } else {
+      return $this->withAddedHeader('Vary', $headers);
+    }
+  }
+
+  /**
    * Returns the literal value of the ETag HTTP header.
    */
   final public function getEtag(): ?string {
