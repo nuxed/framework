@@ -21,8 +21,6 @@ class DispatchMiddleware implements Server\IMiddleware {
       $route = $routeResult->getMatchedRoute();
       if ($route is nonnull) {
         return await $route->getMiddleware()->process($request, $handler);
-      } else {
-        return await $handler->handle($request);
       }
     }
 
