@@ -112,13 +112,13 @@ function empty(
  * - JSON_HEX_QUOT
  * - JSON_UNESCAPED_SLASHES
  *
- * @param mixed $data Data to convert to JSON.
- * @param int $status Integer status code for the response; 200 by default.
+ * @param KeyedContainer<string, mixed>             $data Data to convert to JSON object.
+ * @param int                                       $status Integer status code for the response; 200 by default.
  * @param KeyedContainer<string, Container<string>> $headers Container of headers to use at initialization.
- * @param int $encodingOptions JSON encoding options to use.
+ * @param int                                       $encodingOptions JSON encoding options to use.
  */
 function json(
-  mixed $data,
+  KeyedContainer<string, mixed> $data,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
   ?int $encodingOptions = null,

@@ -12,18 +12,18 @@ use namespace Nuxed\Util\Json;
  * Content-Type header to application/json.
  */
 final class JsonResponse extends Message\Response {
-  private mixed $payload;
+  private KeyedContainer<string, mixed> $payload;
 
   /**
    * Create a JSON response with the given data.
    *
-   * @param mixed $data Data to convert to JSON.
+   * @param KeyedContainer<string, mixed> $data Data to convert to JSON.
    * @param int $status Integer status code for the response; 200 by default.
    * @param KeyedContainer<string, Container<string>> $headers Container of headers to use at initialization.
    * @param int $encodingOptions JSON encoding options to use.
    */
   public function __construct(
-    mixed $data,
+    KeyedContainer<string, mixed> $data,
     int $status = 200,
     KeyedContainer<string, Container<string>> $headers = dict[],
     ?int $encodingOptions = null,
@@ -40,17 +40,17 @@ final class JsonResponse extends Message\Response {
     parent::__construct($status, $headers, $body);
   }
 
-  public function getPayload(): mixed {
+  public function getPayload(): KeyedContainer<string, mixed> {
     return $this->payload;
   }
 
-  public function withPayload(mixed $data): JsonResponse {
+  public function withPayload(KeyedContainer<string, mixed> $data): JsonResponse {
     $new = clone $this;
     $new->setPayload($data);
     return $this->updateBodyFor($new);
   }
 
-  private function setPayload(mixed $data): void {
+  private function setPayload(KeyedContainer<string, mixed> $data): void {
     if (\is_object($data)) {
       /* HH_IGNORE_ERROR[4110] $data is an object*/
       $data = clone $data;
