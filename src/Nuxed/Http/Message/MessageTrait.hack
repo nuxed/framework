@@ -201,4 +201,74 @@ trait MessageTrait {
 
     return $retval;
   }
+
+  public function hasCacheControlDirective(string $directive): bool {
+    if (!$this->hasHeader('cache-control')) {
+      return false;
+    }
+
+    $directive = Str\lowercase($directive);
+    return C\reduce(
+      $this->getHeader('cache-control'),
+      ($result, $value) ==> $result ||
+        Str\lowercase($value) === $directive ||
+        Str\starts_with(Str\lowercase($value), Str\format('%s=', $directive)),
+      false,
+    );
+  }
+
+  public function getCacheControlDirective(string $directive): ?int {
+    $directive = Str\lowercase($directive);
+    foreach ($this->getHeader('cache-control') as $value) {
+      if (
+        Str\starts_with(Str\lowercase($value), Str\format('%s=', $directive))
+      ) {
+        return (int)C\lastx(Str\split($value, '=', 2));
+      }
+    }
+
+    return null;
+  }
+
+  public function withCacheControlDirective(
+    string $directive,
+    ?int $seconds = null,
+  ): this {
+    if (
+      $this->hasCacheControlDirective($directive) &&
+      $this->getCacheControlDirective($directive) === $seconds
+    ) {
+      return $this;
+    }
+
+    return $this->withAddedHeader('cache-control', vec[
+      Str\format(
+        '%s%s%s',
+        Str\lowercase($directive),
+        $seconds is nonnull ? '=' : '',
+        $seconds is nonnull ? (string)$seconds : '',
+      ),
+    ]);
+  }
+
+  public function withoutCacheControlDirective(string $directive): this {
+    if (!$this->hasCacheControlDirective($directive)) {
+      return $this;
+    }
+
+    $directive = Str\lowercase($directive);
+    $cacheControl = $this->getHeader('cache-control');
+    $header = vec[];
+    foreach ($cacheControl as $value) {
+      if (
+        Str\lowercase($value) !== $directive &&
+        !Str\starts_with(Str\lowercase($value), Str\format('%s=', $directive))
+      ) {
+        $header[] = $value;
+      }
+    }
+
+    return $this->withHeader('cache-control', $header);
+  }
+
 }
