@@ -40,7 +40,7 @@ class RequestMatcher implements IRequestMatcher {
       }
 
       if (C\count($allowed) === 0) {
-        return Router\RouteResult::fromRouteFailure([]);
+        return Router\RouteResult::fromRouteFailure(null);
       }
 
       return Router\RouteResult::fromRouteFailure(
