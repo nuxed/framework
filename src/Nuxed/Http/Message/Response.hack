@@ -175,6 +175,35 @@ class Response {
 
 
   /**
+   * Returns the literal value of the ETag HTTP header.
+   */
+  final public function getEtag(): ?string {
+    if (!$this->hasHeader('ETag')) {
+      return null;
+    }
+
+    return $this->getHeaderLine('ETag');
+  }
+
+  /**
+   * Sets the ETag value.
+   *
+   * @param string  $etag The ETag unique identifier
+   * @param bool    $weak Whether you want a weak ETag or not
+   */
+  final public function withEtag(string $etag, bool $weak = false): this {
+    if (!Str\contains($etag, '"')) {
+      $etag = '"'.$etag.'"';
+    }
+
+    return $this->withHeader('ETag', vec[($weak ? 'W/' : '').$etag]);
+  }
+
+  final public function withoutEtag(): this {
+    return $this->withoutHeader('ETag');
+  }
+
+  /**
    * Is response invalid?
    *
    * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
