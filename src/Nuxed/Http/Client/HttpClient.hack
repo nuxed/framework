@@ -20,7 +20,7 @@ abstract class HttpClient implements IHttpClient {
     $this->setOptions($options);
   }
 
-  public static function create(
+  final public static function create(
     HttpClientOptions $options = shape(),
   ): HttpClient {
     return new CurlHttpClient($options);
@@ -33,7 +33,7 @@ abstract class HttpClient implements IHttpClient {
    * relative path to append to the base path of the client. The URL can
    * contain the query string as well.
    */
-  public async function request(
+  final public async function request(
     string $method,
     string $uri,
     HttpClientOptions $options = shape(),
@@ -48,7 +48,7 @@ abstract class HttpClient implements IHttpClient {
    *
    * @throws Exception\IException If an error happens while processing the request.
    */
-  public async function send(
+  final public async function send(
     Message\Request $request,
     HttpClientOptions $options = shape(),
   ): Awaitable<Message\Response> {
