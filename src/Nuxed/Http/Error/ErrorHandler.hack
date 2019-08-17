@@ -43,10 +43,16 @@ class ErrorHandler implements IErrorHandler {
       );
     }
 
+    $message = $error->getMessage();
+    if ('' === $message) {
+      $message = Message\Response::$phrases[$status] ??
+        Message\Response::$phrases[500];
+    }
+
     return new Response\JsonResponse(
       dict[
         'status' => 'error',
-        'message' => $error->getMessage(),
+        'message' => $message,
         'code' => $status,
         'data' => dict[
           'file' => $error->getFile(),
