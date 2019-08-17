@@ -276,7 +276,7 @@ class Response {
    */
   public function expire(): this {
     if ($this->isFresh()) {
-      $new = $this->withoutHeader('Expires')
+      return $this->withoutHeader('Expires')
         ->withHeader('Age', vec[
           (string)($this->getMaxAge() as int),
         ]);
