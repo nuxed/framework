@@ -50,8 +50,8 @@ class FilesystemStore extends AbstractStore {
 
     $time = \time();
     $file = await $this->folder->read($name, Filesystem\File::class);
-    $cache = $this->serializer->unserialize(await $file->read()) as
-      (dynamic, int);
+    $cache = $this->serializer->unserialize(await $file->read())
+      as (dynamic, int);
     $expiry = $cache[1];
     if (0 === $expiry) {
       return true;
@@ -81,8 +81,8 @@ class FilesystemStore extends AbstractStore {
     }
     $id = $this->getFilename($id);
     $file = await $this->folder->read($id, Filesystem\File::class);
-    $cache = $this->serializer->unserialize(await $file->read()) as
-      (dynamic, int);
+    $cache = $this->serializer->unserialize(await $file->read())
+      as (dynamic, int);
     return $cache[0];
   }
 
