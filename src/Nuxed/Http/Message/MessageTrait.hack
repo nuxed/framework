@@ -271,4 +271,41 @@ trait MessageTrait {
     return $this->withHeader('cache-control', $header);
   }
 
+  protected function getDateHeader(string $header): ?\DateTimeInterface {
+    if (!$this->hasHeader($header)) {
+      return null;
+    }
+
+    $value = $this->getHeaderLine($header);
+    $date = \DateTime::createFromFormat(\DATE_RFC2822, $value);
+    if (!$date is \DateTimeInterface) {
+      throw new Exception\RuntimeException(
+        Str\format(
+          'The %s HTTP header is not parseable (%s).',
+          $header,
+          $value,
+        ),
+      );
+    }
+
+    return $date;
+  }
+
+  protected function withDateHeader(
+    string $header,
+    ?\DateTimeInterface $date = null,
+  ): this {
+    if ($date is null) {
+      return $this->withoutHeader($header);
+    }
+
+    if ($date is \DateTime) {
+      $date = \DateTimeImmutable::createFromMutable($date);
+    }
+
+    $date = $date as \DateTimeImmutable->setTimezone(new \DateTimeZone('UTC'));
+    return $this->withHeader($header, vec[
+      $date->format('D, d M Y H:i:s').' GMT',
+    ]);
+  }
 }
