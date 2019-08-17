@@ -14,7 +14,9 @@ class FileTest extends HackTest {
 
   <<DataProvider('provideLoadData')>>
   public function testLoad(Filesystem\Path $file): void {
-    expect(Filesystem\Node::load($file))->toBeInstanceOf(Filesystem\File::class);
+    expect(Filesystem\Node::load($file))->toBeInstanceOf(
+      Filesystem\File::class,
+    );
   }
 
   public function provideLoadData(): Container<(Filesystem\Path)> {
@@ -72,7 +74,9 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testGetReadHandle(Filesystem\File $file): Awaitable<void> {
+  public async function testGetReadHandle(
+    Filesystem\File $file,
+  ): Awaitable<void> {
     await $file->write('foo');
     await using ($handle = $file->getReadHandle()) {
       $content = await $handle->readAsync();
@@ -81,7 +85,9 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testGetWriteHandle(Filesystem\File $file): Awaitable<void> {
+  public async function testGetWriteHandle(
+    Filesystem\File $file,
+  ): Awaitable<void> {
     await using ($handle = $file->getWriteHandle()) {
       await $handle->writeAsync('foo');
     }
@@ -138,7 +144,9 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testCreateThrowsIfFileAlreadyExist(Filesystem\File $file): void {
+  public function testCreateThrowsIfFileAlreadyExist(
+    Filesystem\File $file,
+  ): void {
     expect(async () ==> {
       await $file->create();
     })->toThrow(Filesystem\Exception\ExistingNodeException::class);
@@ -163,7 +171,9 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testCopyThrowsWhenOperationFails(Filesystem\File $file): void {
+  public function testCopyThrowsWhenOperationFails(
+    Filesystem\File $file,
+  ): void {
     expect(async () ==> {
       $path = Filesystem\Path::create('/foo/bar/baz.tmp');
       await $file->copy($path);
@@ -196,14 +206,19 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testDeleteThrowsIfFileDoesntExists(Filesystem\File $file): void {
+  public function testDeleteThrowsIfFileDoesntExists(
+    Filesystem\File $file,
+  ): void {
     expect(async () ==> {
       await $file->delete();
     })->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideExtensionData')>>
-  public function testExtension(Filesystem\Path $path, ?string $expected): void {
+  public function testExtension(
+    Filesystem\Path $path,
+    ?string $expected,
+  ): void {
     $file = new Filesystem\File($path, false);
     expect($file->extension())->toBeSame($expected);
   }
@@ -217,7 +232,8 @@ class FileTest extends HackTest {
     expect($file->extension())->toBeSame($path->extension());
   }
 
-  public function provideExtensionData(): Container<(Filesystem\Path, ?string)> {
+  public function provideExtensionData(
+  ): Container<(Filesystem\Path, ?string)> {
     return vec[
       tuple(Filesystem\Path::create(''), null),
       tuple(Filesystem\Path::create('path/to/hhvm-4-main.hack'), 'hack'),
@@ -271,14 +287,23 @@ class FileTest extends HackTest {
 
   public function provideMimeTypeData(): Container<(Filesystem\Path, string)> {
     return vec[
-      tuple(Filesystem\Path::create(__DIR__.'/../../../.gitattributes'), 'text/plain'),
+      tuple(
+        Filesystem\Path::create(__DIR__.'/../../../.gitattributes'),
+        'text/plain',
+      ),
       tuple(
         Filesystem\Path::create(__DIR__.'/../../../.travis.sh'),
         'text/x-shellscript',
       ),
-      tuple(Filesystem\Path::create(__DIR__.'/../../../.travis.yml'), 'text/plain'),
+      tuple(
+        Filesystem\Path::create(__DIR__.'/../../../.travis.yml'),
+        'text/plain',
+      ),
       tuple(Filesystem\Path::create(__DIR__.'/../../../LICENSE'), 'text/plain'),
-      tuple(Filesystem\Path::create(__DIR__.'/../../../composer.json'), 'text/plain'),
+      tuple(
+        Filesystem\Path::create(__DIR__.'/../../../composer.json'),
+        'text/plain',
+      ),
       // Known issue.
       tuple(Filesystem\Path::create(__FILE__), 'text/x-c++'),
     ];
@@ -292,11 +317,15 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideResetData')>>
-  public function testReset(Filesystem\File $file, Filesystem\Path $path): void {
+  public function testReset(
+    Filesystem\File $file,
+    Filesystem\Path $path,
+  ): void {
     expect($file->reset($path)->path())->toBeSame($path);
   }
 
-  public function provideResetData(): Container<(Filesystem\File, Filesystem\Path)> {
+  public function provideResetData(
+  ): Container<(Filesystem\File, Filesystem\Path)> {
     return vec[
       tuple(static::createFile(), static::createPath()),
       tuple(static::createFile(), static::createPath()),
@@ -315,7 +344,9 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testResetThrowsIfProvidedPathIsAFolder(Filesystem\File $file): void {
+  public function testResetThrowsIfProvidedPathIsAFolder(
+    Filesystem\File $file,
+  ): void {
     expect(() ==> {
       $path = static::createFolder()->path();
       $file->reset($path);
@@ -336,7 +367,9 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testAppendThrowsIfFileIsNotWritable(Filesystem\File $file): void {
+  public function testAppendThrowsIfFileIsNotWritable(
+    Filesystem\File $file,
+  ): void {
     $this->markAsSkippedIfRoot();
 
     expect(async () ==> {
@@ -360,7 +393,9 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testPrependThrowsIfFileIsNotWritable(Filesystem\File $file): void {
+  public function testPrependThrowsIfFileIsNotWritable(
+    Filesystem\File $file,
+  ): void {
     $this->markAsSkippedIfRoot();
 
     expect(async () ==> {
@@ -374,7 +409,9 @@ class FileTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testPrependThrowsIfFileIsNotReadable(Filesystem\File $file): void {
+  public function testPrependThrowsIfFileIsNotReadable(
+    Filesystem\File $file,
+  ): void {
     $this->markAsSkippedIfRoot();
 
     expect(async () ==> {
@@ -488,7 +525,8 @@ class FileTest extends HackTest {
     expect($link->path()->toString())->toBeSame($path->toString());
   }
 
-  public function provideLinkData(): Container<(Filesystem\File, Filesystem\Path)> {
+  public function provideLinkData(
+  ): Container<(Filesystem\File, Filesystem\Path)> {
     return vec[
       tuple(static::createFile(), static::createPath()),
       tuple(static::createFile(), static::createPath()),
@@ -504,14 +542,20 @@ class FileTest extends HackTest {
   ): void {
     expect(async () ==> {
       await $file->link($target->path());
-    })->toThrow(Filesystem\Exception\InvalidPathException::class, 'already exists.');
+    })->toThrow(
+      Filesystem\Exception\InvalidPathException::class,
+      'already exists.',
+    );
   }
 
   <<DataProvider('provideMissingNodes')>>
   public function testLinkThrowsIfFileIsMissing(Filesystem\File $file): void {
     expect(async () ==> {
       await $file->link(static::createPath());
-    })->toThrow(Filesystem\Exception\MissingNodeException::class, 'doesn\'t exist');
+    })->toThrow(
+      Filesystem\Exception\MissingNodeException::class,
+      'doesn\'t exist',
+    );
   }
 
   <<DataProvider('provideSymlinkData')>>
@@ -524,7 +568,8 @@ class FileTest extends HackTest {
     expect($link->path()->toString())->toBeSame($path->toString());
   }
 
-  public function provideSymlinkData(): Container<(Filesystem\File, Filesystem\Path)> {
+  public function provideSymlinkData(
+  ): Container<(Filesystem\File, Filesystem\Path)> {
     return vec[
       tuple(static::createFile(), static::createPath()),
       tuple(static::createFile(), static::createPath()),
@@ -539,14 +584,22 @@ class FileTest extends HackTest {
   ): void {
     expect(async () ==> {
       await $file->symlink($target->path());
-    })->toThrow(Filesystem\Exception\InvalidPathException::class, 'already exists.');
+    })->toThrow(
+      Filesystem\Exception\InvalidPathException::class,
+      'already exists.',
+    );
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testSymlinkThrowsIfFileIsMissing(Filesystem\File $file): void {
+  public function testSymlinkThrowsIfFileIsMissing(
+    Filesystem\File $file,
+  ): void {
     expect(async () ==> {
       await $file->symlink(static::createPath());
-    })->toThrow(Filesystem\Exception\MissingNodeException::class, 'doesn\'t exist');
+    })->toThrow(
+      Filesystem\Exception\MissingNodeException::class,
+      'doesn\'t exist',
+    );
   }
 
   public function provideNodes(): Container<(Filesystem\Node)> {

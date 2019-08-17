@@ -30,7 +30,10 @@ class ListenerProviderAggregateTest extends HackTest\HackTest {
 
     $event = new Fixture\OrderCanceledEvent('bar');
     $i = 0;
-    foreach ($aggregate->getListeners<Fixture\OrderCanceledEvent>($event) await as $listener) {
+    foreach (
+      $aggregate->getListeners<Fixture\OrderCanceledEvent>($event) await as
+        $listener
+    ) {
       expect($listeners)->toContain($listener);
       $i++;
     }

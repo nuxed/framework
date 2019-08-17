@@ -11,7 +11,9 @@ class NodeTest extends HackTest {
 
   <<DataProvider('provideLoadFileData')>>
   public function testLoadFile(Filesystem\Path $file): void {
-    expect(Filesystem\Node::load($file))->toBeInstanceOf(Filesystem\File::class);
+    expect(Filesystem\Node::load($file))->toBeInstanceOf(
+      Filesystem\File::class,
+    );
   }
 
   public function provideLoadFileData(): Container<(Filesystem\Path)> {
@@ -25,7 +27,9 @@ class NodeTest extends HackTest {
 
   <<DataProvider('provideLoadFolderData')>>
   public function testLoadFolder(Filesystem\Path $folder): void {
-    expect(Filesystem\Node::load($folder))->toBeInstanceOf(Filesystem\Folder::class);
+    expect(Filesystem\Node::load($folder))->toBeInstanceOf(
+      Filesystem\Folder::class,
+    );
   }
 
   public function provideLoadFolderData(): Container<(Filesystem\Path)> {

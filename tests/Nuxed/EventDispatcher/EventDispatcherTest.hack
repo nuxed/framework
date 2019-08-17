@@ -63,9 +63,7 @@ class EventDispatcherTest extends HackTest\HackTest {
     );
     $dispatcher = new EventDispatcher\EventDispatcher($provider);
     $event = new Fixture\OrderCreatedEvent('hello');
-    expect(
-      () ==> $dispatcher->dispatch<Fixture\OrderCreatedEvent>($event),
-    )
+    expect(() ==> $dispatcher->dispatch<Fixture\OrderCreatedEvent>($event))
       ->toThrow(\Exception::class);
     expect($event->orderId)->toBeSame('caught');
   }

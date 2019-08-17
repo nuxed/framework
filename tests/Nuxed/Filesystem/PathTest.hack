@@ -13,7 +13,9 @@ class PathTest extends HackTest {
   use IoTestTrait;
 
   public function testCreate(): void {
-    expect(Filesystem\Path::create('/foo/bar')->toString())->toBeSame('/foo/bar');
+    expect(Filesystem\Path::create('/foo/bar')->toString())->toBeSame(
+      '/foo/bar',
+    );
     $path = Filesystem\Path::create('/foo/bar');
     expect(Filesystem\Path::create($path))->toBeSame($path);
   }
@@ -99,7 +101,9 @@ class PathTest extends HackTest {
     bool $above,
     string $expected,
   ): void {
-    expect(Filesystem\Path::join($parts, $above)->toString())->toBeSame($expected);
+    expect(Filesystem\Path::join($parts, $above)->toString())->toBeSame(
+      $expected,
+    );
   }
 
   public function provideJoinData(
@@ -167,7 +171,10 @@ class PathTest extends HackTest {
     string $to,
     string $expected,
   ): void {
-    expect(Filesystem\Path::create($path)->relativeTo(Filesystem\Path::create($to))->toString())
+    expect(
+      Filesystem\Path::create($path)->relativeTo(Filesystem\Path::create($to))
+        ->toString(),
+    )
       ->toBeSame($expected);
   }
 
@@ -183,8 +190,9 @@ class PathTest extends HackTest {
   public function testRelativeToThrowsForAbsolutePath(): void {
     // absolute + absolute
     expect(
-      () ==>
-        Filesystem\Path::create('foo/bar')->relativeTo(Filesystem\Path::create('foo/bar/baz')),
+      () ==> Filesystem\Path::create('foo/bar')->relativeTo(
+        Filesystem\Path::create('foo/bar/baz'),
+      ),
     )
       ->toThrow(
         Filesystem\Exception\InvalidPathException::class,
@@ -193,8 +201,9 @@ class PathTest extends HackTest {
 
     // relative + absolute
     expect(
-      () ==>
-        Filesystem\Path::create('/foo/bar')->relativeTo(Filesystem\Path::create('foo/bar/baz')),
+      () ==> Filesystem\Path::create('/foo/bar')->relativeTo(
+        Filesystem\Path::create('foo/bar/baz'),
+      ),
     )
       ->toThrow(
         Filesystem\Exception\InvalidPathException::class,
@@ -203,8 +212,9 @@ class PathTest extends HackTest {
 
     // absolute + relative
     expect(
-      () ==>
-        Filesystem\Path::create('foo/bar')->relativeTo(Filesystem\Path::create('/foo/bar/baz')),
+      () ==> Filesystem\Path::create('foo/bar')->relativeTo(
+        Filesystem\Path::create('/foo/bar/baz'),
+      ),
     )
       ->toThrow(
         Filesystem\Exception\InvalidPathException::class,
@@ -287,7 +297,9 @@ class PathTest extends HackTest {
 
   <<DataProvider('provideParentData')>>
   public function testParent(string $path, string $expected): void {
-    expect(Filesystem\Path::create($path)->parent()->toString())->toBeSame($expected);
+    expect(Filesystem\Path::create($path)->parent()->toString())->toBeSame(
+      $expected,
+    );
   }
 
   public function provideParentData(): Container<(string, string)> {
@@ -335,7 +347,9 @@ class PathTest extends HackTest {
 
   <<DataProvider('providePartsData')>>
   public function testParts(string $path, Container<string> $expected): void {
-    expect(vec(Filesystem\Path::create($path)->parts()))->toBeSame(vec($expected));
+    expect(vec(Filesystem\Path::create($path)->parts()))->toBeSame(
+      vec($expected),
+    );
   }
 
   public function providePartsData(): Container<(string, Container<string>)> {

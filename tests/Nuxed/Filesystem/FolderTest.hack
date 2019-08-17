@@ -20,7 +20,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public function testCreateThrowsIfFolderExists(Filesystem\Folder $folder): void {
+  public function testCreateThrowsIfFolderExists(
+    Filesystem\Folder $folder,
+  ): void {
     expect(async () ==> {
       expect($folder->exists())->toBeTrue();
       await $folder->create();
@@ -32,7 +34,11 @@ class FolderTest extends HackTest {
     // create the target directory path.
     $target = static::createPath();
     // copy folder to the target directory.
-    $copy = await $folder->copy($target, Filesystem\OperationType::OVERWRITE, 0711);
+    $copy = await $folder->copy(
+      $target,
+      Filesystem\OperationType::OVERWRITE,
+      0711,
+    );
     expect($copy)->toBeInstanceOf(Filesystem\Folder::class);
     $copy as Filesystem\Folder;
     expect($copy->exists())->toBeTrue();
@@ -40,7 +46,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testCopyThrowsIfFolderDoesntExists(Filesystem\Folder $missing): void {
+  public function testCopyThrowsIfFolderDoesntExists(
+    Filesystem\Folder $missing,
+  ): void {
     expect(async () ==> {
       await $missing->copy(static::createPath());
     })->toThrow(Filesystem\Exception\MissingNodeException::class);
@@ -85,7 +93,10 @@ class FolderTest extends HackTest {
     await $target->touch('foo.txt');
     $targetSize = await $target->size();
     expect($targetSize)->toBeSame(1);
-    $copy = await $folder->copy($target->path(), Filesystem\OperationType::OVERWRITE);
+    $copy = await $folder->copy(
+      $target->path(),
+      Filesystem\OperationType::OVERWRITE,
+    );
     expect($copy->exists())->toBeTrue();
     $copy as Filesystem\Folder;
     list($folderSize, $copySize) = await Tuple\from_async(
@@ -115,7 +126,10 @@ class FolderTest extends HackTest {
     expect($folderSize)->toBeSame(2);
     expect($targetSize)->toBeSame(1);
 
-    $copy = await $folder->copy($target->path(), Filesystem\OperationType::SKIP);
+    $copy = await $folder->copy(
+      $target->path(),
+      Filesystem\OperationType::SKIP,
+    );
 
     list($folderSize, $copySize) = await Tuple\from_async(
       $folder->size(),
@@ -153,7 +167,10 @@ class FolderTest extends HackTest {
     expect($folderSize)->toBeSame(2);
     expect($targetSize)->toBeSame(3);
 
-    $copy = await $folder->copy($target->path(), Filesystem\OperationType::MERGE);
+    $copy = await $folder->copy(
+      $target->path(),
+      Filesystem\OperationType::MERGE,
+    );
 
     list($folderSize, $copySize) = await Tuple\from_async(
       $folder->size(),
@@ -175,7 +192,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testDeleteThrowsIfFolderDoesntExist(Filesystem\Folder $folder): void {
+  public function testDeleteThrowsIfFolderDoesntExist(
+    Filesystem\Folder $folder,
+  ): void {
     expect(async () ==> {
       expect($folder->exists())->toBeFalse();
       await $folder->delete();
@@ -197,7 +216,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testFlushThrowsIfFolderDoesntExist(Filesystem\Folder $folder): void {
+  public function testFlushThrowsIfFolderDoesntExist(
+    Filesystem\Folder $folder,
+  ): void {
     expect(async () ==> {
       expect($folder->exists())->toBeFalse();
       await $folder->delete();
@@ -244,7 +265,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testFindThrowsIfFolderDoesntExist(Filesystem\Folder $folder): void {
+  public function testFindThrowsIfFolderDoesntExist(
+    Filesystem\Folder $folder,
+  ): void {
     expect(async () ==> {
       expect($folder->exists())->toBeFalse();
       await $folder->find(re"/.*/");
@@ -264,7 +287,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testFolders(Filesystem\Folder $folder): Awaitable<void> {
+  public async function testFolders(
+    Filesystem\Folder $folder,
+  ): Awaitable<void> {
     await $folder->flush();
     await $folder->mkdir('a/a/a');
     await Asio\v(vec[
@@ -279,7 +304,8 @@ class FolderTest extends HackTest {
     $folders = await $folder->folders(true, true);
     expect(C\count($folders))->toBeSame(9);
     expect($folders)->toBeSortedBy(
-      (Filesystem\Node $a, Filesystem\Node $b) ==> $a->path()->compare($b->path()) < 0,
+      (Filesystem\Node $a, Filesystem\Node $b) ==>
+        $a->path()->compare($b->path()) < 0,
     );
     $folders = await $folder->folders(false, false);
     expect(C\count($folders))->toBeSame(3);
@@ -304,7 +330,8 @@ class FolderTest extends HackTest {
     $files = await $folder->files(true, true);
     expect(C\count($files))->toBeSame(9);
     expect($files)->toBeSortedBy(
-      (Filesystem\Node $a, Filesystem\Node $b) ==> $a->path()->compare($b->path()) < 0,
+      (Filesystem\Node $a, Filesystem\Node $b) ==>
+        $a->path()->compare($b->path()) < 0,
     );
     $files = await $folder->files(false, false);
     expect(C\count($files))->toBeSame(3);
@@ -335,7 +362,8 @@ class FolderTest extends HackTest {
     $nodes = await $folder->list(true, true);
     expect(C\count($nodes))->toBeSame(18);
     expect($nodes)->toBeSortedBy(
-      (Filesystem\Node $a, Filesystem\Node $b) ==> $a->path()->compare($b->path()) < 0,
+      (Filesystem\Node $a, Filesystem\Node $b) ==>
+        $a->path()->compare($b->path()) < 0,
     );
     $nodes = await $folder->list(false, false, Filesystem\Node::class);
     expect(C\count($nodes))->toBeSame(6);
@@ -362,7 +390,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testListThrowsIfFolderDoesntExist(Filesystem\Folder $folder): void {
+  public function testListThrowsIfFolderDoesntExist(
+    Filesystem\Folder $folder,
+  ): void {
     expect(() ==> $folder->list())
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
@@ -418,7 +448,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testSizeThrowsIfFolderDoesntExist(Filesystem\Folder $folder): void {
+  public function testSizeThrowsIfFolderDoesntExist(
+    Filesystem\Folder $folder,
+  ): void {
     expect(() ==> $folder->size())
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
@@ -441,7 +473,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testTouchMode(Filesystem\Folder $folder): Awaitable<void> {
+  public async function testTouchMode(
+    Filesystem\Folder $folder,
+  ): Awaitable<void> {
     $this->markAsSkippedIfRoot();
     if ($folder->contains('foo')) {
       await $folder->remove('foo');
@@ -492,7 +526,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testTouchThrowsIfFolderDoesntExist(Filesystem\Folder $folder): void {
+  public function testTouchThrowsIfFolderDoesntExist(
+    Filesystem\Folder $folder,
+  ): void {
     expect(() ==> $folder->touch('foo'))
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
@@ -516,7 +552,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testMkdirMode(Filesystem\Folder $folder): Awaitable<void> {
+  public async function testMkdirMode(
+    Filesystem\Folder $folder,
+  ): Awaitable<void> {
     if ($folder->contains('foo')) {
       await $folder->remove('foo');
     }
@@ -568,7 +606,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testMkdirThrowsIfFolderDoesntExist(Filesystem\Folder $folder): void {
+  public function testMkdirThrowsIfFolderDoesntExist(
+    Filesystem\Folder $folder,
+  ): void {
     expect(() ==> $folder->mkdir('foo'))
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
@@ -622,13 +662,17 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testRemoveThrowsIfFolderDoesntExist(Filesystem\Folder $folder): void {
+  public function testRemoveThrowsIfFolderDoesntExist(
+    Filesystem\Folder $folder,
+  ): void {
     expect(() ==> $folder->remove('foo'))
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testContains(Filesystem\Folder $folder): Awaitable<void> {
+  public async function testContains(
+    Filesystem\Folder $folder,
+  ): Awaitable<void> {
     await $folder->flush();
     expect($folder->contains('foo'))->toBeFalse();
     await $folder->touch('foo');
@@ -665,13 +709,17 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testReadThrowsIfFolderDoesntExist(Filesystem\Folder $folder): void {
+  public function testReadThrowsIfFolderDoesntExist(
+    Filesystem\Folder $folder,
+  ): void {
     expect(() ==> $folder->read('foo'))
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testChownRecursive(Filesystem\Folder $folder): Awaitable<void> {
+  public async function testChownRecursive(
+    Filesystem\Folder $folder,
+  ): Awaitable<void> {
     $this->markAsSkippedIfNotRoot();
     await $folder->flush();
     $nodes = await Asio\v(vec[
@@ -690,7 +738,9 @@ class FolderTest extends HackTest {
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testChgroRecursive(Filesystem\Folder $folder): Awaitable<void> {
+  public async function testChgroRecursive(
+    Filesystem\Folder $folder,
+  ): Awaitable<void> {
     $this->markAsSkippedIfNotRoot();
     await $folder->flush();
     $nodes = await Asio\v(vec[

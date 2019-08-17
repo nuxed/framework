@@ -65,7 +65,9 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testAccessTimeThrowsIfFileIsMissing(Filesystem\Node $node): void {
+  public function testAccessTimeThrowsIfFileIsMissing(
+    Filesystem\Node $node,
+  ): void {
     expect(() ==> $node->accessTime())
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
@@ -86,7 +88,9 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testChangeTimeThrowsFileIsMissing(Filesystem\Node $node): void {
+  public function testChangeTimeThrowsFileIsMissing(
+    Filesystem\Node $node,
+  ): void {
     expect(() ==> $node->changeTime())
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
@@ -132,11 +136,16 @@ trait NodeTestTrait {
   ): Awaitable<void> {
     expect(async () ==> {
       await $node->rename($another->basename(), false);
-    })->toThrow(Filesystem\Exception\ExistingNodeException::class, 'already exists');
+    })->toThrow(
+      Filesystem\Exception\ExistingNodeException::class,
+      'already exists',
+    );
   }
 
   <<DataProvider('provideNodes')>>
-  public async function testRenameEarlyReturn(Filesystem\Node $node): Awaitable<void> {
+  public async function testRenameEarlyReturn(
+    Filesystem\Node $node,
+  ): Awaitable<void> {
     $res = await $node->rename($node->basename());
     expect($res)->toBeTrue();
   }
@@ -204,7 +213,9 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testChownThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
+  public function testChownThrowsIfNodeDoesntExist(
+    Filesystem\Node $node,
+  ): void {
     expect(() ==> $node->chown(666))
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
@@ -218,25 +229,33 @@ trait NodeTestTrait {
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testChgrpThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
+  public function testChgrpThrowsIfNodeDoesntExist(
+    Filesystem\Node $node,
+  ): void {
     expect(() ==> $node->chgrp(666))
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testGroupThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
+  public function testGroupThrowsIfNodeDoesntExist(
+    Filesystem\Node $node,
+  ): void {
     expect(() ==> $node->group())
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testOwnerThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
+  public function testOwnerThrowsIfNodeDoesntExist(
+    Filesystem\Node $node,
+  ): void {
     expect(() ==> $node->owner())
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
   <<DataProvider('provideMissingNodes')>>
-  public function testPermissionsThrowsIfNodeDoesntExist(Filesystem\Node $node): void {
+  public function testPermissionsThrowsIfNodeDoesntExist(
+    Filesystem\Node $node,
+  ): void {
     expect(() ==> $node->permissions())
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
@@ -246,7 +265,8 @@ trait NodeTestTrait {
   abstract public function provideNodes(): Container<(Filesystem\Node)>;
   abstract public function provideMissingNodes(): Container<(Filesystem\Node)>;
 
-  public function provideNodesPair(): Container<(Filesystem\Node, Filesystem\Node)> {
+  public function provideNodesPair(
+  ): Container<(Filesystem\Node, Filesystem\Node)> {
     $nodes = vec($this->provideNodes());
     $missing = vec($this->provideMissingNodes());
     if (C\count($missing) > C\count($nodes)) {
@@ -263,7 +283,8 @@ trait NodeTestTrait {
     return $ret;
   }
 
-  public function provideExistingNodesPair(): Container<(Filesystem\Node, Filesystem\Node)> {
+  public function provideExistingNodesPair(
+  ): Container<(Filesystem\Node, Filesystem\Node)> {
     $a = vec($this->provideNodes());
     $b = Vec\reverse($this->provideNodes());
     $ret = vec[];
@@ -275,7 +296,8 @@ trait NodeTestTrait {
     return $ret;
   }
 
-  public function provideMissingNodesPair(): Container<(Filesystem\Node, Filesystem\Node)> {
+  public function provideMissingNodesPair(
+  ): Container<(Filesystem\Node, Filesystem\Node)> {
     $a = vec($this->provideMissingNodes());
     $b = Vec\reverse($this->provideMissingNodes());
 
