@@ -6,7 +6,7 @@ use namespace HH\Lib\C;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Vec;
 use namespace HH\Lib\Experimental\IO;
-use namespace Nuxed\Io;
+use namespace Nuxed\Filesystem;
 
 require __DIR__.'/../vendor/autoload.hack';
 
@@ -16,8 +16,8 @@ async function main(): Awaitable<noreturn> {
   $stdout = IO\request_output();
   $files = await Asio\v(
     vec[
-      new Io\Folder(__DIR__.'/../src/Nuxed'),
-      new Io\Folder(__DIR__.'/../tests/Nuxed'),
+      new Filesystem\Folder(__DIR__.'/../src/Nuxed'),
+      new Filesystem\Folder(__DIR__.'/../tests/Nuxed'),
     ]
       |> Vec\map($$, ($node) ==> $node->files(false, true)),
   );
@@ -26,7 +26,10 @@ async function main(): Awaitable<noreturn> {
     Vec\concat(...$files)
     |> Vec\map($$, ($file) ==> format($file, $stdout, false))
     |> Asio\v(
-      Vec\concat($$, vec[format(Io\Node::load(__FILE__), $stdout, true)]),
+      Vec\concat(
+        $$,
+        vec[format(Filesystem\Node::load(__FILE__), $stdout, true)],
+      ),
     )
   );
 
@@ -38,7 +41,7 @@ async function main(): Awaitable<noreturn> {
  * exec() blocks, so this is not actually async.
  */
 async function format(
-  Nuxed\Io\File $file,
+  Filesystem\File $file,
   IO\WriteHandle $stdout,
   bool $ignoreExtension = false,
 ): Awaitable<void> {
