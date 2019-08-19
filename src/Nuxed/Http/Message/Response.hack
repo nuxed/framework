@@ -469,7 +469,7 @@ class Response {
         'Last-Modified',
       ] as $header
     ) {
-      $new = $instance->withoutHeader($header);
+      $new = $new->withoutHeader($header);
     }
 
     return $new;
