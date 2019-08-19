@@ -120,7 +120,7 @@ final class Folder extends Node {
     $target = $destination->path();
 
     // Recursively copy over contents to new destination
-    $contents = await $this->list(false, true, Node::class);
+    $contents = await $this->list<Node>(false, true);
 
     $awaitables = vec[];
     foreach ($contents as $node) {
@@ -184,7 +184,7 @@ final class Folder extends Node {
     ));
 
     // delete rest of the nodes.
-    $nodes = await $this->list(false, true, Node::class);
+    $nodes = await $this->list<Node>(false, true);
     await Asio\v(Vec\map(
       $nodes,
       ($node) ==> $node->exists()
@@ -204,7 +204,7 @@ final class Folder extends Node {
     bool $recursive = false,
   ): Awaitable<Container<Node>> {
     return Vec\filter(
-      await $this->list(true, $recursive, Node::class),
+      await $this->list<Node>(true, $recursive),
       ($node) ==> Regex\matches(
         $this->path()->relativeTo($node->path())
           |> $$->toString()
@@ -222,7 +222,7 @@ final class Folder extends Node {
     bool $sort = false,
     bool $recursive = false,
   ): Awaitable<Container<File>> {
-    return $this->list($sort, $recursive, File::class);
+    return $this->list<File>($sort, $recursive);
   }
 
   /**
@@ -232,16 +232,15 @@ final class Folder extends Node {
     bool $sort = false,
     bool $recursive = false,
   ): Awaitable<Container<Folder>> {
-    return $this->list($sort, $recursive, Folder::class);
+    return $this->list<Folder>($sort, $recursive);
   }
 
   /**
    * Scan the folder and return a list of File and Folder objects.
    */
-  public async function list<T as Node>(
+  public async function list<reify T as Node>(
     bool $sort = false,
     bool $recursive = false,
-    ?classname<T> $filter = null,
   ): Awaitable<Container<T>> {
     $this->isAvailable();
     $this->isReadable();
@@ -264,26 +263,22 @@ final class Folder extends Node {
       );
     }
 
-    /**
-     * @link https://github.com/facebook/hhvm/issues/8090
-     */
-    $filter ??= Node::class;
     $contents = vec[];
     $awaitables = vec[];
     foreach ($iterator as $node) {
       if (
-        $node->isDir() && ($filter === Node::class || $filter === Folder::class)
+        $node->isDir() && (T::class === Node::class || T::class === Folder::class)
       ) {
         $contents[] = new Folder(Path::create($node->getPathname()));
       } else if (
-        $node->isFile() && ($filter === Node::class || $filter === File::class)
+        $node->isFile() && (T::class === Node::class || T::class === File::class)
       ) {
         $contents[] = new File(Path::create($node->getPathname()));
       }
 
       if ($node->isDir() && $recursive) {
         $folder = new Folder($node->getPathname());
-        $awaitables[] = $folder->list(false, true, $filter);
+        $awaitables[] = $folder->list<T>(false, true);
       }
     }
 
@@ -341,7 +336,7 @@ final class Folder extends Node {
   <<__Override>>
   public async function size(): Awaitable<int> {
     $this->isAvailable();
-    $nodes = await $this->list(false, true, Node::class);
+    $nodes = await $this->list<Node>(false, true);
     return C\count($nodes);
   }
 

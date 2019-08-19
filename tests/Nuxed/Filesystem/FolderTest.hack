@@ -359,21 +359,21 @@ class FolderTest extends HackTest {
       $folder->touch('a/a/c.txt'),
     ]);
 
-    $nodes = await $folder->list(true, true);
+    $nodes = await $folder->list<Filesystem\Node>(true, true);
     expect(C\count($nodes))->toBeSame(18);
     expect($nodes)->toBeSortedBy(
       (Filesystem\Node $a, Filesystem\Node $b) ==>
         $a->path()->compare($b->path()) < 0,
     );
-    $nodes = await $folder->list(false, false, Filesystem\Node::class);
+    $nodes = await $folder->list<Filesystem\Node>(false, false);
     expect(C\count($nodes))->toBeSame(6);
-    $files = await $folder->list(false, false, Filesystem\File::class);
+    $files = await $folder->list<Filesystem\File>(false, false);
     expect(C\count($files))->toBeSame(3);
-    $files = await $folder->list(true, true, Filesystem\File::class);
+    $files = await $folder->list<Filesystem\File>(true, true);
     expect(C\count($files))->toBeSame(9);
-    $folders = await $folder->list(false, false, Filesystem\Folder::class);
+    $folders = await $folder->list<Filesystem\Folder>(false, false);
     expect(C\count($folders))->toBeSame(3);
-    $folders = await $folder->list(true, true, Filesystem\Folder::class);
+    $folders = await $folder->list<Filesystem\Folder>(true, true);
     expect(C\count($folders))->toBeSame(9);
   }
 
@@ -384,7 +384,7 @@ class FolderTest extends HackTest {
     $this->markAsSkippedIfRoot();
     $permissions = $folder->permissions();
     await $folder->chmod(0111);
-    expect(() ==> $folder->list())
+    expect(() ==> $folder->list<Filesystem\Node>())
       ->toThrow(Filesystem\Exception\UnreadableNodeException::class);
     await $folder->chmod($permissions);
   }
@@ -393,7 +393,7 @@ class FolderTest extends HackTest {
   public function testListThrowsIfFolderDoesntExist(
     Filesystem\Folder $folder,
   ): void {
-    expect(() ==> $folder->list())
+    expect(() ==> $folder->list<Filesystem\Node>())
       ->toThrow(Filesystem\Exception\MissingNodeException::class);
   }
 
