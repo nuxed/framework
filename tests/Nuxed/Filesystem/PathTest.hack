@@ -16,8 +16,6 @@ class PathTest extends HackTest {
     expect(Filesystem\Path::create('/foo/bar')->toString())->toBeSame(
       '/foo/bar',
     );
-    $path = Filesystem\Path::create('/foo/bar');
-    expect(Filesystem\Path::create($path))->toBeSame($path);
   }
 
   <<DataProvider('provideToStringAndMagicToStringData')>>
@@ -27,7 +25,6 @@ class PathTest extends HackTest {
   ): void {
     $path = Filesystem\Path::create($path);
     expect($path->toString())->toBeSame($realpath);
-    expect((string)$path)->toBeSame($realpath);
   }
 
   public function provideToStringAndMagicToStringData(

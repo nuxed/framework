@@ -10,7 +10,7 @@ use namespace Nuxed\Http\Message;
  * status of 200.
  */
 function text(
-  \Stringish $text,
+  string $text,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
 ): Message\Response {
@@ -21,7 +21,7 @@ function text(
       $headers,
     ),
     Message\stream($text),
-  );
+  ) |> $$->withCharset('utf-8');
 }
 
 /**
@@ -31,7 +31,7 @@ function text(
  * status of 200.
  */
 function html(
-  \Stringish $html,
+  string $html,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
 ): Message\Response {
@@ -42,7 +42,7 @@ function html(
       $headers,
     ),
     Message\stream($html),
-  );
+  ) |> $$->withCharset('utf-8');
 }
 
 /**
@@ -52,7 +52,7 @@ function html(
  * status of 200.
  */
 function xml(
-  \Stringish $xml,
+  string $xml,
   int $status = 200,
   KeyedContainer<string, Container<string>> $headers = dict[],
 ): Message\Response {
@@ -63,7 +63,7 @@ function xml(
       $headers,
     ),
     Message\stream($xml),
-  );
+  ) |> $$->withCharset('utf-8');
 }
 
 /**

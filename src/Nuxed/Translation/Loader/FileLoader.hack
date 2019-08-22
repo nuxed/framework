@@ -6,7 +6,7 @@ use namespace Nuxed\Translation\Exception;
 
 abstract class FileLoader implements ILoader<string> {
   public function load(
-    \Stringish $resource,
+    string $resource,
     string $locale,
     string $domain = 'messages',
   ): Translation\MessageCatalogue {

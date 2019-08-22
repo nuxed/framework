@@ -40,9 +40,9 @@ function response(
   return new Response($status, $headers, $body, $version, $reason);
 }
 
-function stream(\Stringish $content): IStream {
+function stream(string $content): IStream {
   $handle = \fopen('php://memory', 'wb+');
-  \fwrite($handle, (string)$content);
+  \fwrite($handle, $content);
   $stream = new Stream($handle);
   $stream->rewind();
   return $stream;

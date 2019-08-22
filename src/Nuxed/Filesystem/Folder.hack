@@ -76,7 +76,7 @@ final class Folder extends Node {
         continue;
       }
 
-      $node = Node::load($node->getPathname());
+      $node = Node::load(Path::create($node->getPathname()));
       $awaitables[] = $op($node);
     }
 
@@ -277,7 +277,7 @@ final class Folder extends Node {
       }
 
       if ($node->isDir() && $recursive) {
-        $folder = new Folder($node->getPathname());
+        $folder = new Folder(Path::create($node->getPathname()));
         $awaitables[] = $folder->list<T>(false, true);
       }
     }
@@ -288,14 +288,13 @@ final class Folder extends Node {
     if ($sort) {
       $contents = Vec\sort(
         $contents,
-        (Node $a, Node $b) ==> $a->path()->compare($b->path()),
+        (Node $a, Node $b) ==> $a->path()->compare($b->path()->toString()),
       );
     }
 
     /* HH_FIXME[4110] */
     return $contents;
   }
-
 
   /**
    * {@inheritdoc}
@@ -306,7 +305,7 @@ final class Folder extends Node {
     bool $overwrite = true,
   ): Awaitable<bool> {
     $this->isAvailable();
-    if ($target->compare($this->path) === 0) {
+    if ($target->compare($this->path->toString()) === 0) {
       return true; // Don't move to the same location
     }
 

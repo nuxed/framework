@@ -305,7 +305,7 @@ class FolderTest extends HackTest {
     expect(C\count($folders))->toBeSame(9);
     expect($folders)->toBeSortedBy(
       (Filesystem\Node $a, Filesystem\Node $b) ==>
-        $a->path()->compare($b->path()) < 0,
+        $a->path()->compare($b->path()->toString()) < 0,
     );
     $folders = await $folder->folders(false, false);
     expect(C\count($folders))->toBeSame(3);
@@ -331,7 +331,7 @@ class FolderTest extends HackTest {
     expect(C\count($files))->toBeSame(9);
     expect($files)->toBeSortedBy(
       (Filesystem\Node $a, Filesystem\Node $b) ==>
-        $a->path()->compare($b->path()) < 0,
+        $a->path()->compare($b->path()->toString()) < 0,
     );
     $files = await $folder->files(false, false);
     expect(C\count($files))->toBeSame(3);
@@ -363,7 +363,7 @@ class FolderTest extends HackTest {
     expect(C\count($nodes))->toBeSame(18);
     expect($nodes)->toBeSortedBy(
       (Filesystem\Node $a, Filesystem\Node $b) ==>
-        $a->path()->compare($b->path()) < 0,
+        $a->path()->compare($b->path()->toString()) < 0,
     );
     $nodes = await $folder->list<Filesystem\Node>(false, false);
     expect(C\count($nodes))->toBeSame(6);
@@ -403,7 +403,7 @@ class FolderTest extends HackTest {
     expect($target->exists())->toBeFalse();
     await $folder->move($target, false);
     expect($target->exists())->toBeTrue();
-    expect($target->compare($folder->path()))->toBeSame(0);
+    expect($target->compare($folder->path()->toString()))->toBeSame(0);
   }
 
   <<DataProvider('provideExistingNodesPair')>>
@@ -469,7 +469,7 @@ class FolderTest extends HackTest {
     expect($size)->toBeSame(3);
     $file = await $folder->touch('qux');
     expect($file->name())->toBeSame('qux');
-    expect($file->parent()?->path()?->compare($folder->path()))->toBeSame(0);
+    expect($file->parent()?->path()?->compare($folder->path()->toString()))->toBeSame(0);
   }
 
   <<DataProvider('provideNodes')>>
@@ -548,7 +548,7 @@ class FolderTest extends HackTest {
     expect($size)->toBeSame(3);
     $child = await $folder->mkdir('qux');
     expect($child->name())->toBeSame('qux');
-    expect($child->parent()?->path()?->compare($folder->path()))->toBeSame(0);
+    expect($child->parent()?->path()?->compare($folder->path()->toString()))->toBeSame(0);
   }
 
   <<DataProvider('provideNodes')>>

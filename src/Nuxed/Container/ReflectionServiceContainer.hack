@@ -61,7 +61,7 @@ final class ReflectionServiceContainer
     $arguments = vec[];
     foreach ($constructor->getParameters() as $parameter) {
       $type = $parameter->getType() as nonnull;
-      $request = (string)$type;
+      $request = $type->__toString();
       if ($type->isBuiltin()) {
         throw new Exception\ContainerException(Str\format(
           'Unable to resolve builtin type (%s) parameter (%s) for service (%s).',

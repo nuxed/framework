@@ -1,6 +1,7 @@
 namespace Nuxed\Test\Filesystem;
 
 use namespace HH\Asio;
+use namespace Nuxed\Crypto\Hex;
 use namespace Nuxed\Filesystem;
 use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\Filesystem as fs;
@@ -35,7 +36,7 @@ class FileTest extends HackTest {
   ): Awaitable<void> {
     $file = await Filesystem\File::temporary($prefix, $dir);
     expect($file->path()->basename())->toContain($prefix);
-    expect($file->path()->parent()->compare($dir))->toBeSame(0);
+    expect($file->path()->parent()->compare($dir->toString()))->toBeSame(0);
   }
 
   public function provideTemporaryData(): Container<(string, Filesystem\Path)> {
@@ -125,7 +126,7 @@ class FileTest extends HackTest {
 
   public async function testCreateFailIfThereIsNoParentFolder(
   ): Awaitable<void> {
-    $file = new Filesystem\File('/foo.hack', false);
+    $file = new Filesystem\File(Filesystem\Path::create('/foo.hack'), false);
     $ret = await $file->create();
     expect($ret)->toBeFalse();
   }
@@ -133,7 +134,7 @@ class FileTest extends HackTest {
   public async function testCreateCreatesTheParentFolderIfItDoesnExist(
   ): Awaitable<void> {
     $dir = static::createPath();
-    $path = Filesystem\Path::create($dir.'/foo.hack');
+    $path = Filesystem\Path::create($dir->toString().'/foo.hack');
     expect($dir->exists())->toBeFalse();
     expect($path->exists())->toBeFalse();
     $file = new Filesystem\File($path, false);
@@ -246,7 +247,10 @@ class FileTest extends HackTest {
 
   public async function testMd5(): Awaitable<void> {
     $tmp = static::temporaryFolder();
-    $file = new Filesystem\File($tmp->path()->toString().'/foo.hack', true);
+    $file = new Filesystem\File(
+      Filesystem\Path::create($tmp->path()->toString().'/foo.hack'),
+      true,
+    );
 
     await $file->write('namespace Tmp\Foo;'."\n\n");
     await $file->append('<<__EntryPoint>>'."\n");
@@ -260,7 +264,7 @@ class FileTest extends HackTest {
 
   public async function testMd5Raw(): Awaitable<void> {
     $tmp = static::temporaryFolder();
-    $file = new Filesystem\File($tmp->path()->toString().'/foo.hack', true);
+    $file = new Filesystem\File(Filesystem\Path::create($tmp->path()->toString().'/foo.hack'), true);
 
     await $file->write('namespace Tmp\Foo;'."\n\n");
     await $file->append('<<__EntryPoint>>'."\n");
@@ -269,7 +273,7 @@ class FileTest extends HackTest {
     await $file->append('}'."\n");
     $hash = $file->md5(true);
     expect(Str\length($hash))->toBeSame(16);
-    expect(\bin2hex($hash))->toBeSame('c934dc050854790967503f84a39742c1');
+    expect(Hex\encode($hash))->toBeSame('c934dc050854790967503f84a39742c1');
   }
 
   <<DataProvider('provideMissingNodes')>>

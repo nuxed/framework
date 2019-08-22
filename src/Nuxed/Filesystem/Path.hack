@@ -2,11 +2,12 @@ namespace Nuxed\Filesystem;
 
 use namespace HH\Lib\{C, Str, Vec};
 use namespace HH\Lib\Experimental\Filesystem;
+use namespace Nuxed\Util;
 
 /**
  * Provides convenience functions for inflecting notation paths and file system paths.
  */
-final class Path implements \Stringish {
+final class Path implements Util\Stringable {
   /**
    * Directory separator.
    */
@@ -20,25 +21,13 @@ final class Path implements \Stringish {
   public function __construct(private Filesystem\Path $path) {
   }
 
-  public static function create(\Stringish $path): Path {
-    if ($path is Path) {
-      return $path;
-    }
-
-    if ($path is Filesystem\Path) {
-      return new self($path);
-    }
-
-    $path = static::standard((string)$path, false);
+  public static function create(string $path): Path {
+    $path = static::standard($path, false);
     return new self(new Filesystem\Path($path));
   }
 
   public function toString(): string {
     return $this->path->toString();
-  }
-
-  public function __toString(): string {
-    return $this->toString();
   }
 
   /**
@@ -239,8 +228,8 @@ final class Path implements \Stringish {
     return $this->path->getParts();
   }
 
-  public function compare(\Stringish $other): int {
-    $other = static::standard((string)$other, false);
+  public function compare(string $other): int {
+    $other = static::standard($other, false);
     $other = static::normalize($other) ?? $other;
     if (Str\ends_with($other, '/')) {
       $other = Str\slice($other, 0, Str\length($other) - 1);

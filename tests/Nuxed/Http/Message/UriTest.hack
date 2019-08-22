@@ -20,7 +20,7 @@ class UriTest extends HackTest {
     expect($uri->getPath())->toBeSame('/path/123');
     expect($uri->getQuery())->toBeSame('q=abc');
     expect($uri->getFragment())->toBeSame('test');
-    expect((string)$uri)->toBeSame(
+    expect($uri->toString())->toBeSame(
       'https://user:pass@example.com:8080/path/123?q=abc#test',
     );
   }
@@ -42,7 +42,7 @@ class UriTest extends HackTest {
     expect($uri->getPath())->toBeSame('/path/123');
     expect($uri->getQuery())->toBeSame('q=abc');
     expect($uri->getFragment())->toBeSame('test');
-    expect((string)$uri)->toBeSame(
+    expect($uri->toString())->toBeSame(
       'https://user:pass@example.com:8080/path/123?q=abc#test',
     );
   }
@@ -50,7 +50,7 @@ class UriTest extends HackTest {
   <<DataProvider('getValidUris')>>
   public function testValidUrisStayValid(string $input): void {
     $uri = new Message\Uri($input);
-    expect((string)$uri)->toBeSame($input);
+    expect($uri->toString())->toBeSame($input);
   }
 
   public function getValidUris(): Container<(string)> {
@@ -137,7 +137,7 @@ class UriTest extends HackTest {
     expect($uri->getPath())->toBeSame('/0');
     expect($uri->getQuery())->toBeSame('0');
     expect($uri->getFragment())->toBeSame('0');
-    expect((string)$uri)->toBeSame('0://0:0@0/0?0#0');
+    expect($uri->toString())->toBeSame('0://0:0@0/0?0#0');
   }
 
   public function testCanConstructFalseyUriParts(): void {
@@ -155,7 +155,7 @@ class UriTest extends HackTest {
     expect($uri->getPath())->toBeSame('/0');
     expect($uri->getQuery())->toBeSame('0');
     expect($uri->getFragment())->toBeSame('0');
-    expect((string)$uri)->toBeSame('0://0:0@0/0?0#0');
+    expect($uri->toString())->toBeSame('0://0:0@0/0?0#0');
   }
 
   public function getResolveTestCases(): Container<(string, string, string)> {
@@ -221,19 +221,19 @@ class UriTest extends HackTest {
   public function testSchemeIsNormalizedToLowercase(): void {
     $uri = new Message\Uri('HTTP://example.com');
     expect($uri->getScheme())->toBeSame('http');
-    expect((string)$uri)->toBeSame('http://example.com');
+    expect($uri->toString())->toBeSame('http://example.com');
     $uri = (new Message\Uri('//example.com'))->withScheme('HTTP');
     expect($uri->getScheme())->toBeSame('http');
-    expect((string)$uri)->toBeSame('http://example.com');
+    expect($uri->toString())->toBeSame('http://example.com');
   }
 
   public function testHostIsNormalizedToLowercase(): void {
     $uri = new Message\Uri('//eXaMpLe.CoM');
     expect($uri->getHost())->toBeSame('example.com');
-    expect((string)$uri)->toBeSame('//example.com');
+    expect($uri->toString())->toBeSame('//example.com');
     $uri = (new Message\Uri())->withHost('eXaMpLe.CoM');
     expect($uri->getHost())->toBeSame('example.com');
-    expect((string)$uri)->toBeSame('//example.com');
+    expect($uri->toString())->toBeSame('//example.com');
   }
 
   public function testPortIsNullIfStandardPortForScheme(): void {
@@ -270,7 +270,7 @@ class UriTest extends HackTest {
   public function testPortCanBeRemoved(): void {
     $uri = (new Message\Uri('http://example.com:8080'))->withPort(null);
     expect($uri->getPort())->toBeNull();
-    expect((string)$uri)->toBeSame('http://example.com');
+    expect($uri->toString())->toBeSame('http://example.com');
   }
 
   public function testAuthorityWithUserInfoButWithoutHost(): void {
@@ -354,14 +354,14 @@ class UriTest extends HackTest {
     expect($uri->getPath())->toBeSame($path);
     expect($uri->getQuery())->toBeSame($query);
     expect($uri->getFragment())->toBeSame($fragment);
-    expect((string)$uri)->toBeSame($output);
+    expect($uri->toString())->toBeSame($output);
   }
 
   public function testWithPathEncodesProperly(): void {
     $uri = (new Message\Uri())->withPath('/baz?#€/b%61r');
     // Query and fragment delimiters and multibyte chars are encoded.
     expect($uri->getPath())->toBeSame('/baz%3F%23%E2%82%AC/b%61r');
-    expect((string)$uri)->toBeSame('/baz%3F%23%E2%82%AC/b%61r');
+    expect($uri->toString())->toBeSame('/baz%3F%23%E2%82%AC/b%61r');
   }
 
   public function testWithQueryEncodesProperly(): void {
@@ -369,7 +369,7 @@ class UriTest extends HackTest {
     // A query starting with a "?" is valid and must not be magically removed. Otherwise it would be impossible to
     // construct such an URI. Also the "?" and "/" does not need to be encoded in the query.
     expect($uri->getQuery())->toBeSame('?=%23&%E2%82%AC=/&b%61r');
-    expect((string)$uri)->toBeSame('??=%23&%E2%82%AC=/&b%61r');
+    expect($uri->toString())->toBeSame('??=%23&%E2%82%AC=/&b%61r');
   }
 
   public function testWithFragmentEncodesProperly(): void {
@@ -377,13 +377,13 @@ class UriTest extends HackTest {
     // A fragment starting with a "#" is valid and must not be magically removed. Otherwise it would be impossible to
     // construct such an URI. Also the "?" and "/" does not need to be encoded in the fragment.
     expect($uri->getFragment())->toBeSame('%23%E2%82%AC?/b%61r');
-    expect((string)$uri)->toBeSame('#%23%E2%82%AC?/b%61r');
+    expect($uri->toString())->toBeSame('#%23%E2%82%AC?/b%61r');
   }
 
   public function testAllowsForRelativeUri(): void {
     $uri = (new Message\Uri())->withPath('foo');
     expect($uri->getPath())->toBeSame('foo');
-    expect((string)$uri)->toBeSame('foo');
+    expect($uri->toString())->toBeSame('foo');
   }
 
   public function testAddsSlashForRelativeUriStringWithHost(): void {
@@ -392,7 +392,7 @@ class UriTest extends HackTest {
     $uri = (new Message\Uri())->withPath('foo')->withHost('example.com');
     expect($uri->getPath())->toBeSame('foo');
     // concatenating a relative path with a host doesn't work: "//example.comfoo" would be wrong
-    expect((string)$uri)->toBeSame('//example.com/foo');
+    expect($uri->toString())->toBeSame('//example.com/foo');
   }
 
   public function testRemoveExtraSlashesWihoutHost(): void {
@@ -401,7 +401,7 @@ class UriTest extends HackTest {
     $uri = (new Message\Uri())->withPath('//foo');
     expect($uri->getPath())->toBeSame('//foo');
     // URI "//foo" would be interpreted as network reference and thus change the original path to the host
-    expect((string)$uri)->toBeSame('/foo');
+    expect($uri->toString())->toBeSame('/foo');
   }
 
   public function testDefaultReturnValuesOfGetters(): void {

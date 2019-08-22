@@ -33,7 +33,7 @@ final class TranslationReader implements ITranslationReader {
     Translation\MessageCatalogue $catalogue,
   ): void {
     try {
-      $folder = Filesystem\Node::load($directory) as Filesystem\Folder;
+      $folder = Filesystem\Node::load(Filesystem\Path::create($directory)) as Filesystem\Folder;
     } catch (\Throwable $e) {
       return;
     }

@@ -19,11 +19,11 @@ abstract class Node {
    * Initialize the node path. If the node doesn't exist and `$create` is true, create it.
    */
   public function __construct(
-    \Stringish $path,
+    Path $path,
     bool $create = false,
     int $mode = 0755,
   ) {
-    $this->path = $this->normalizePath(Path::create($path));
+    $this->path = $this->normalizePath($path);
     $this->reset($this->path);
     if ($create && !$this->path->exists()) {
       Asio\join($this->create($mode));
@@ -125,8 +125,7 @@ abstract class Node {
   /**
    * Helper method for deleting a file or folder.
    */
-  public static async function destroy(\Stringish $path): Awaitable<bool> {
-    $path = Path::create($path);
+  public static async function destroy(Path $path): Awaitable<bool> {
     if (!$path->exists()) {
       throw new Exception\MissingNodeException(
         Str\format('Node (%s) doesn\'t exist.', $path->toString()),
@@ -182,8 +181,7 @@ abstract class Node {
   /**
    * Attempt to load a file or folder object at a target location.
    */
-  final public static function load(\Stringish $path): Node {
-    $path = Path::create($path);
+  final public static function load(Path $path): Node {
     if (!$path->exists()) {
       throw new Exception\MissingNodeException(
         Str\format('Node (%s) doesn\'t exist.', $path->toString()),

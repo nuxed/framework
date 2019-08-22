@@ -8,6 +8,7 @@ use namespace HH\Lib\Str;
  * Load a .env file into the current environment.
  */
 async function load(string $file, bool $override = false): Awaitable<void> {
+  $file = Filesystem\Path::create($file);
   $file = new Filesystem\File($file, false);
   $lines = await $file->lines();
   $variables = vec[];

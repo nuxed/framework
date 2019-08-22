@@ -9,7 +9,7 @@ class FilesystemStore extends AbstractStore {
   protected Filesystem\Folder $folder;
 
   public function __construct(
-    string $cache_dir,
+    Filesystem\Path $cache_dir,
     string $namespace = '',
     int $defaultTtl = 0,
     protected Serializer\ISerializer $serializer =
