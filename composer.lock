@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d3ff8ffc5173a6ac1fa6e635123318ed",
+    "content-hash": "d64e38da63f2f56810c3c8e7ef33942e",
     "packages": [
         {
             "name": "azjezz/http-normalizer",
@@ -159,16 +159,16 @@
         },
         {
             "name": "facebook/xhp-lib",
-            "version": "v2.10.0",
+            "version": "v2.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hhvm/xhp-lib.git",
-                "reference": "c718fe4976e7d4bbd7563a643f90558dbfb7714b"
+                "reference": "f629af6724f191a8d5eb677a8245175b9ab74c18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hhvm/xhp-lib/zipball/c718fe4976e7d4bbd7563a643f90558dbfb7714b",
-                "reference": "c718fe4976e7d4bbd7563a643f90558dbfb7714b",
+                "url": "https://api.github.com/repos/hhvm/xhp-lib/zipball/f629af6724f191a8d5eb677a8245175b9ab74c18",
+                "reference": "f629af6724f191a8d5eb677a8245175b9ab74c18",
                 "shasum": ""
             },
             "require": {
@@ -198,7 +198,7 @@
                 "hhvm",
                 "xhp"
             ],
-            "time": "2019-07-15T21:04:03+00:00"
+            "time": "2019-08-19T17:09:21+00:00"
         },
         {
             "name": "hhvm/hhvm-autoload",
