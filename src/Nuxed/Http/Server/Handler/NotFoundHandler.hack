@@ -6,6 +6,6 @@ class NotFoundHandler implements Server\IHandler {
   public async function handle(
     Message\ServerRequest $_request,
   ): Awaitable<Message\Response> {
-    throw new Server\Exception\NotFoundException();
+    throw new Server\Exception\ServerException(404, dict[]);
   }
 }
