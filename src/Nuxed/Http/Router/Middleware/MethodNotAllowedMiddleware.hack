@@ -27,7 +27,7 @@ class MethodNotAllowedMiddleware implements Server\IMiddleware {
     }
 
     return Message\response()
-      ->withStatus(Message\StatusCode::STATUS_METHOD_NOT_ALLOWED)
+      ->withStatus(Message\StatusCode::METHOD_NOT_ALLOWED)
       ->withHeader('Allow', $routeResult->getAllowedMethods() as nonnull);
   }
 }
