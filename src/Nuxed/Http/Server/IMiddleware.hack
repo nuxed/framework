@@ -14,6 +14,6 @@ interface IMiddleware {
    */
   public function process(
     Message\ServerRequest $request,
-    IRequestHandler $handler,
+    IHandler $handler,
   ): Awaitable<Message\Response>;
 }

@@ -15,7 +15,7 @@ final class PathMiddlewareDecorator implements Server\IMiddleware {
 
   public async function process(
     Message\ServerRequest $request,
-    Server\IRequestHandler $handler,
+    Server\IHandler $handler,
   ): Awaitable<Message\Response> {
     $path = $request->getUri()->getPath();
     $path = $path === '' ? '/' : $path;
@@ -82,15 +82,15 @@ final class PathMiddlewareDecorator implements Server\IMiddleware {
   }
 
   private function prepareHandlerForOriginalRequest(
-    Server\IRequestHandler $handler,
-  ): Server\IRequestHandler {
+    Server\IHandler $handler,
+  ): Server\IHandler {
     $callable = async ($request) ==> {
       $uri = $request->getUri();
       $uri = $uri->withPath($this->prefix.$uri->getPath());
       return await $handler->handle($request->withUri($uri));
     };
 
-    return new Server\RequestHandler\CallableRequestHandlerDecorator($callable);
+    return new Server\Handler\CallableHandlerDecorator($callable);
   }
 
   /**

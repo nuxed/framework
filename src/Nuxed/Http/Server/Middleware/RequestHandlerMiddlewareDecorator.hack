@@ -13,9 +13,9 @@ use namespace Nuxed\Http\{Message, Server};
  * they may be piped or routed to. When processed, they delegate handling to the
  * decorated handler, which will return a response.
  */
-final class RequestHandlerMiddlewareDecorator
-  implements Server\IMiddleware, Server\IRequestHandler {
-  public function __construct(private Server\IRequestHandler $handler) {}
+final class HandlerMiddlewareDecorator
+  implements Server\IMiddleware, Server\IHandler {
+  public function __construct(private Server\IHandler $handler) {}
 
   /**
    * Proxies to decorated handler to handle the request.
@@ -31,7 +31,7 @@ final class RequestHandlerMiddlewareDecorator
    */
   public function process(
     Message\ServerRequest $request,
-    Server\IRequestHandler $_,
+    Server\IHandler $_,
   ): Awaitable<Message\Response> {
     return $this->handler->handle($request);
   }

@@ -11,7 +11,7 @@ final class InvalidMiddlewareException
       'Middleware "%s" is neither a string service name, a "%s" instance, or a "%s" instance.',
       \is_object($middleware) ? \get_class($middleware) : \gettype($middleware),
       Server\IMiddleware::class,
-      Server\IRequestHandler::class,
+      Server\IHandler::class,
     ));
   }
 }

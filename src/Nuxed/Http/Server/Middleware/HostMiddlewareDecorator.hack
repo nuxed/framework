@@ -11,7 +11,7 @@ class HostMiddlewareDecorator implements Server\IMiddleware {
 
   public async function process(
     Message\ServerRequest $request,
-    Server\IRequestHandler $handler,
+    Server\IHandler $handler,
   ): Awaitable<Message\Response> {
     $host = $request->getUri()->getHost();
 

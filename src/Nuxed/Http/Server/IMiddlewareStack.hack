@@ -14,7 +14,7 @@ namespace Nuxed\Http\Server;
  *
  * @see https://github.com/senchalabs/connect
  */
-interface IMiddlewareStack extends IRequestHandler, IMiddleware {
+interface IMiddlewareStack extends IHandler, IMiddleware {
   /**
    * Attach middleware to the stack.
    */

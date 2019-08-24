@@ -16,7 +16,7 @@ use namespace Nuxed\Http\{Message, Router, Server};
 class MethodNotAllowedMiddleware implements Server\IMiddleware {
   public async function process(
     Message\ServerRequest $request,
-    Server\IRequestHandler $handler,
+    Server\IHandler $handler,
   ): Awaitable<Message\Response> {
     $routeResult = $request->getAttribute(Router\RouteResult::class);
 

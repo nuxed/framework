@@ -1,6 +1,6 @@
 namespace Nuxed\Http\Session;
 
-use type Nuxed\Http\Server\{IMiddleware, IRequestHandler};
+use type Nuxed\Http\Server\{IHandler, IMiddleware};
 use type Nuxed\Http\Message\{Response, ServerRequest};
 
 class SessionMiddleware implements IMiddleware {
@@ -10,7 +10,7 @@ class SessionMiddleware implements IMiddleware {
 
   public async function process(
     ServerRequest $request,
-    IRequestHandler $handler,
+    IHandler $handler,
   ): Awaitable<Response> {
     $session = await $this->persistence->initialize($request);
     $request = $request->withSession($session);

@@ -19,7 +19,7 @@ class RouteMiddleware implements Server\IMiddleware {
 
   public function process(
     Message\ServerRequest $request,
-    Server\IRequestHandler $handler,
+    Server\IHandler $handler,
   ): Awaitable<Message\Response> {
     $result = $this->matcher->match($request);
 

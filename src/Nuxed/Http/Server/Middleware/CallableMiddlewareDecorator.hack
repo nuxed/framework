@@ -7,7 +7,7 @@ final class CallableMiddlewareDecorator implements Server\IMiddleware {
 
   public function process(
     Message\ServerRequest $request,
-    Server\IRequestHandler $handler,
+    Server\IHandler $handler,
   ): Awaitable<Message\Response> {
     $fun = $this->middleware;
     return $fun($request, $handler);

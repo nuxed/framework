@@ -7,7 +7,7 @@ final class EmptyStackException
   extends \OutOfBoundsException
   implements IException {
   public static function forClass(
-    classname<Server\IRequestHandler> $class,
+    classname<Server\IHandler> $class,
   ): this {
     return new static(Str\format(
       '%s cannot handle request; no middleware available to process the request.',

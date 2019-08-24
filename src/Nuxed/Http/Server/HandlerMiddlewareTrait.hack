@@ -2,12 +2,12 @@ namespace Nuxed\Http\Server;
 
 use namespace Nuxed\Http\Message;
 
-trait RequestHandlerMiddlewareTrait implements IMiddleware {
-  require implements IRequestHandler;
+trait HandlerMiddlewareTrait implements IMiddleware {
+  require implements IHandler;
 
   public function process(
     Message\ServerRequest $request,
-    IRequestHandler $_handler,
+    IHandler $_handler,
   ): Awaitable<Message\Response> {
     return $this->handle($request);
   }

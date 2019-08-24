@@ -1,10 +1,10 @@
-namespace Nuxed\Http\Server\RequestHandler;
+namespace Nuxed\Http\Server\Handler;
 
 use namespace Nuxed\Http\{Message, Server};
 
-final class CallableRequestHandlerDecorator implements Server\IRequestHandler {
+final class CallableHandlerDecorator implements Server\IHandler {
   public function __construct(
-    private Server\CallableRequestHandler $callback,
+    private Server\CallableHandler $callback,
   ) {}
 
   public function handle(

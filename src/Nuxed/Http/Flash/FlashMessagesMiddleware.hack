@@ -9,7 +9,7 @@ final class FlashMessagesMiddleware implements Server\IMiddleware {
 
   public async function process(
     Message\ServerRequest $request,
-    Server\IRequestHandler $handler,
+    Server\IHandler $handler,
   ): Awaitable<Message\Response> {
     $session = $request->getSession();
     $flash = FlashMessages::create($session, $this->key);

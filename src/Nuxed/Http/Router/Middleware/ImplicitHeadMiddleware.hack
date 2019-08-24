@@ -44,7 +44,7 @@ class ImplicitHeadMiddleware implements Server\IMiddleware {
    */
   public async function process(
     Message\ServerRequest $request,
-    Server\IRequestHandler $handler,
+    Server\IHandler $handler,
   ): Awaitable<Message\Response> {
     if ($request->getMethod() !== Message\RequestMethod::METHOD_HEAD) {
       return await $handler->handle($request);

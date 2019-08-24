@@ -55,9 +55,9 @@ final class MiddlewareStack implements IMiddlewareStack {
    */
   public async function process(
     ServerRequest $request,
-    IRequestHandler $handler,
+    IHandler $handler,
   ): Awaitable<Response> {
-    $next = new RequestHandler\NextMiddlewareProcessor($this->stack, $handler);
+    $next = new Handler\NextMiddlewareProcessor($this->stack, $handler);
     return await $next->handle($request);
   }
 }

@@ -53,21 +53,21 @@ function lm(LazyMiddleware $factory): IMiddleware {
 }
 
 /**
- * Callable Request Handler Decorator.
+ * Callable Handler Decorator.
  *
- * @see RequestHandler\CallableRequestHandlerDecorator
+ * @see Handler\CallableHandlerDecorator
  * @see cm
  */
-function ch(CallableRequestHandler $handler): IRequestHandler {
-  return new RequestHandler\CallableRequestHandlerDecorator($handler);
+function ch(CallableHandler $handler): IHandler {
+  return new Handler\CallableHandlerDecorator($handler);
 }
 
 /**
- * Double Pass Request Handler Decorator.
+ * Double Pass Handler Decorator.
  *
  * @see dm
  */
-function dh(DoublePassRequestHandler $handler): IRequestHandler {
+function dh(DoublePassHandler $handler): IHandler {
   return ch(($request) ==> {
     $response = new Message\Response();
     return $handler($request, $response);
@@ -75,9 +75,9 @@ function dh(DoublePassRequestHandler $handler): IRequestHandler {
 }
 
 /**
- * Lazy Request Handler Decorator.
+ * Lazy Handler Decorator.
  */
-function lh(LazyRequestHandler $factory): IRequestHandler {
+function lh(LazyHandler $factory): IHandler {
   return ch(($request) ==> {
     return $factory()
       |> $$->handle($request);
@@ -85,7 +85,7 @@ function lh(LazyRequestHandler $factory): IRequestHandler {
 }
 
 /**
- * Request Handler Middleware Decorator.
+ * Handler Middleware Decorator.
  *
  * Decorate a request handler as middleware.
  *
@@ -97,12 +97,12 @@ function lh(LazyRequestHandler $factory): IRequestHandler {
  * they may be piped or routed to. When processed, they delegate handling to the
  * decorated handler, which will return a response.
  *
- * @see Middleware\RequestHandlerMiddlewareDecorator
+ * @see Middleware\HandlerMiddlewareDecorator
  */
 function hm(
-  IRequestHandler $handler,
-): Middleware\RequestHandlerMiddlewareDecorator {
-  return new Middleware\RequestHandlerMiddlewareDecorator($handler);
+  IHandler $handler,
+): Middleware\HandlerMiddlewareDecorator {
+  return new Middleware\HandlerMiddlewareDecorator($handler);
 }
 
 function host(string $host, IMiddleware $middleware): IMiddleware {

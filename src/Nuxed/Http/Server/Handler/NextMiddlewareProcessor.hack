@@ -1,13 +1,13 @@
-namespace Nuxed\Http\Server\RequestHandler;
+namespace Nuxed\Http\Server\Handler;
 
 use namespace Nuxed\Http\{Message, Server};
 
-class NextMiddlewareProcessor implements Server\IRequestHandler {
+class NextMiddlewareProcessor implements Server\IHandler {
   private \SplPriorityQueue<Server\IMiddleware> $queue;
 
   public function __construct(
     \SplPriorityQueue<Server\IMiddleware> $queue,
-    private Server\IRequestHandler $handler,
+    private Server\IHandler $handler,
   ) {
     $this->queue = clone $queue;
   }

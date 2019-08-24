@@ -7,7 +7,7 @@ class ErrorMiddleware implements Server\IMiddleware {
 
   public async function process(
     Message\ServerRequest $request,
-    Server\IRequestHandler $handler,
+    Server\IHandler $handler,
   ): Awaitable<Message\Response> {
     try {
       return await $handler->handle($request);
