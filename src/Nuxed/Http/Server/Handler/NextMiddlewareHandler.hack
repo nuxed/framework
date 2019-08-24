@@ -2,7 +2,7 @@ namespace Nuxed\Http\Server\Handler;
 
 use namespace Nuxed\Http\{Message, Server};
 
-class NextMiddlewareProcessor implements Server\IHandler {
+class NextMiddlewareHandler implements Server\IHandler {
   private \SplPriorityQueue<Server\IMiddleware> $queue;
 
   public function __construct(

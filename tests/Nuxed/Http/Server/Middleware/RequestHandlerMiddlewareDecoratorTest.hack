@@ -4,21 +4,21 @@ use namespace Nuxed\Http\Server;
 use type Facebook\HackTest\HackTest;
 use function Facebook\FBExpect\expect;
 
-class RequestHandlerMiddlewareDecoratorTest extends HackTest {
+class HandlerMiddlewareDecoratorTest extends HackTest {
   use RequestFactoryTestTrait;
 
-  public async function testRequestHandlerMiddleware(): Awaitable<void> {
+  public async function testHandlerMiddleware(): Awaitable<void> {
     $handler = Server\dh(async ($request, $resposne) ==> {
       await $resposne->getBody()->writeAsync('foo');
       return $resposne;
     });
 
-    $middleware = new Server\Middleware\RequestHandlerMiddlewareDecorator(
+    $middleware = new Server\Middleware\HandlerMiddlewareDecorator(
       $handler,
     );
 
     expect($middleware)->toBeInstanceOf(Server\IMiddleware::class);
-    expect($middleware)->toBeInstanceOf(Server\IRequestHandler::class);
+    expect($middleware)->toBeInstanceOf(Server\IHandler::class);
 
     $response = await $middleware->process(
       $this->request('/'),
